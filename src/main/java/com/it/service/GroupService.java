@@ -1,17 +1,16 @@
-//打卡任务类
 package com.it.service;
 
-public class TaskService {
+public class GroupService {
     public void setName(){
 
     }
-    public void setQRcode(){
+    public void setIntroduction(){
 
     }
-    public void setBeginTime(){
+    public void addMember(){
 
     }
-    public void setEndTime(){
+    public void deleteMember(){
 
     }
     public void addYes(){
@@ -24,9 +23,6 @@ public class TaskService {
 
     }
     public void deleteNo(){
-
-    }
-    public void finish(User user){
 
     }
 }
