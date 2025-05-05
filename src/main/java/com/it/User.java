@@ -35,13 +35,13 @@ public class User {
     public void setId(String id) {
         this.id = id;
     }
-    public void setName(String userName){
-        this.name = userName;
+    public void setName(String user_name){
+        this.name = user_name;
     }
     public void setPassword(String password){
         this.password = password;
     }
-    public void setPhoneNumber(){
+    public void setPhoneNumber(String phone_number){
         this.phone_number = phone_number;
     }
     public void setFace(){

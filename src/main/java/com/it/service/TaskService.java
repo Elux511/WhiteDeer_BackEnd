@@ -17,23 +17,23 @@ public class TaskService {
     public void setQRcode(){
 
     }
-    public void setBeginTime(LocalTime beginTime){
-        task.setBeginTime(beginTime);
+    public void setBeginTime(LocalTime begin_time){
+        task.setBeginTime(begin_time);
     }
-    public void setEndTime(LocalTime endTime){
-        task.setEndTime(endTime);
+    public void setEndTime(LocalTime end_time){
+        task.setEndTime(end_time);
     }
-    public void addYes(Task task){
-        task.addYes(task.getId());
+    public  void addYes(User user){
+        task.addYes(user.getId());
     }
-    public void deleteYes(Task task){
-        task.deleteYes(task.getId());
+    public void deleteYes(User user){
+        task.deleteYes(user.getId());
     }
-    public void addNo(Task task){
-        task.addNo(task.getId());
+    public void addNo(User user){
+        task.addNo(user.getId());
     }
-    public void deleteNo(Task task){
-        task.deleteNo(task.getId());
+    public void deleteNo(User user){
+        task.deleteNo(user.getId());
     }
     public void finish(User user){
         user.addYes(user.getId());
