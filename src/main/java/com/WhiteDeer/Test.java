@@ -1,6 +1,6 @@
-package com.it;
+package com.WhiteDeer;
 
-public class Main {
+public class Test {
     public static void main(String[] args) {
 
     }
