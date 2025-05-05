@@ -14,11 +14,11 @@ public class GroupService {
     public void setGroup(Group group){
         this.group = group;
     }
-    public void setName(){
-
+    public void setName(String name){
+        group.setName(name);
     }
-    public void setIntroduction(){
-
+    public void setIntroduction(String introduction){
+        group.setIntroduction(introduction);
     }
     public void addMember(User user){
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
