@@ -1,8 +1,14 @@
 package com.it.service;
 
-public class UserService {
-    public void setName(){
+import com.it.User;
 
+public class UserService {
+    User user;
+    public void setUser(User user){
+        this.user = user;
+    }
+    public void setName(String userName){
+        user.setName(userName);
     }
     public void setPassword(){
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="User" class="com.it.User"/>
+    <bean id="Group" class="com.it.Group"/>
+    <bean id="Task" class="com.it.Task"/>
+    <bean id="GroupMember" class="com.it.GroupMember"/>
+
+    <bean id="UserService" class="com.it.service.UserService" autowire="byType"/>
+    <bean id="GroupService" class="com.it.service.GroupService" autowire="byType"/>
+    <bean id="TaskService" class="com.it.service.TaskService" autowire="byType"/>
+</beans>
