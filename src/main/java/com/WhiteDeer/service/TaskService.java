@@ -4,6 +4,7 @@ package com.WhiteDeer.service;
 import com.WhiteDeer.Task;
 import com.WhiteDeer.User;
 
+
 import java.time.LocalTime;
 
 public class TaskService {
@@ -35,8 +36,21 @@ public class TaskService {
     public void deleteNo(User user){
         task.deleteNo(user.getId());
     }
+    public void checkIn(User user){
+        switch (task.getMethod())
+        {
+        case faceRecognition:
+
+            break;
+        case geoFencing:
+            break;
+        case both:
+            break;
+        }
+    }
     public void finish(User user){
         user.addYes(user.getId());
         user.deleteNo(user.getId());
     }
+
 }

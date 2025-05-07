@@ -4,7 +4,7 @@ import java.time.LocalTime;
 import java.util.Vector;
 
 public class Task {
-    enum CheckInMethod{
+    public enum CheckInMethod{
         faceRecognition,
         geoFencing,
         both
