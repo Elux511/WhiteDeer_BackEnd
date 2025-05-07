@@ -1,9 +1,5 @@
-package com.it;
+package com.WhiteDeer;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.time.LocalTime;
 import java.util.Vector;
 
 public class Group {
