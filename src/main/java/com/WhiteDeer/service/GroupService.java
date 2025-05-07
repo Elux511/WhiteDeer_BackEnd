@@ -1,9 +1,9 @@
-package com.it.service;
+package com.WhiteDeer.service;
 
-import com.it.Group;
-import com.it.GroupMember;
-import com.it.Task;
-import com.it.User;
+import com.WhiteDeer.Group;
+import com.WhiteDeer.GroupMember;
+import com.WhiteDeer.Task;
+import com.WhiteDeer.User;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
