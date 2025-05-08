@@ -1,15 +1,16 @@
 //package com.example; // 请根据实际包名调整
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "Task")
 public class Task {
-
+    //id自增
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "task_id")
     private String taskId;
 
@@ -44,12 +45,10 @@ public class Task {
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
-
     //Begin_time
     public Timestamp getBeginTime() {
         return beginTime;
     }
-
     public void setBeginTime(Timestamp beginTime) {
         this.beginTime = beginTime;
     }
@@ -57,7 +56,6 @@ public class Task {
     public Timestamp getEndTime() {
         return endTime;
     }
-
     public void setEndTime(Timestamp endTime) {
         this.endTime = endTime;
     }
@@ -65,7 +63,6 @@ public class Task {
     public int getRange() {
         return range;
     }
-
     public void setRange(int range) {
         this.range = range;
     }
@@ -73,7 +70,6 @@ public class Task {
     public BigDecimal getLocation() {
         return location;
     }
-
     public void setLocation(BigDecimal location) {
         this.location = location;
     }
@@ -81,7 +77,6 @@ public class Task {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -89,7 +84,6 @@ public class Task {
     public String getGroup() {
         return group;
     }
-
     public void setGroup(String group) {
         this.group = group;
     }
@@ -97,7 +91,6 @@ public class Task {
     public String getYesUser() {
         return yesUser;
     }
-
     public void setYesUser(String yesUser) {
         this.yesUser = yesUser;
     }
@@ -105,7 +98,6 @@ public class Task {
     public String getNoUser() {
         return noUser;
     }
-
     public void setNoUser(String noUser) {
         this.noUser = noUser;
     }
