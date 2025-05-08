@@ -7,7 +7,7 @@ from PIL import Image
 
 
 #人脸检测模型
-face_detector = cv.CascadeClassifier("C:/Users/19877/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\cv2\data\haarcascade_frontalface_default.xml")
+face_detector = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
 #人脸识别器
 recognizer = cv.face.LBPHFaceRecognizer_create()
 
@@ -16,7 +16,7 @@ recognizer = cv.face.LBPHFaceRecognizer_create()
 #将传入的人脸图片与训练模型中的图片一一对照
 def checkFace(user_id, img_path):
 
-    recognizer.read(r"D:\for_pycharm\myApi\trainer\trainer.yml")
+    recognizer.read(f"trainer/{user_id}_trainer.yml")
     img = cv.imread(img_path)
     PIL_image = Image.open(img_path).convert('L')
     img_numpy = np.array(PIL_image, 'uint8')

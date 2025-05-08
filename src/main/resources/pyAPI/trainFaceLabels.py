@@ -6,7 +6,7 @@ from PIL import Image
 
 
 #人脸检测模型
-face_detector = cv.CascadeClassifier("C:/Users/19877/AppData/Local/Packages/PythonSoftwareFoundation.Python.3.11_qbz5n2kfra8p0\LocalCache\local-packages\Python311\site-packages\cv2\data\haarcascade_frontalface_default.xml")
+face_detector = cv.CascadeClassifier("haarcascade_frontalface_default.xml")
 #人脸识别器
 recognizer = cv.face.LBPHFaceRecognizer_create()
 
@@ -44,7 +44,8 @@ def getImageLabels(user_id, img_path):
 
     #让识别器记录id和对应人脸
     recognizer.train(face_sample,np.array(id))
-    recognizer.write('trainer/trainer.yml')
+    recognizer.write(f"trainer/{user_id}_trainer.yml")
+    print(1)
 
 
 if __name__ == "__main__":
@@ -53,6 +54,6 @@ if __name__ == "__main__":
         print("错误：参数不足")
         sys.exit(1)
 
-    user_id = sys.argv[1]
+    user_id = int(sys.argv[1])
     img_path = sys.argv[2]
     getImageLabels(user_id, img_path)
