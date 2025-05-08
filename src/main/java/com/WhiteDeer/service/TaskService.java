@@ -3,10 +3,15 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.Task;
 import com.WhiteDeer.User;
+import com.WhiteDeer.mapper.dto.TaskDto;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalTime;
-
-public class TaskService {
+@Service
+public class TaskService implements TaskServiceImpl{
     Task task;
     public void setTask(Task task){
         this.task = task;
@@ -39,4 +44,33 @@ public class TaskService {
         user.addYes(user.getId());
         user.deleteNo(user.getId());
     }
+    @Autowired
+    private TaskService taskService;
+    @Override
+    public Task add(TaskDto task){
+        Task task1 = new Task();
+        BeanUtils.copyProperties(task,task1);
+        return taskRepository.save(task1);//插入和修改调用save
+    }
+
+    @Override
+    public Task getTask(TaskDto task){
+        return taskRepository.findById(taskId).orElseThrow(()->{
+            return new IllegalArgumentException("用户不存在");
+        });
+        return null;
+    }
+
+    @Override
+    public Task edit(TaskUto task){
+        Task task1 = new Task();
+        BeanUtils.copyProperties(task,task1);
+        return taskRepository.save(task1);
+    }
+
+    @Override
+    public void delete(Integer taskId){
+        return taskRepository.deleteBYId(taskId);
+    }
+
 }

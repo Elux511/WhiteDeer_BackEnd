@@ -1,6 +1,7 @@
-package com.it.mapper.dto;
+package com.WhiteDeer.mapper.dto;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -8,21 +9,19 @@ import java.sql.Timestamp;
 public class TaskDto {
 
     private String taskId;
-
+    @NotBlank(message="打卡开始时间不能为空")
     private Timestamp beginTime;
-
+    @NotBlank(message="打卡结束时间不能为空")
     private Timestamp endTime;
-
+    @NotBlank(message="打卡范围大小不能为空")
     private int range;
-
+    @NotBlank(message="打卡中心地点不能为空")
     private BigDecimal location;
-
+    @NotBlank(message="打卡名称不能为空")
     private String name;
-
+    @NotBlank(message="打卡组不能为空")
     private String group;
-
     private String yesUser;
-
     private String noUser;
 
     public String getNoUser() {
@@ -88,7 +87,6 @@ public class TaskDto {
         this.taskId = taskId;
     }
 
-
     @Override
     public String toString() {
         return "TaskDto{" +
@@ -103,6 +101,5 @@ public class TaskDto {
                 ", noUser='" + noUser + '\'' +
                 '}';
     }
-
 
 }

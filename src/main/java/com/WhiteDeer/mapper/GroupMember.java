@@ -19,7 +19,7 @@ public class GroupMember {
     @Column(name = "join_time")
     private String joinTime;
 
-    // 以下是各属性的getter和setter方法
+
     public String getGroupMemberId() {
         return groupMemberId;
     }
