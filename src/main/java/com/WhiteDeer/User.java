@@ -10,7 +10,7 @@ public class User {
     private Vector<String> group_set;
     private Vector<String> yes_task_set;
     private Vector<String> no_task_set;
-    //face
+    private String face;
     public String getId() {
         return id;
     }
@@ -32,6 +32,9 @@ public class User {
     public Vector<String> getNo_task_set() {
         return no_task_set;
     }
+    public String getFace() {
+        return face;
+    }
     public void setId(String id) {
         this.id = id;
     }
@@ -44,7 +47,7 @@ public class User {
     public void setPhoneNumber(String phone_number){
         this.phone_number = phone_number;
     }
-    public void setFace(){
+    public void setFace(String face){
 
     }
     public void addGroup(String group_id){

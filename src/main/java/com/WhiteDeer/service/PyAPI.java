@@ -10,6 +10,7 @@ public class PyAPI {
         try {
             //指定使用的python解释器，python文件路径和传入的参数
             ProcessBuilder pb = new ProcessBuilder("python", "trainFaceLabels.py",user_id,img_path);
+            //将工作目录设置在这里，之后（也包括上面的代码）的相对路径均基于此路径，无论是java的还是python的
             pb.directory(new File("src/main/resources/pyAPI"));
             //合并标准错误流到输出
             pb.redirectErrorStream(true);
@@ -31,6 +32,7 @@ public class PyAPI {
         try {
             //指定使用的python解释器，python文件路径和传入的参数
             ProcessBuilder pb = new ProcessBuilder("python", "faceRecognition.py",user_id,img_path);
+            //将工作目录设置在这里，之后（也包括上面的代码）的相对路径均基于此路径，无论是java的还是python的
             pb.directory(new File("src/main/resources/pyAPI"));
             //合并标准错误流到输出
             pb.redirectErrorStream(true);

@@ -16,10 +16,14 @@ public class Task {
     //QRcode
     private LocalTime begin_time;
     private LocalTime end_time;
+    private double longitude;//经度
+    private double latitude;//纬度
+    private double mistake_range;//位置误差
     private CheckInMethod method;
     private Vector<String> yes_user;
     private Vector<String> no_user;
 
+    //getter
     public String getId() {
         return id;
     }
@@ -35,6 +39,15 @@ public class Task {
     public LocalTime getEnd_time() {
         return end_time;
     }
+    public double getLongitude() {
+        return longitude;
+    }
+    public double getLatitude() {
+        return latitude;
+    }
+    public double getMistakeRange() {
+        return mistake_range;
+    }
     public CheckInMethod getMethod() {
         return method;
     }
@@ -44,6 +57,8 @@ public class Task {
     public Vector<String> getNo_user() {
         return no_user;
     }
+
+    //setter
     public void setId(String id) {
         this.id = id;
     }
@@ -58,6 +73,15 @@ public class Task {
     }
     public void setEndTime(LocalTime end_time){
         this.end_time = end_time;
+    }
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+    public void setMistakeRange(double mistake_range) {
+        this.mistake_range = mistake_range;
     }
     public void addYes(String user_id){
         yes_user.add(user_id);
