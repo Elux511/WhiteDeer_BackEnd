@@ -16,7 +16,7 @@ public interface TaskServiceImpl {
      * @param task 打卡任务ID
      * @return
      */
-    Task getTask(TaskDto task);
+    Task getTask(String taskId);
 
     /**
      * 修改打卡任务

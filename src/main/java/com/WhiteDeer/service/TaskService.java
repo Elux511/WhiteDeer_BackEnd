@@ -3,7 +3,9 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.Task;
 import com.WhiteDeer.User;
+import com.WhiteDeer.repository.TaskRepository;
 import com.WhiteDeer.mapper.dto.TaskDto;
+import org.apache.catalina.Store;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalTime;
 @Service
-public class TaskService implements TaskServiceImpl{
+public abstract   class TaskService implements TaskServiceImpl{
     Task task;
     public void setTask(Task task){
         this.task = task;
@@ -46,6 +48,8 @@ public class TaskService implements TaskServiceImpl{
     }
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private TaskRepository taskRepository;
     @Override
     public Task add(TaskDto task){
         Task task1 = new Task();
@@ -55,14 +59,13 @@ public class TaskService implements TaskServiceImpl{
 
     @Override
     public Task getTask(TaskDto task){
-        return taskRepository.findById(taskId).orElseThrow(()->{
+        return taskRepository.findById(Integer.parseInt(task.getTaskId())).orElseThrow(()->{
             return new IllegalArgumentException("用户不存在");
         });
-        return null;
     }
 
     @Override
-    public Task edit(TaskUto task){
+    public Task edit(TaskDto task){
         Task task1 = new Task();
         BeanUtils.copyProperties(task,task1);
         return taskRepository.save(task1);

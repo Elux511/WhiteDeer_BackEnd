@@ -1,15 +1,19 @@
 package com.WhiteDeer.service;
-
+import com.WhiteDeer.mapper.dto.GroupDto;
 import com.WhiteDeer.Group;
 import com.WhiteDeer.GroupMember;
 import com.WhiteDeer.Task;
 import com.WhiteDeer.User;
+import com.WhiteDeer.mapper.dto.TaskDto;
+import org.apache.catalina.Store;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.time.LocalTime;
 
-public class GroupService {
+public class GroupService implements GroupServiceImpl{
     Group group;
     public void setGroup(Group group){
         this.group = group;
@@ -48,4 +52,37 @@ public class GroupService {
     public void deleteNo(Task task){
         group.deleteNo(task.getId());
     }
+
+
+    @Autowired
+    private GroupService groupService;
+    @Override
+    public Group add(GroupDto group){
+        Group group1 = new Group();
+        BeanUtils.copyProperties(group,group1);
+        Store groupRepository;
+        return groupRepository.save(group1);//插入和修改调用save
+    }
+
+    @Override
+    public Group getGroup(GroupDto group){
+        return groupRepository.findById(group.getGroupId()).orElseThrow(()->{
+            return new IllegalArgumentException("用户不存在");
+        });
+        return null;
+    }
+
+    @Override
+    public Group edit(GroupDto group){
+        Group group1 = new Group();
+        BeanUtils.copyProperties(group,group1);
+        return groupRepository.save(group1);
+    }
+
+    @Override
+    public void delete(Integer groupId){
+        return groupRepository.deleteBYId(groupId);
+    }
+
+
 }

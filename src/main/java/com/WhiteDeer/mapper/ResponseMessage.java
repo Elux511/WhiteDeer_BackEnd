@@ -38,4 +38,9 @@ public class ResponseMessage <T>{
         return new ResponseMessage<T>(200, "success", data);
 
     }
+    //成功请求（无参数）
+    public static <T> ResponseMessage<T>success(){
+        return new ResponseMessage<T>(200, "success", data);
+
+    }
 }
