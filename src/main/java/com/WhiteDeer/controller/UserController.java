@@ -1,48 +1,96 @@
 package com.WhiteDeer.controller;
 
-
-import com.WhiteDeer.User;
-import com.WhiteDeer.mapper.dto.UserDto;
+import com.WhiteDeer.entity.User;
 import com.WhiteDeer.mapper.ResponseMessage;
+import com.WhiteDeer.mapper.dto.UserDto;
 import com.WhiteDeer.service.UserService;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.PutExchange;
 
+import java.util.Set;
 
-@RestController//返回对象，直接转化为json文本
-@RequestMapping("/user")
+@RestController
+@RequestMapping("/users")
 public class UserController {
+    private final UserService userService;
+
     @Autowired
-    UserService userService;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
-
-    //增加打卡任务
     @PostMapping
-    public String add(@Validated @RequestBody UserDto user) {
-        User user1=userService.add(user);
-        return ResponseMessage.success(user1);
+    public ResponseMessage createUser(@Validated @RequestBody UserDto userDto) {
+        User user = userService.add(userDto);
+        return ResponseMessage.success(user);
     }
-    //查询打卡任务
+
     @GetMapping("/{userId}")
-    public ResponseMessage get(@PathVariable Integer userId){
-        User userNew=userService.getTask(userId);
-        return ResponseMessage.success(userNew);
+    public ResponseMessage getUser(@PathVariable String userId) {
+        User user = userService.getUser(userId);
+        return ResponseMessage.success(user);
     }
-    //修改
+
     @PutMapping
-    public ResponseMessage edit(@PathVariable Integer userId){
-        User userNew=userService.edit(userId);
-        return ResponseMessage.success(userNew);
+    public ResponseMessage updateUser(@Validated @RequestBody UserDto userDto) {
+        User user = userService.update(userDto);
+        return ResponseMessage.success(user);
     }
-    //删除
+
     @DeleteMapping("/{userId}")
-    public ResponseMessage delete(@PathVariable Integer userId){
+    public ResponseMessage deleteUser(@PathVariable String userId) {
         userService.delete(userId);
         return ResponseMessage.success();
     }
 
+    @PostMapping("/{userId}/groups/{groupId}")
+    public ResponseMessage addUserToGroup(
+            @PathVariable String userId,
+            @PathVariable String groupId) {
+        userService.addUserToGroup(userId, groupId);
+        return ResponseMessage.success();
+    }
+
+    @DeleteMapping("/{userId}/groups/{groupId}")
+    public ResponseMessage removeUserFromGroup(
+            @PathVariable String userId,
+            @PathVariable String groupId) {
+        userService.removeUserFromGroup(userId, groupId);
+        return ResponseMessage.success();
+    }
+
+    @PostMapping("/{userId}/tasks/{taskId}/complete")
+    public ResponseMessage markTaskAsCompleted(
+            @PathVariable String userId,
+            @PathVariable String taskId) {
+        userService.markTaskAsCompleted(userId, taskId);
+        return ResponseMessage.success();
+    }
+
+    @PostMapping("/{userId}/tasks/{taskId}/incomplete")
+    public ResponseMessage markTaskAsNotCompleted(
+            @PathVariable String userId,
+            @PathVariable String taskId) {
+        userService.markTaskAsNotCompleted(userId, taskId);
+        return ResponseMessage.success();
+    }
+
+    @GetMapping("/{userId}/groups")
+    public ResponseMessage getUserGroups(@PathVariable String userId) {
+        Set<String> groups = userService.getUserGroups(userId);
+        return ResponseMessage.success(groups);
+    }
+
+    @GetMapping("/{userId}/completed-tasks")
+    public ResponseMessage getCompletedTasks(@PathVariable String userId) {
+        Set<String> tasks = userService.getCompletedTasks(userId);
+        return ResponseMessage.success(tasks);
+    }
+
+    @GetMapping("/{userId}/incomplete-tasks")
+    public ResponseMessage getNotCompletedTasks(@PathVariable String userId) {
+        Set<String> tasks = userService.getNotCompletedTasks(userId);
+        return ResponseMessage.success(tasks);
+    }
 }

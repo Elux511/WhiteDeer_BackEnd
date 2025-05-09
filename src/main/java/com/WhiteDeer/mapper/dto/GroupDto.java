@@ -1,85 +1,51 @@
 package com.WhiteDeer.mapper.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-import java.math.BigDecimal;
 public class GroupDto {
+    private String id;
 
+    @NotBlank(message = "群组名称不能为空")
+    @Size(min = 2, max = 50, message = "群组名称长度必须在2-50个字符之间")
+    private String name;
 
-    private String groupId;
+    @NotBlank(message = "创建者ID不能为空")
+    private String creatorId;
 
-    private String groupName;
+    @Size(max = 500, message = "群组介绍不能超过500个字符")
+    private String introduction;
 
-    private String groupIntroduction;
-
-    private String memberList;
-
-    private String yesTaskSet;
-
-    private String noTaskSet;
-
-
-    public String getGroupId() {
-        return groupId;
+    // Getters and Setters
+    public String getId() {
+        return id;
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public String getName() {
+        return name;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getGroupIntroduction() {
-        return groupIntroduction;
+    public String getCreatorId() {
+        return creatorId;
     }
 
-    public void setGroupIntroduction(String groupIntroduction) {
-        this.groupIntroduction = groupIntroduction;
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
 
-    public String getMemberList() {
-        return memberList;
+    public String getIntroduction() {
+        return introduction;
     }
 
-    public void setMemberList(String memberList) {
-        this.memberList = memberList;
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
-
-    public String getYesTaskSet() {
-        return yesTaskSet;
-    }
-
-    public void setYesTaskSet(String yesTaskSet) {
-        this.yesTaskSet = yesTaskSet;
-    }
-
-    public String getNoTaskSet() {
-        return noTaskSet;
-    }
-
-    public void setNoTaskSet(String noTaskSet) {
-        this.noTaskSet = noTaskSet;
-    }
-
-
-
-    @Override
-    public String toString() {
-        return "GroupDto{" +
-                "groupId='" + groupId + '\'' +
-                ", groupName='" + groupName + '\'' +
-                ", groupIntroduction='" + groupIntroduction + '\'' +
-                ", memberList='" + memberList + '\'' +
-                ", yesTaskSet='" + yesTaskSet + '\'' +
-                ", noTaskSet='" + noTaskSet + '\'' +
-                '}';
-    }
-
 }

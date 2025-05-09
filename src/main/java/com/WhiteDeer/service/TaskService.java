@@ -1,41 +1,81 @@
-package com.WhiteDeer.controller;
+package com.WhiteDeer.service;
 
-import com.WhiteDeer.Task;
+import com.WhiteDeer.entity.Task;
+import com.WhiteDeer.exception.TaskNotFoundException;
+import com.WhiteDeer.mapper.dto.TaskCheckInDto;
 import com.WhiteDeer.mapper.dto.TaskDto;
-import com.WhiteDeer.mapper.ResponseMessage;
-import com.WhiteDeer.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import com.WhiteDeer.repository.TaskRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@RestController
-@RequestMapping("/task")
+import java.util.Set;
+
+@Service
 public class TaskService {
+    private final TaskRepository taskRepository;
 
-    @Autowired
-    private TaskService taskService;
-
-    @PostMapping
-    public ResponseMessage add(@Validated @RequestBody TaskDto taskDto) {
-        Task task = taskService.add(taskDto);
-        return ResponseMessage.success(task);
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
 
-    @GetMapping("/{taskId}")
-    public ResponseMessage get(@PathVariable Integer taskId) {
-        Task task = taskService.getTask(taskId);
-        return ResponseMessage.success(task);
+    @Transactional
+    public Task add(TaskDto taskDto) {
+        Task task = new Task();
+        BeanUtils.copyProperties(taskDto, task);
+        return taskRepository.save(task);
     }
 
-    @PutMapping
-    public ResponseMessage edit(@Validated @RequestBody TaskDto taskDto) {
-        Task task = taskService.edit(taskDto);
-        return ResponseMessage.success(task);
+    public Task getTask(String taskId) {
+        Task task = taskRepository.findById(taskId);
+        if (task == null) {
+            throw new TaskNotFoundException(taskId);
+        }
+        return task;
     }
 
-    @DeleteMapping("/{taskId}")
-    public ResponseMessage delete(@PathVariable Integer taskId) {
-        taskService.delete(taskId);
-        return ResponseMessage.success();
+    @Transactional
+    public Task edit(TaskDto taskDto) {
+        Task existingTask = getTask(taskDto.getId());
+        BeanUtils.copyProperties(taskDto, existingTask);
+        return taskRepository.save(existingTask);
+    }
+
+    @Transactional
+    public void delete(String taskId) {
+        taskRepository.deleteById(taskId);
+    }
+
+    @Transactional
+    public Task updateCheckInStatus(TaskCheckInDto checkInDto) {
+        Task task = getTask(checkInDto.getTaskId());
+        if (checkInDto.isCompleted()) {
+            taskRepository.addCompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+            taskRepository.removeUncompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+        } else {
+            taskRepository.addUncompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+            taskRepository.removeCompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+        }
+        return getTask(checkInDto.getTaskId());
+    }
+
+    public int[] getCheckInStatistics(String taskId) {
+        Task task = getTask(taskId);
+        return new int[] {
+                task.getCompletedUserIds().size(),
+                task.getUncompletedUserIds().size()
+        };
+    }
+
+    public Set<String> getCompletedUsers(String taskId) {
+        return getTask(taskId).getCompletedUserIds();
+    }
+
+    public Set<String> getUncompletedUsers(String taskId) {
+        return getTask(taskId).getUncompletedUserIds();
+    }
+
+    public boolean checkUserCompletionStatus(String taskId, String userId) {
+        return getTask(taskId).isUserCompleted(userId);
     }
 }

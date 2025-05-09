@@ -1,11 +1,9 @@
-import com.WhiteDeer.GroupMember;
 import com.WhiteDeer.mapper.dto.GroupMemberDto;
 import com.WhiteDeer.mapper.ResponseMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.PutExchange;
 
 import com.WhiteDeer.service.GroupMemberService;
 

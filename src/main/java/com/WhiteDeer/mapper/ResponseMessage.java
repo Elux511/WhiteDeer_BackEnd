@@ -1,12 +1,36 @@
 package com.WhiteDeer.mapper;
 
-public class ResponseMessage <T>{
-    public T getData() {
-        return data;
+public class ResponseMessage {
+    private int code;
+    private String message;
+    private Object data;
+
+    public static ResponseMessage success() {
+        return success(null);
     }
 
-    public void setData(T data) {
-        this.data = data;
+    public static ResponseMessage success(Object data) {
+        ResponseMessage response = new ResponseMessage();
+        response.setCode(200);
+        response.setMessage("操作成功");
+        response.setData(data);
+        return response;
+    }
+
+    public static ResponseMessage error(int code, String message) {
+        ResponseMessage response = new ResponseMessage();
+        response.setCode(code);
+        response.setMessage(message);
+        return response;
+    }
+
+    // Getters and Setters
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
     }
 
     public String getMessage() {
@@ -17,30 +41,11 @@ public class ResponseMessage <T>{
         this.message = message;
     }
 
-    public int getCode() {
-        return code;
+    public Object getData() {
+        return data;
     }
 
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    private int code;
-    private String message;
-    private T data;
-    public ResponseMessage(int code, String message, T data) {
-        this.code = code;
-        this.message = message;
+    public void setData(Object data) {
         this.data = data;
-    }
-  //成功请求
-    public static <T> ResponseMessage<T>success(T data){
-        return new ResponseMessage<T>(200, "success", data);
-
-    }
-    //成功请求（无参数）
-    public static <T> ResponseMessage<T>success(){
-        return new ResponseMessage<T>(200, "success", data);
-
     }
 }
