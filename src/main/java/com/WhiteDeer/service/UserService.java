@@ -1,12 +1,14 @@
 package com.WhiteDeer.service;
 
-import com.WhiteDeer.Group;
-import com.WhiteDeer.GroupMember;
-import com.WhiteDeer.Task;
-import com.WhiteDeer.User;
+import com.WhiteDeer.entity.Group;
+import com.WhiteDeer.entity.GroupMember;
+import com.WhiteDeer.entity.Task;
+import com.WhiteDeer.entity.User;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
+import com.WhiteDeer.mapper.dto.UserDto;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalTime;
 
 public class UserService {
@@ -64,4 +66,34 @@ public class UserService {
         //把团队加进自己所在团队列表
         user.addGroup(group.getId());
     }
+    @Autowired
+    private TaskService userService;
+    @Override
+    public User add(UserDto user){
+        User newuser = new User();
+        BeanUtils.copyProperties(user,newuser);
+        return userRepository.save(newuser);//插入和修改调用save
+    }
+
+
+    @Override
+    public Task getUser(UserDto user){
+        return userRepository.findById(user.getUser_id()).orElseThrow(()->{
+            return new IllegalArgumentException("用户不存在");
+        });
+        return null;
+    }
+
+    @Override
+    public User edit(UserDto user){
+        User user1 = new User();
+        BeanUtils.copyProperties(user,user1);
+        return userRepository.save(user1);
+    }
+
+    @Override
+    public void delete(Integer taskId){
+        return userRepository.deleteBYId(user.getId());
+    }
+
 }

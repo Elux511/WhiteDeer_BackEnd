@@ -3,10 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="User" class="com.WhiteDeer.User"/>
-    <bean id="Group" class="com.WhiteDeer.Group"/>
-    <bean id="Task" class="com.WhiteDeer.Task"/>
-    <bean id="GroupMember" class="com.WhiteDeer.GroupMember"/>
+    <bean id="User" class="com.WhiteDeer.entity.User"/>
+    <bean id="Group" class="com.WhiteDeer.entity.Group"/>
+    <bean id="Task" class="com.WhiteDeer.entity.Task"/>
+    <bean id="GroupMember" class="com.WhiteDeer.entity.GroupMember"/>
 
     <bean id="UserService" class="com.WhiteDeer.service.UserService" autowire="byType"/>
     <bean id="GroupService" class="com.WhiteDeer.service.GroupService" autowire="byType"/>

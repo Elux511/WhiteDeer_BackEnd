@@ -1,5 +1,5 @@
 package com.WhiteDeer.service;
-import com.WhiteDeer.Task;
+import com.WhiteDeer.entity.Task;
 import com.WhiteDeer.mapper.dto.TaskDto;
 
 
@@ -16,7 +16,7 @@ public interface TaskServiceImpl {
      * @param task 打卡任务ID
      * @return
      */
-    Task getTask(TaskDto task);
+    Task getTask(String taskId);
 
     /**
      * 修改打卡任务

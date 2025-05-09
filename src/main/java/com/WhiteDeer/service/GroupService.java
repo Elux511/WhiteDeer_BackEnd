@@ -1,9 +1,9 @@
 package com.WhiteDeer.service;
 
-import com.WhiteDeer.Group;
-import com.WhiteDeer.GroupMember;
-import com.WhiteDeer.Task;
-import com.WhiteDeer.User;
+import com.WhiteDeer.entity.Group;
+import com.WhiteDeer.entity.GroupMember;
+import com.WhiteDeer.entity.Task;
+import com.WhiteDeer.entity.User;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -20,7 +20,6 @@ public class GroupService {
     public void setIntroduction(String introduction){
         group.setIntroduction(introduction);
     }
-    //创建一个group_member并初始化，加入到set中
     public void addMember(User user){
         ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
         GroupMember member = (GroupMember) ctx.getBean("groupMember");
@@ -30,7 +29,6 @@ public class GroupService {
         member.setJoin_time(LocalTime.now());
         group.addMember(member);
     }
-    //遍历group_member
     public void deleteMember(User user){
         for(GroupMember gm : group.getMember_list())
         {

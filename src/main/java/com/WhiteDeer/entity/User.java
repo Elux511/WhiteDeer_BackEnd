@@ -1,4 +1,4 @@
-package com.WhiteDeer;
+package com.WhiteDeer.entity;
 
 import java.util.Vector;
 

@@ -1,10 +1,10 @@
 package com.WhiteDeer.repository;
 
-import com.WhiteDeer.entity.Task;
+import com.WhiteDeer.entity.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TaskRepository extends CrudRepository<Task, Integer> {
+public interface UserRepository extends CrudRepository<User, Integer> {
 
 }
