@@ -62,8 +62,10 @@ public class TaskService {
     }
     //完成打卡任务
     public void finish(User user){
-        user.addYes(user.getId());
-        user.deleteNo(user.getId());
+        //用户的任务列表里对该任务进行增删
+        user.addYes(task.getId());
+        user.deleteNo(task.getId());
+        //任务的用户列表里对该用户进行增删
         task.addYes(user.getId());
         task.deleteNo(user.getId());
     }

@@ -11,6 +11,8 @@ public class User {
     private Vector<String> yes_task_set;
     private Vector<String> no_task_set;
     private String face;
+
+    //getter
     public String getId() {
         return id;
     }
@@ -35,6 +37,8 @@ public class User {
     public String getFace() {
         return face;
     }
+
+    //setter
     public void setId(String id) {
         this.id = id;
     }
