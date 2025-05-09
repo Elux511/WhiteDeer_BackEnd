@@ -1,37 +1,44 @@
 package com.WhiteDeer.controller;
 
-
-import com.WhiteDeer.entity.Sms;
-import com.github.qcloudsms.SmsSingleSender;
-import com.github.qcloudsms.SmsSingleSenderResult;
-import com.github.qcloudsms.httpclient.HTTPException;
-import org.json.JSONException;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
+import com.WhiteDeer.entity.User;
+import com.WhiteDeer.service.SmsService;
+import com.WhiteDeer.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import java.util.Optional;
 
 @RestController
-@RequestMapping(value="/sms")
+@RequestMapping(value = "/sms")
 public class SmsController {
-    @RequestMapping(value="sendcode",method = RequestMethod.POST)
-    public void sms(@RequestBody Sms sms){
-        int appid= 0;//腾讯云服务的id
-        String appkey = "";//腾讯密钥
-        int temletId = 0;//短信模板id
-        String smsSign ="";//短信签名
-        try{
-            String[] params={sms.getCode(),Integer.toString((sms.getValid_time()))};
-            SmsSingleSender ssender =new SmsSingleSender(appid,appkey);
-            SmsSingleSenderResult result = ssender.sendWithParam("86",sms.getPhone_number(),temletId,params,smsSign,"","");
-        }catch (HTTPException e){
-            e.printStackTrace();
-        }catch(JSONException e){
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+    @Autowired
+    private SmsService smsService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @PostMapping("/sendcode/{userId}")
+    public ResponseEntity<?> sendVerificationCode(@PathVariable Long userId) {
+        // 从数据库加载用户
+        Optional<User> userOptional = userRepository.findById(Math.toIntExact(userId));
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User user = userOptional.get();
+
+        // 检查用户是否已设置手机号
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().isEmpty()) {
+            return ResponseEntity.badRequest().body("用户未设置手机号");
+        }
+
+        try {
+            smsService.sendVerificationCode(user);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
         }
     }
 }

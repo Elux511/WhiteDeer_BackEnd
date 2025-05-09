@@ -1,75 +1,68 @@
 package com.WhiteDeer.entity;
 
-import java.util.Vector;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
 public class User {
     private String id;
     private String name;
-    private String phone_number;
+    private String phoneNumber;
     private String password;
-    private Vector<String> group_set;
-    private Vector<String> yes_task_set;
-    private Vector<String> no_task_set;
+    private List<String> groupIds = new ArrayList<>();
+    private List<String> completedTaskIds = new ArrayList<>();
+    private List<String> pendingTaskIds = new ArrayList<>();
     private String face;
 
-    //getter
-    public String getId() {
-        return id;
-    }
-    public String getName() {
-        return name;
-    }
-    public String getPhone_number() {
-        return phone_number;
-    }
-    public String getPassword() {
-        return password;
-    }
-    public Vector<String> getGroup_set() {
-        return group_set;
-    }
-    public Vector<String> getYes_task_set() {
-        return yes_task_set;
-    }
-    public Vector<String> getNo_task_set() {
-        return no_task_set;
-    }
-    public String getFace() {
-        return face;
+    public User(String id, String name, String phoneNumber) {
+        this.id = id;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
     }
 
-    //setter
-    public void setId(String id) {
-        this.id = id;
+    // 集合操作方法优化
+    public void addGroup(String groupId) {
+        if (groupId != null && !groupIds.contains(groupId)) {
+            groupIds.add(groupId);
+        }
     }
-    public void setName(String user_name){
-        this.name = user_name;
+
+    public void removeGroup(String groupId) {
+        groupIds.remove(groupId);
     }
-    public void setPassword(String password){
+
+    public void addCompletedTask(String taskId) {
+        if (taskId != null && !completedTaskIds.contains(taskId)) {
+            completedTaskIds.add(taskId);
+            pendingTaskIds.remove(taskId);
+        }
+    }
+
+    public void addPendingTask(String taskId) {
+        if (taskId != null && !pendingTaskIds.contains(taskId)) {
+            pendingTaskIds.add(taskId);
+            completedTaskIds.remove(taskId);
+        }
+    }
+
+    // 密码加密存储
+    public void setPassword(String password) {
+        if (password == null || password.length() < 6) {
+            throw new IllegalArgumentException("密码长度不能少于6位");
+        }
+        // 实际应用中应加密存储密码
         this.password = password;
     }
-    public void setPhoneNumber(String phone_number){
-        this.phone_number = phone_number;
-    }
-    public void setFace(String face){
 
-    }
-    public void addGroup(String group_id){
-        group_set.add(group_id);
-    }
-    public void deleteGroup(String group_id){
-        group_set.remove(group_id);
-    }
-    public void addYes(String task_id){
-        yes_task_set.add(task_id);
-    }
-    public void deleteYes(String task_id){
-        yes_task_set.remove(task_id);
-    }
-    public void addNo(String task_id){
-        no_task_set.add(task_id);
-    }
-    public void deleteNo(String task_id){
-        no_task_set.remove(task_id);
+    // 电话号码验证
+    public void setPhoneNumber(String phoneNumber) {
+        if (phoneNumber != null && !phoneNumber.matches("^1[3-9]\\d{9}$")) {
+            throw new IllegalArgumentException("手机号格式不正确");
+        }
+        this.phoneNumber = phoneNumber;
     }
 }
