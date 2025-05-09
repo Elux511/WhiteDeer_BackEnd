@@ -1,6 +1,7 @@
 package com.WhiteDeer.repository;
 
 import com.WhiteDeer.entity.Task;
+import com.WhiteDeer.exception.TaskNotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
