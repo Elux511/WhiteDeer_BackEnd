@@ -11,6 +11,7 @@ public class Group {
     Vector<String> no_task_set;
     String introduction;//简介暂定为String类型
 
+    //getter
     public String getId() {
         return id;
     }
@@ -32,6 +33,8 @@ public class Group {
     public String getIntroduction() {
         return introduction;
     }
+
+    //setter
     public void setId(String id) {
         this.id = id;
     }
@@ -59,4 +62,5 @@ public class Group {
     public void deleteNo(String task_id){
         no_task_set.remove(task_id);
     }
+
 }
