@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.Vector;
 
 public class PyAPI {
+
     //获得用户人脸的特征（用于初次记录）
     //传入用户人脸图片，保存人脸特征
     static public void trainFaceLabels(String user_id, String img_path) {

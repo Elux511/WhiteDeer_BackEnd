@@ -13,6 +13,7 @@ public class Task {
     private String id;
     private String name;
     private Group group;
+    private String introduction;
     //QRcode
     private LocalTime begin_time;
     private LocalTime end_time;
@@ -33,6 +34,10 @@ public class Task {
     public Group getGroup() {
         return group;
     }
+    public String getIntroduction() {
+        return introduction;
+    }
+    //getQRcode
     public LocalTime getBegin_time() {
         return begin_time;
     }
@@ -65,6 +70,12 @@ public class Task {
     public void setName(String name){
         this.name = name;
     }
+    public void setGroup(Group group){
+        this.group = group;
+    }
+    public void setIntroduction(String introduction){
+        this.introduction = introduction;
+    }
     public void setQRcode(){
 
     }
@@ -82,6 +93,9 @@ public class Task {
     }
     public void setMistakeRange(double mistake_range) {
         this.mistake_range = mistake_range;
+    }
+    public void setMethod(CheckInMethod method){
+        this.method = method;
     }
     public void addYes(String user_id){
         yes_user.add(user_id);
