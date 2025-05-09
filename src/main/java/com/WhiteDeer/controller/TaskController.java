@@ -1,5 +1,5 @@
 package com.WhiteDeer.controller;
-
+import org.modelmapper.ModelMapper;
 import com.WhiteDeer.Task;
 import com.WhiteDeer.mapper.dto.TaskDto;
 import com.WhiteDeer.mapper.ResponseMessage;
@@ -20,17 +20,20 @@ public class TaskController {
 
     @Autowired
     ResponseMessage responseMessage;
+
+    @Autowired
+    private ModelMapper modelMapper;
     //增加打卡任务
     @PostMapping
     public String add(@Validated @RequestBody TaskDto task) {
         Task taskNew=taskService.add(task);
-        return ResponseMessage.success();
+        return ResponseMessage.success(taskNew);
     }
     //查询打卡任务
     @GetMapping("/{taskId}")
     public ResponseMessage get(@PathVariable Integer taskId){
         //TaskDto task=new TaskDto();
-        Task taskNew=taskService.getTask(taskid);
+        Task taskNew=taskService.getTask(taskId);
         return ResponseMessage.success(taskNew);
     }
     //修改
@@ -45,5 +48,15 @@ public class TaskController {
         taskService.delete(taskId);
         //success无返回值
     }
+
+    @GetMapping("/{taskId}")
+    public ResponseEntity<ResponseMessage> get(@PathVariable Integer taskId) {
+        Task taskEntity = taskRepository.findById(taskId)
+                .orElseThrow(() -> new IllegalArgumentException("任务不存在"));
+        TaskDto taskDto = modelMapper.map(taskEntity, TaskDto.class);
+        Task resultTask = taskService.getTask(taskDto);
+        return ResponseEntity.ok(ResponseMessage.success(resultTask));
+    }
+
 
 }
