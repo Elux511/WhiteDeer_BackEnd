@@ -14,8 +14,8 @@ public class Task {
         GEO_FENCING,
         BOTH
     }
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
+
     private String id;
     private String name;
     private String groupId;
@@ -27,9 +27,8 @@ public class Task {
 
     public Task() {}
 
-    public Task(String id, String name, String groupId, LocalTime beginTime,
+    public Task( String name, String groupId, LocalTime beginTime,
                 LocalTime endTime, CheckInMethod method) {
-        this.id = id;
         this.name = name;
         this.groupId = groupId;
         this.beginTime = beginTime;

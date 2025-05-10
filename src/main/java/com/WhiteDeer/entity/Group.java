@@ -14,8 +14,7 @@ public class Group {
 
     public Group() {}
 
-    public Group(String id, String name, String creatorId, String introduction) {
-        this.id = id;
+    public Group(String name, String creatorId, String introduction) {
         this.name = name;
         this.creatorId = creatorId;
         this.introduction = introduction;
