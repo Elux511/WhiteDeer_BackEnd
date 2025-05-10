@@ -25,7 +25,6 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    // 集合操作方法优化
     public void addGroup(String groupId) {
         if (groupId != null && !groupIds.contains(groupId)) {
             groupIds.add(groupId);
