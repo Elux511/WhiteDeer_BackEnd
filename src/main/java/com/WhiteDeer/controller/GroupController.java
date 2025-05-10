@@ -1,46 +1,98 @@
 package com.WhiteDeer.controller;
 
 import com.WhiteDeer.entity.Group;
-import com.WhiteDeer.mapper.dto.GroupDto;
+import com.WhiteDeer.entity.GroupMember;
 import com.WhiteDeer.mapper.ResponseMessage;
+import com.WhiteDeer.mapper.dto.GroupDto;
 import com.WhiteDeer.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
 
-@RestController//返回对象，直接转化为json文本
-@RequestMapping("/group")
+@RestController
+@RequestMapping("/groups")
 public class GroupController {
-    @Autowired
-    GroupService groupService;
-    @Autowired
-    private Group group;
+    private final GroupService groupService;
 
+    @Autowired
+    public GroupController(GroupService groupService) {
+        this.groupService = groupService;
+    }
 
-    //增加打卡任务
     @PostMapping
-    public String add(@Validated @RequestBody GroupDto group) {
-        Group groupNew=groupService.add(group);
-        return ResponseMessage.success(groupNew);
+    public ResponseMessage createGroup(@Validated @RequestBody GroupDto groupDto) {
+        Group group = groupService.createGroup(groupDto);
+        return ResponseMessage.success(group);
     }
-    //查询打卡任务
+
     @GetMapping("/{groupId}")
-    public ResponseMessage get(@PathVariable Integer groupId){
-        Group groupNew=groupService.getGroup(groupId);
-        return ResponseMessage.success(groupNew);
+    public ResponseMessage getGroup(@PathVariable String groupId) {
+        Group group = groupService.getGroup(groupId);
+        return ResponseMessage.success(group);
     }
-    //修改
+
     @PutMapping
-    public ResponseMessage edit(@PathVariable Integer groupId){
-        Group groupNew=groupService.edit(groupId);
-        return ResponseMessage.success(groupNew);
+    public ResponseMessage updateGroup(@Validated @RequestBody GroupDto groupDto) {
+        Group group = groupService.updateGroup(groupDto);
+        return ResponseMessage.success(group);
     }
-    //删除
+
     @DeleteMapping("/{groupId}")
-    public ResponseMessage delete(@PathVariable Integer groupId){
-        groupService.delete(groupId);
+    public ResponseMessage deleteGroup(@PathVariable String groupId) {
+        groupService.deleteGroup(groupId);
         return ResponseMessage.success();
     }
 
+    @PostMapping("/{groupId}/members/{userId}")
+    public ResponseMessage addMemberToGroup(
+            @PathVariable String groupId,
+            @PathVariable String userId,
+            @RequestParam(defaultValue = "member") String role) {
+        groupService.addMemberToGroup(groupId, userId, role);
+        return ResponseMessage.success();
+    }
+
+    @DeleteMapping("/{groupId}/members/{userId}")
+    public ResponseMessage removeMemberFromGroup(
+            @PathVariable String groupId,
+            @PathVariable String userId) {
+        groupService.removeMemberFromGroup(groupId, userId);
+        return ResponseMessage.success();
+    }
+
+    @PostMapping("/{groupId}/tasks/{taskId}/complete")
+    public ResponseMessage markTaskAsCompleted(
+            @PathVariable String groupId,
+            @PathVariable String taskId) {
+        groupService.markTaskAsCompleted(groupId, taskId);
+        return ResponseMessage.success();
+    }
+
+    @PostMapping("/{groupId}/tasks/{taskId}/incomplete")
+    public ResponseMessage markTaskAsNotCompleted(
+            @PathVariable String groupId,
+            @PathVariable String taskId) {
+        groupService.markTaskAsNotCompleted(groupId, taskId);
+        return ResponseMessage.success();
+    }
+
+    @GetMapping("/{groupId}/members")
+    public ResponseMessage getGroupMembers(@PathVariable String groupId) {
+        Set<GroupMember> members = groupService.getGroupMembers(groupId);
+        return ResponseMessage.success(members);
+    }
+
+    @GetMapping("/{groupId}/completed-tasks")
+    public ResponseMessage getCompletedTasks(@PathVariable String groupId) {
+        Set<String> tasks = groupService.getCompletedTasks(groupId);
+        return ResponseMessage.success(tasks);
+    }
+
+    @GetMapping("/{groupId}/incomplete-tasks")
+    public ResponseMessage getNotCompletedTasks(@PathVariable String groupId) {
+        Set<String> tasks = groupService.getNotCompletedTasks(groupId);
+        return ResponseMessage.success(tasks);
+    }
 }

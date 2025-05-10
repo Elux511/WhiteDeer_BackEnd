@@ -1,112 +1,127 @@
 package com.WhiteDeer.entity;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
 import java.time.LocalTime;
-import java.util.Vector;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Task {
-    public enum CheckInMethod{
-        faceRecognition,
-        geoFencing,
-        both
-    };
-
+    public enum CheckInMethod {
+        FACE_RECOGNITION,
+        GEO_FENCING,
+        BOTH
+    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     private String name;
-    private Group group;
-    private String introduction;
-    //QRcode
-    private LocalTime begin_time;
-    private LocalTime end_time;
-    private double longitude;//经度
-    private double latitude;//纬度
-    private double mistake_range;//位置误差
+    private String groupId;
+    private LocalTime beginTime;
+    private LocalTime endTime;
     private CheckInMethod method;
-    private Vector<String> yes_user;
-    private Vector<String> no_user;
+    private Set<String> completedUserIds = new HashSet<>();
+    private Set<String> uncompletedUserIds = new HashSet<>();
 
-    //getter
+    public Task() {}
+
+    public Task(String id, String name, String groupId, LocalTime beginTime,
+                LocalTime endTime, CheckInMethod method) {
+        this.id = id;
+        this.name = name;
+        this.groupId = groupId;
+        this.beginTime = beginTime;
+        this.endTime = endTime;
+        this.method = method;
+    }
+
+    // Getters and Setters
     public String getId() {
         return id;
     }
-    public String getName() {
-        return name;
-    }
-    public Group getGroup() {
-        return group;
-    }
-    public String getIntroduction() {
-        return introduction;
-    }
-    //getQRcode
-    public LocalTime getBegin_time() {
-        return begin_time;
-    }
-    public LocalTime getEnd_time() {
-        return end_time;
-    }
-    public double getLongitude() {
-        return longitude;
-    }
-    public double getLatitude() {
-        return latitude;
-    }
-    public double getMistakeRange() {
-        return mistake_range;
-    }
-    public CheckInMethod getMethod() {
-        return method;
-    }
-    public Vector<String> getYes_user() {
-        return yes_user;
-    }
-    public Vector<String> getNo_user() {
-        return no_user;
-    }
 
-    //setter
     public void setId(String id) {
         this.id = id;
     }
-    public void setName(String name){
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
-    public void setGroup(Group group){
-        this.group = group;
-    }
-    public void setIntroduction(String introduction){
-        this.introduction = introduction;
-    }
-    public void setQRcode(){
 
+    public String getGroupId() {
+        return groupId;
     }
-    public void setBeginTime(LocalTime begin_time){
-        this.begin_time = begin_time;
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
-    public void setEndTime(LocalTime end_time){
-        this.end_time = end_time;
+
+    public LocalTime getBeginTime() {
+        return beginTime;
     }
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
+
+    public void setBeginTime(LocalTime beginTime) {
+        this.beginTime = beginTime;
     }
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
+
+    public LocalTime getEndTime() {
+        return endTime;
     }
-    public void setMistakeRange(double mistake_range) {
-        this.mistake_range = mistake_range;
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
-    public void setMethod(CheckInMethod method){
+
+    public CheckInMethod getMethod() {
+        return method;
+    }
+
+    public void setMethod(CheckInMethod method) {
         this.method = method;
     }
-    public void addYes(String user_id){
-        yes_user.add(user_id);
+
+    public Set<String> getCompletedUserIds() {
+        return new HashSet<>(completedUserIds);
     }
-    public void deleteYes(String user_id){
-        yes_user.remove(user_id);
+
+    public Set<String> getUncompletedUserIds() {
+        return new HashSet<>(uncompletedUserIds);
     }
-    public void addNo(String user_id){
-        no_user.add(user_id);
+
+    public boolean markAsCompleted(String userId) {
+        if (completedUserIds.contains(userId)) {
+            return false;
+        }
+        completedUserIds.add(userId);
+        uncompletedUserIds.remove(userId);
+        return true;
     }
-    public void deleteNo(String user_id){
-        no_user.remove(user_id);
+
+    public boolean markAsUncompleted(String userId) {
+        if (uncompletedUserIds.contains(userId)) {
+            return false;
+        }
+        uncompletedUserIds.add(userId);
+        completedUserIds.remove(userId);
+        return true;
+    }
+
+    public void resetUserStatus(String userId) {
+        completedUserIds.remove(userId);
+        uncompletedUserIds.remove(userId);
+    }
+
+    public boolean isUserCompleted(String userId) {
+        return completedUserIds.contains(userId);
+    }
+
+    public boolean isUserUncompleted(String userId) {
+        return uncompletedUserIds.contains(userId);
     }
 }

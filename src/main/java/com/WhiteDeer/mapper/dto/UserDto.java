@@ -1,37 +1,39 @@
 package com.WhiteDeer.mapper.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
-
-import java.math.BigDecimal;
-import java.sql.Timestamp;
-
-import jakarta.persistence.Column;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 public class UserDto {
-    private Integer User_id;
-    private String user_name;
+    private String id;
+
+    @NotBlank(message = "用户名不能为空")
+    @Size(min = 2, max = 20, message = "用户名长度必须在2-20个字符之间")
+    private String name;
+
+    @NotBlank(message = "密码不能为空")
+    @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
     private String password;
-    private String phone_number;
-    private String face;
-    private String groupcontrol_set;
-    private String groupmember_name;
 
+    @NotBlank(message = "手机号不能为空")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+    private String phoneNumber;
 
-    public Integer getUser_id() {
-        return User_id;
+    // Getters and Setters
+    public String getId() {
+        return id;
     }
 
-    public void setUser_id(Integer user_id) {
-        User_id = user_id;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getUser_name() {
-        return user_name;
+    public String getName() {
+        return name;
     }
 
-    public void setUser_name(String user_name) {
-        this.user_name = user_name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {
@@ -42,49 +44,11 @@ public class UserDto {
         this.password = password;
     }
 
-    public String getPhone_number() {
-        return phone_number;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone_number(String phone_number) {
-        this.phone_number = phone_number;
-    }
-
-    public String getFace() {
-        return face;
-    }
-
-    public void setFace(String face) {
-        this.face = face;
-    }
-
-    public String getGroupcontrol_set() {
-        return groupcontrol_set;
-    }
-
-    public void setGroupcontrol_set(String groupcontrol_set) {
-        this.groupcontrol_set = groupcontrol_set;
-    }
-
-    public String getGroupmember_name() {
-        return groupmember_name;
-    }
-
-    public void setGroupmember_name(String groupmember_name) {
-        this.groupmember_name = groupmember_name;
-    }
-
-
-    @Override
-    public String toString() {
-        return "UserDto{" +
-                "User_id=" + User_id +
-                ", user_name='" + user_name + '\'' +
-                ", password='" + password + '\'' +
-                ", phone_number='" + phone_number + '\'' +
-                ", face='" + face + '\'' +
-                ", groupcontrol_set='" + groupcontrol_set + '\'' +
-                ", groupmember_name='" + groupmember_name + '\'' +
-                '}';
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

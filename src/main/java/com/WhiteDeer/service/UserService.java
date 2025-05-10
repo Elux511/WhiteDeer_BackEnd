@@ -1,99 +1,79 @@
 package com.WhiteDeer.service;
 
-import com.WhiteDeer.entity.Group;
-import com.WhiteDeer.entity.GroupMember;
-import com.WhiteDeer.entity.Task;
 import com.WhiteDeer.entity.User;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.WhiteDeer.exception.UserNotFoundException;
 import com.WhiteDeer.mapper.dto.UserDto;
+import com.WhiteDeer.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import java.time.LocalTime;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
+@Service
 public class UserService {
-    User user;
-    public void setUser(User user){
-        this.user = user;
-    }
-    public void setName(String userName){
-        user.setName(userName);
-    }
-    public void setPassword(String password){
-        user.setPassword(password);
-    }
-    public void setPhoneNumber(String phone_number){
-        user.setPhoneNumber(phone_number);
-    }
-    public void setFace(){
+    private final UserRepository userRepository;
 
-    }
-    public void addGroup(Group group){
-        user.addGroup(group.getId());
-    }
-    public void deleteGroup(Group group){
-        user.deleteGroup(group.getId());
-    }
-    public void addYes(Task task){
-        user.addYes(task.getId());
-    }
-    public void deleteYes(Task task){
-        user.deleteYes(task.getId());
-    }
-    public void addNo(Task task){
-        user.addNo(task.getId());
-    }
-    public void deleteNo(Task task){
-        user.deleteNo(task.getId());
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
-    //创建一个团队
-    public void createGroup(String group_name, User user, String introduction){
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-        Group group = (Group)ctx.getBean("Group");
-        //group.setId();
-        group.setName(group_name);
-        group.setIntroduction(introduction);
-
-        //把自己加进团队成员中
-        GroupMember member = (GroupMember) ctx.getBean("groupMember");
-        member.setUser(user);
-        member.setGroup(group);
-        member.setMember_type(GroupMember.Type.member);
-        member.setJoin_time(LocalTime.now());
-        group.addMember(member);
-
-        //把团队加进自己所在团队列表
-        user.addGroup(group.getId());
-    }
-    @Autowired
-    private TaskService userService;
-    @Override
-    public User add(UserDto user){
-        User newuser = new User();
-        BeanUtils.copyProperties(user,newuser);
-        return userRepository.save(newuser);//插入和修改调用save
+    @Transactional
+    public User add(UserDto userDto) {
+        User user = new User();
+        BeanUtils.copyProperties(userDto, user);
+        return userRepository.save(user);
     }
 
-
-    @Override
-    public Task getUser(UserDto user){
-        return userRepository.findById(user.getUser_id()).orElseThrow(()->{
-            return new IllegalArgumentException("用户不存在");
-        });
-        return null;
+    public User getUser(String userId) {
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw new UserNotFoundException(userId);
+        }
+        return user;
     }
 
-    @Override
-    public User edit(UserDto user){
-        User user1 = new User();
-        BeanUtils.copyProperties(user,user1);
-        return userRepository.save(user1);
+    @Transactional
+    public User update(UserDto userDto) {
+        User existingUser = getUser(userDto.getId());
+        BeanUtils.copyProperties(userDto, existingUser);
+        return userRepository.save(existingUser);
     }
 
-    @Override
-    public void delete(Integer taskId){
-        return userRepository.deleteBYId(user.getId());
+    @Transactional
+    public void delete(String userId) {
+        userRepository.deleteById(userId);
     }
 
+    @Transactional
+    public void addUserToGroup(String userId, String groupId) {
+        userRepository.addGroup(userId, groupId);
+    }
+
+    @Transactional
+    public void removeUserFromGroup(String userId, String groupId) {
+        userRepository.removeGroup(userId, groupId);
+    }
+
+    @Transactional
+    public void markTaskAsCompleted(String userId, String taskId) {
+        userRepository.addYesTask(userId, taskId);
+    }
+
+    @Transactional
+    public void markTaskAsNotCompleted(String userId, String taskId) {
+        userRepository.addNoTask(userId, taskId);
+    }
+
+    public Set<String> getUserGroups(String userId) {
+        return getUser(userId).getGroupSet();
+    }
+
+    public Set<String> getCompletedTasks(String userId) {
+        return getUser(userId).getYesTaskSet();
+    }
+
+    public Set<String> getNotCompletedTasks(String userId) {
+        return getUser(userId).getNoTaskSet();
+    }
 }

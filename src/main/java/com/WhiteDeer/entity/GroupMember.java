@@ -1,40 +1,40 @@
 package com.WhiteDeer.entity;
 
-import java.time.LocalTime;
-
 public class GroupMember {
-    public enum Type{
-        manager,
-        member
-    };
+    private String userId;
+    private String role; // "admin" or "member"
+    private String joinTime;
 
-    Group group;
-    User user;
-    Type member_type;
-    LocalTime join_time;
+    public GroupMember() {}
 
-    public Group getGroup() {
-        return group;
+    public GroupMember(String userId, String role, String joinTime) {
+        this.userId = userId;
+        this.role = role;
+        this.joinTime = joinTime;
     }
-    public User getUser() {
-        return user;
+
+    // Getters and Setters
+    public String getUserId() {
+        return userId;
     }
-    public Type getMember_type() {
-        return member_type;
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
-    public LocalTime getJoin_time() {
-        return join_time;
+
+    public String getRole() {
+        return role;
     }
-    public void setGroup(Group group){
-        this.group = group;
+
+    public void setRole(String role) {
+        this.role = role;
     }
-    public void setUser(User user){
-        this.user = user;
+
+    public String getJoinTime() {
+        return joinTime;
     }
-    public void setMember_type(Type member_type){
-        this.member_type = member_type;
-    }
-    public void setJoin_time(LocalTime join_time){
-        this.join_time = join_time;
+
+    public void setJoinTime(String joinTime) {
+        this.joinTime = joinTime;
     }
 }

@@ -2,7 +2,8 @@ package com.WhiteDeer.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.util.HashSet;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +14,12 @@ public class User {
     private String name;
     private String phoneNumber;
     private String password;
-    private List<String> groupIds = new ArrayList<>();
-    private List<String> completedTaskIds = new ArrayList<>();
-    private List<String> pendingTaskIds = new ArrayList<>();
-    private String face;
+    private Set<String> groupSet = new HashSet<>();
+    private Set<String> yesTaskSet = new HashSet<>();
+    private Set<String> noTaskSet = new HashSet<>();
+    public User() {}
 
-    public User(String id, String name, String phoneNumber) {
+    public User(String id, String name, String phoneNumber, String password) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -58,11 +59,85 @@ public class User {
         this.password = password;
     }
 
-    // 电话号码验证
     public void setPhoneNumber(String phoneNumber) {
         if (phoneNumber != null && !phoneNumber.matches("^1[3-9]\\d{9}$")) {
             throw new IllegalArgumentException("手机号格式不正确");
         }
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Set<String> getGroupSet() {
+        return new HashSet<>(groupSet);
+    }
+
+    public Set<String> getYesTaskSet() {
+        return new HashSet<>(yesTaskSet);
+    }
+
+    public Set<String> getNoTaskSet() {
+        return new HashSet<>(noTaskSet);
+    }
+
+    // 操作方法
+    public void addGroup(String groupId) {
+        groupSet.add(groupId);
+    }
+
+    public void removeGroup(String groupId) {
+        groupSet.remove(groupId);
+    }
+
+    public void addYesTask(String taskId) {
+        yesTaskSet.add(taskId);
+        noTaskSet.remove(taskId);
+    }
+
+    public void removeYesTask(String taskId) {
+        yesTaskSet.remove(taskId);
+    }
+
+    public void addNoTask(String taskId) {
+        noTaskSet.add(taskId);
+        yesTaskSet.remove(taskId);
+    }
+
+    public void removeNoTask(String taskId) {
+        noTaskSet.remove(taskId);
+    }
+
+    public boolean isInGroup(String groupId) {
+        return groupSet.contains(groupId);
+    }
+
+    public boolean hasCompletedTask(String taskId) {
+        return yesTaskSet.contains(taskId);
+    }
+
+    public boolean hasNotCompletedTask(String taskId) {
+        return noTaskSet.contains(taskId);
     }
 }

@@ -2,73 +2,93 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.entity.Group;
 import com.WhiteDeer.entity.GroupMember;
-import com.WhiteDeer.entity.Task;
-import com.WhiteDeer.entity.User;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.WhiteDeer.exception.GroupNotFoundException;
+import com.WhiteDeer.mapper.dto.GroupDto;
+import com.WhiteDeer.repository.GroupRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
+import java.util.Set;
 
+@Service
 public class GroupService {
-    Group group;
-    public void setGroup(Group group){
-        this.group = group;
+    private final GroupRepository groupRepository;
+
+    public GroupService(GroupRepository groupRepository) {
+        this.groupRepository = groupRepository;
     }
-    public void setName(String name){
-        group.setName(name);
+
+    @Transactional
+    public Group createGroup(GroupDto groupDto) {
+        Group group = new Group();
+        BeanUtils.copyProperties(groupDto, group);
+
+        // 添加创建者为管理员
+        GroupMember creator = new GroupMember(
+                groupDto.getCreatorId(),
+                "admin",
+                java.time.LocalDateTime.now().toString()
+        );
+        group.addMember(creator);
+
+        return groupRepository.save(group);
     }
-    public void setIntroduction(String introduction){
-        group.setIntroduction(introduction);
-    }
-    public void addMember(User user){
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-        GroupMember member = (GroupMember) ctx.getBean("groupMember");
-        member.setUser(user);
-        member.setGroup(group);
-        member.setMember_type(GroupMember.Type.member);
-        member.setJoin_time(LocalTime.now());
-        group.addMember(member);
-    }
-    public void deleteMember(User user){
-        for(GroupMember gm : group.getMember_list())
-        {
-            if (gm.getUser() == user)
-                group.deleteMember(gm);
+
+    public Group getGroup(String groupId) {
+        Group group = groupRepository.findById(groupId);
+        if (group == null) {
+            throw new GroupNotFoundException(groupId);
         }
-    }
-    public void addYes(Task task){
-        group.addYes(task.getId());
-    }
-    public void deleteYes(Task task){
-        group.deleteYes(task.getId());
-    }
-    public void addNo(Task task){
-        group.addNo(task.getId());
-    }
-    public void deleteNo(Task task){
-        group.deleteNo(task.getId());
+        return group;
     }
 
-    //需要地理定位的打卡
-    public void publishTask(String task_name, String introduction, LocalTime begin_time, LocalTime end_time, Task.CheckInMethod method, double lat, double lng, double mistake_range){
-        ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
-        Task task = (Task) ctx.getBean("task");
-        //task.setId();
-        task.setName(task_name);
-        task.setIntroduction(introduction);
-        task.setBeginTime(begin_time);
-        task.setEndTime(end_time);
-        task.setMethod(method);
-        task.setLatitude(lat);
-        task.setLongitude(lng);
-        task.setMistakeRange(mistake_range);
-        for(GroupMember gm : group.getMember_list())   //将所有团队成员加入至未完成列表
-            task.addNo(gm.getUser().getId());
-        group.addNo(task.getId());//最终将任务添加至团队未完成列表
+    @Transactional
+    public Group updateGroup(GroupDto groupDto) {
+        Group existingGroup = getGroup(groupDto.getId());
+        BeanUtils.copyProperties(groupDto, existingGroup);
+        return groupRepository.save(existingGroup);
     }
 
-    //不需要地理定位的打卡
-    public void publishTask(String task_name, String introduction, LocalTime begin_time, LocalTime end_time, Task.CheckInMethod method) {
-        publishTask(task_name, introduction, begin_time, end_time, method, -1, -1, -1);
+    @Transactional
+    public void deleteGroup(String groupId) {
+        groupRepository.deleteById(groupId);
+    }
+
+    @Transactional
+    public void addMemberToGroup(String groupId, String userId, String role) {
+        GroupMember member = new GroupMember(
+                userId,
+                role,
+                java.time.LocalDateTime.now().toString()
+        );
+        groupRepository.addMember(groupId, member);
+    }
+
+    @Transactional
+    public void removeMemberFromGroup(String groupId, String userId) {
+        groupRepository.removeMember(groupId, userId);
+    }
+
+    @Transactional
+    public void markTaskAsCompleted(String groupId, String taskId) {
+        groupRepository.addYesTask(groupId, taskId);
+    }
+
+    @Transactional
+    public void markTaskAsNotCompleted(String groupId, String taskId) {
+        groupRepository.addNoTask(groupId, taskId);
+    }
+
+    public Set<GroupMember> getGroupMembers(String groupId) {
+        return getGroup(groupId).getMemberList();
+    }
+
+    public Set<String> getCompletedTasks(String groupId) {
+        return getGroup(groupId).getYesTaskSet();
+    }
+
+    public Set<String> getNotCompletedTasks(String groupId) {
+        return getGroup(groupId).getNoTaskSet();
     }
 }

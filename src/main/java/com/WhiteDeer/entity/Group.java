@@ -1,66 +1,107 @@
 package com.WhiteDeer.entity;
 
-import java.util.Vector;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Group {
-    String id;
-    String name;
-    User creator;
-    Vector<GroupMember> member_list;
-    Vector<String> yes_task_set;
-    Vector<String> no_task_set;
-    String introduction;//简介暂定为String类型
+    private String id;
+    private String name;
+    private String creatorId;
+    private Set<GroupMember> memberList = new HashSet<>();
+    private Set<String> yesTaskSet = new HashSet<>();
+    private Set<String> noTaskSet = new HashSet<>();
+    private String introduction;
 
-    //getter
+    public Group() {}
+
+    public Group(String id, String name, String creatorId, String introduction) {
+        this.id = id;
+        this.name = name;
+        this.creatorId = creatorId;
+        this.introduction = introduction;
+    }
+
+    // Getters and Setters
     public String getId() {
         return id;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
-    public User getCreator() {
-        return creator;
+
+    public void setName(String name) {
+        this.name = name;
     }
-    public Vector<GroupMember> getMember_list() {
-        return member_list;
+
+    public String getCreatorId() {
+        return creatorId;
     }
-    public Vector<String> getYes_task_set() {
-        return yes_task_set;
+
+    public void setCreatorId(String creatorId) {
+        this.creatorId = creatorId;
     }
-    public Vector<String> getNo_task_set() {
-        return no_task_set;
+
+    public Set<GroupMember> getMemberList() {
+        return new HashSet<>(memberList);
     }
+
+    public Set<String> getYesTaskSet() {
+        return new HashSet<>(yesTaskSet);
+    }
+
+    public Set<String> getNoTaskSet() {
+        return new HashSet<>(noTaskSet);
+    }
+
     public String getIntroduction() {
         return introduction;
     }
 
-    //setter
-    public void setId(String id) {
-        this.id = id;
-    }
-    public void setName(String name){
-        this.name = name;
-    }
-    public void setIntroduction(String intro){
-        this.introduction = intro;
-    }
-    public void addMember(GroupMember member){
-        member_list.add(member);
-    }
-    public void deleteMember(GroupMember member){
-        member_list.remove(member);
-    }
-    public void addYes(String task_id){
-        yes_task_set.add(task_id);
-    }
-    public void deleteYes(String task_id){
-        yes_task_set.remove(task_id);
-    }
-    public void addNo(String task_id){
-        no_task_set.add(task_id);
-    }
-    public void deleteNo(String task_id){
-        no_task_set.remove(task_id);
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 
+    // 操作方法
+    public void addMember(GroupMember member) {
+        memberList.add(member);
+    }
+
+    public void removeMember(String userId) {
+        memberList.removeIf(m -> m.getUserId().equals(userId));
+    }
+
+    public void addYesTask(String taskId) {
+        yesTaskSet.add(taskId);
+        noTaskSet.remove(taskId);
+    }
+
+    public void removeYesTask(String taskId) {
+        yesTaskSet.remove(taskId);
+    }
+
+    public void addNoTask(String taskId) {
+        noTaskSet.add(taskId);
+        yesTaskSet.remove(taskId);
+    }
+
+    public void removeNoTask(String taskId) {
+        noTaskSet.remove(taskId);
+    }
+
+    public boolean hasMember(String userId) {
+        return memberList.stream().anyMatch(m -> m.getUserId().equals(userId));
+    }
+
+    public boolean hasCompletedTask(String taskId) {
+        return yesTaskSet.contains(taskId);
+    }
+
+    public boolean hasNotCompletedTask(String taskId) {
+        return noTaskSet.contains(taskId);
+    }
 }

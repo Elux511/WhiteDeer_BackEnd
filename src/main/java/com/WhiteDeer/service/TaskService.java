@@ -1,132 +1,81 @@
-//打卡任务类
 package com.WhiteDeer.service;
 
 import com.WhiteDeer.entity.Task;
-import com.WhiteDeer.entity.User;
+import com.WhiteDeer.exception.TaskNotFoundException;
+import com.WhiteDeer.mapper.dto.TaskCheckInDto;
 import com.WhiteDeer.mapper.dto.TaskDto;
+import com.WhiteDeer.repository.TaskRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
-import java.util.Vector;
+import java.util.Set;
 
 @Service
-public class TaskService implements TaskServiceImpl{
-    Task task;
-    public void setTask(Task task){
-        this.task = task;
-    }
-    public void setName(String name){
-        task.setName(name);
-    }
-    public void setQRcode(){
+public class TaskService {
+    private final TaskRepository taskRepository;
 
-    }
-    public void setBeginTime(LocalTime begin_time){
-        task.setBeginTime(begin_time);
-    }
-    public void setEndTime(LocalTime end_time){
-        task.setEndTime(end_time);
-    }
-    public  void addYes(User user){
-        task.addYes(user.getId());
-    }
-    public void deleteYes(User user){
-        task.deleteYes(user.getId());
-    }
-    public void addNo(User user){
-        task.addNo(user.getId());
-    }
-    public void deleteNo(User user){
-        task.deleteNo(user.getId());
-    }
-    public void finish(User user){
-        user.addYes(user.getId());
-        user.deleteNo(user.getId());
-    }
-    @Autowired
-    private TaskService taskService;
-    @Override
-    public Task add(TaskDto task){
-        Task task1 = new Task();
-        BeanUtils.copyProperties(task,task1);
-        return taskRepository.save(task1);//插入和修改调用save
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
 
-    @Override
-    public Task getTask(TaskDto task){
-        return taskRepository.findById(taskId).orElseThrow(()->{
-            return new IllegalArgumentException("用户不存在");
-        });
-        return null;
+    @Transactional
+    public Task add(TaskDto taskDto) {
+        Task task = new Task();
+        BeanUtils.copyProperties(taskDto, task);
+        return taskRepository.save(task);
     }
 
-    @Override
-    public Task edit(TaskUto task){
-        Task task1 = new Task();
-        BeanUtils.copyProperties(task,task1);
-        return taskRepository.save(task1);
+    public Task getTask(String taskId) {
+        Task task = taskRepository.findById(taskId);
+        if (task == null) {
+            throw new TaskNotFoundException(taskId);
+        }
+        return task;
     }
 
-    @Override
-    public void delete(Integer taskId){
-        return taskRepository.deleteBYId(taskId);
-    }
-    //用于faceRecognition型打卡任务的检测
-    public void checkIn(User user, String img_path){
-        if(PyAPI.faceRecognition(user.getId(), img_path))
-            finish(user);
-    }
-    //用于geoFencing型打卡任务的检测
-    public void checkIn(User user, double lat, double lng){
-        Vector<Double> location = PyAPI.geoFencing();
-        Double lat_ = location.get(0);
-        Double lng_ = location.get(1);
-        if(calculateDistance(lat_,lng_,lat,lng) < task.getMistakeRange())
-            finish(user);
-    }
-    //用于all型打卡任务的检测
-    public void checkIn(User user, String img_path,double lat, double lng){
-        boolean flag;
-        Vector<Double> location = PyAPI.geoFencing();
-        Double lat_ = location.get(0);
-        Double lng_ = location.get(1);
-        flag = PyAPI.faceRecognition(user.getId(), img_path) && (calculateDistance(lat_,lng_,lat,lng) < task.getMistakeRange());
-        if (flag)
-            finish(user);
-    }
-    //完成打卡任务
-    public void finish(User user){
-        //用户的任务列表里对该任务进行增删
-        user.addYes(task.getId());
-        user.deleteNo(task.getId());
-        //任务的用户列表里对该用户进行增删
-        task.addYes(user.getId());
-        task.deleteNo(user.getId());
+    @Transactional
+    public Task edit(TaskDto taskDto) {
+        Task existingTask = getTask(taskDto.getId());
+        BeanUtils.copyProperties(taskDto, existingTask);
+        return taskRepository.save(existingTask);
     }
 
+    @Transactional
+    public void delete(String taskId) {
+        taskRepository.deleteById(taskId);
+    }
 
-    //计算经纬度距离
-    public double calculateDistance(Double lat1, Double lng1, double lat2, double lng2){
-        final double R = 6371000; // 地球平均半径（公里）
+    @Transactional
+    public Task updateCheckInStatus(TaskCheckInDto checkInDto) {
+        Task task = getTask(checkInDto.getTaskId());
+        if (checkInDto.isCompleted()) {
+            taskRepository.addCompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+            taskRepository.removeUncompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+        } else {
+            taskRepository.addUncompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+            taskRepository.removeCompletedUser(checkInDto.getTaskId(), checkInDto.getUserId());
+        }
+        return getTask(checkInDto.getTaskId());
+    }
 
-        // 将角度转换为弧度
-        double lat1Rad = Math.toRadians(lat1);
-        double lon1Rad = Math.toRadians(lng1);
-        double lat2Rad = Math.toRadians(lat2);
-        double lon2Rad = Math.toRadians(lng2);
+    public int[] getCheckInStatistics(String taskId) {
+        Task task = getTask(taskId);
+        return new int[] {
+                task.getCompletedUserIds().size(),
+                task.getUncompletedUserIds().size()
+        };
+    }
 
-        // 纬度差和经度差
-        double deltaLat = lat2Rad - lat1Rad;
-        double deltaLon = lon2Rad - lon1Rad;
+    public Set<String> getCompletedUsers(String taskId) {
+        return getTask(taskId).getCompletedUserIds();
+    }
 
-        // Haversine公式计算
-        double a = Math.pow(Math.sin(deltaLat / 2), 2)
-                + Math.cos(lat1Rad) * Math.cos(lat2Rad)
-                * Math.pow(Math.sin(deltaLon / 2), 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    public Set<String> getUncompletedUsers(String taskId) {
+        return getTask(taskId).getUncompletedUserIds();
+    }
 
-        return R * c;
+    public boolean checkUserCompletionStatus(String taskId, String userId) {
+        return getTask(taskId).isUserCompleted(userId);
     }
 }

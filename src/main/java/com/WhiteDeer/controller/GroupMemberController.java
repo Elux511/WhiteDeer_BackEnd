@@ -1,4 +1,3 @@
-import com.WhiteDeer.entity.GroupMember;
 import com.WhiteDeer.mapper.dto.GroupMemberDto;
 import com.WhiteDeer.mapper.ResponseMessage;
 
