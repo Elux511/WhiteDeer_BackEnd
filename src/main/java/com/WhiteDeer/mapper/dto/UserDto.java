@@ -7,18 +7,13 @@ import jakarta.validation.constraints.Size;
 public class UserDto {
     private String id;
 
-    @NotBlank(message = "用户名不能为空")
-    @Size(min = 2, max = 20, message = "用户名长度必须在2-20个字符之间")
     private String name;
 
-    @NotBlank(message = "密码不能为空")
-    @Size(min = 6, max = 20, message = "密码长度必须在6-20个字符之间")
     private String password;
 
-    @NotBlank(message = "手机号不能为空")
-    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phoneNumber;
-
+    private byte[] faceImage;
+    private String faceImageContentType;
     // Getters and Setters
     public String getId() {
         return id;
@@ -50,5 +45,21 @@ public class UserDto {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+    // 新增人脸图片相关方法
+    public byte[] getFaceImage() {
+        return faceImage;
+    }
+
+    public void setFaceImage(byte[] faceImage) {
+        this.faceImage = faceImage;
+    }
+
+    public String getFaceImageContentType() {
+        return faceImageContentType;
+    }
+
+    public void setFaceImageContentType(String faceImageContentType) {
+        this.faceImageContentType = faceImageContentType;
     }
 }

@@ -9,9 +9,12 @@ import com.WhiteDeer.service.TaskService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Set;
 
+/**
+ * 任务服务实现类
+ * 实现TaskService接口定义的所有功能
+ */
 @Service
 public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;

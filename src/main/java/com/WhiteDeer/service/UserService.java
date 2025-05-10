@@ -3,77 +3,59 @@ package com.WhiteDeer.service;
 import com.WhiteDeer.entity.User;
 import com.WhiteDeer.exception.UserNotFoundException;
 import com.WhiteDeer.mapper.dto.UserDto;
-import com.WhiteDeer.repository.UserRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Set;
 
-@Service
-public class UserService {
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
+/**
+ * 用户服务接口
+ * 定义用户管理的核心操作契约
+ */
+public interface UserService {
+    // 添加用户
     @Transactional
-    public User add(UserDto userDto) {
-        User user = new User();
-        BeanUtils.copyProperties(userDto, user);
-        return userRepository.save(user);
-    }
+    User add(UserDto userDto);
 
-    public User getUser(String userId) {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
-        return user;
-    }
+    // 根据ID获取用户
+    User getUser(String userId) throws UserNotFoundException;
 
+    // 更新用户信息
     @Transactional
-    public User update(UserDto userDto) {
-        User existingUser = getUser(userDto.getId());
-        BeanUtils.copyProperties(userDto, existingUser);
-        return userRepository.save(existingUser);
-    }
+    User update(UserDto userDto);
 
+    // 删除用户
     @Transactional
-    public void delete(String userId) {
-        userRepository.deleteById(userId);
-    }
+    void delete(String userId);
 
+    // 添加用户到组
     @Transactional
-    public void addUserToGroup(String userId, String groupId) {
-        userRepository.addGroup(userId, groupId);
-    }
+    void addUserToGroup(String userId, String groupId);
 
+    // 从组移除用户
     @Transactional
-    public void removeUserFromGroup(String userId, String groupId) {
-        userRepository.removeGroup(userId, groupId);
-    }
+    void removeUserFromGroup(String userId, String groupId);
 
+    // 标记任务为已完成
     @Transactional
-    public void markTaskAsCompleted(String userId, String taskId) {
-        userRepository.addYesTask(userId, taskId);
-    }
+    void markTaskAsCompleted(String userId, String taskId);
 
+    // 标记任务为未完成
     @Transactional
-    public void markTaskAsNotCompleted(String userId, String taskId) {
-        userRepository.addNoTask(userId, taskId);
-    }
+    void markTaskAsNotCompleted(String userId, String taskId);
 
-    public Set<String> getUserGroups(String userId) {
-        return getUser(userId).getGroupSet();
-    }
+    // 获取用户所属组
+    Set<String> getUserGroups(String userId);
 
-    public Set<String> getCompletedTasks(String userId) {
-        return getUser(userId).getYesTaskSet();
-    }
+    // 获取用户已完成任务
+    Set<String> getCompletedTasks(String userId);
 
-    public Set<String> getNotCompletedTasks(String userId) {
-        return getUser(userId).getNoTaskSet();
-    }
+    // 获取用户未完成任务
+    Set<String> getNotCompletedTasks(String userId);
+
+    //face操作
+    @Transactional
+    void uploadFaceImage(String userId, byte[] imageData, String contentType);
+
+    byte[] getFaceImage(String userId);
+
+    String getFaceImageContentType(String userId);
 }
