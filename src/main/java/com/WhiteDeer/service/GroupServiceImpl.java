@@ -12,8 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
+/**
+ * 群组服务实现类
+ */
 @Service
 public class GroupServiceImpl implements GroupService {
+
     private final GroupRepository groupRepository;
 
     public GroupServiceImpl(GroupRepository groupRepository) {
@@ -38,7 +42,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Group getGroup(String groupId) {
+    public Group getGroup(String groupId) throws GroupNotFoundException {
         Group group = groupRepository.findById(groupId);
         if (group == null) {
             throw new GroupNotFoundException(groupId);
