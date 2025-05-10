@@ -64,39 +64,77 @@ public class UserRepository {
             return user;
         }
     }
+        public User save(User user) {
 
-    public User save(User user) {
-        String sql;
-        if (user.getId() == null) {
-            user.setId(java.util.UUID.randomUUID().toString());
-            sql = "INSERT INTO users (id, name, phone_number, password, group_set, yes_task_set, no_task_set) " +
-                    "VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)";
-        } else {
-            sql = "UPDATE users SET name = ?, phone_number = ?, password = ?, " +
-                    "group_set = ?::jsonb, yes_task_set = ?::jsonb, no_task_set = ?::jsonb " +
-                    "WHERE id = ?";
-        }
-
-        try {
-            String groupSetJson = objectMapper.writeValueAsString(user.getGroupSet());
-            String yesTaskSetJson = objectMapper.writeValueAsString(user.getYesTaskSet());
-            String noTaskSetJson = objectMapper.writeValueAsString(user.getNoTaskSet());
-
+            String sql;
+            System.out.println(user.toString());
             if (user.getId() == null) {
-                jdbcTemplate.update(sql,
-                        user.getId(), user.getName(), user.getPhoneNumber(),
-                        user.getPassword(), groupSetJson, yesTaskSetJson, noTaskSetJson);
+                user.setId(java.util.UUID.randomUUID().toString());
+                System.out.println(user.toString());
+                sql = "INSERT INTO users (user_id, user_name,phone_number, password, group_set, yes_task_set, no_task_set) " +
+                        "VALUES (?, ?, ?,?, ?, ?, ?)";
+
             } else {
-                jdbcTemplate.update(sql,
-                        user.getName(), user.getPhoneNumber(), user.getPassword(),
-                        groupSetJson, yesTaskSetJson, noTaskSetJson,
-                        user.getId());
+                sql = "UPDATE users SET user_name = ?, phone_number = ?, password = ?, " +
+                        "group_set = ?, yes_task_set = ?, no_task_set = ? " +
+                        "WHERE user_id = ?";
             }
-            return user;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to save user", e);
+
+            try {
+                String groupSetJson = objectMapper.writeValueAsString(user.getGroupSet());
+                String yesTaskSetJson = objectMapper.writeValueAsString(user.getYesTaskSet());
+                String noTaskSetJson = objectMapper.writeValueAsString(user.getNoTaskSet());
+
+                if (user.getId() == null) {
+
+                    jdbcTemplate.update(sql,
+                            user.getId(), user.getPhoneNumber(), user.getPassword(),
+                            yesTaskSetJson, noTaskSetJson,user.getName(),groupSetJson);
+                    System.out.println(1);
+                } else {
+                    System.out.println(1);
+                    jdbcTemplate.update(sql,
+                            user.getId(), user.getName(), user.getPhoneNumber(),
+                            user.getPassword(), groupSetJson, yesTaskSetJson, noTaskSetJson);
+                }
+                //System.out.println(1);
+                return user;
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to save user", e);
+            }
         }
-    }
+//    public User save(User user) {
+//        String sql;
+//        if (user.getId() == null) {
+//            user.setId(java.util.UUID.randomUUID().toString());
+//            sql = "INSERT INTO users (id, name, phone_number, password, group_set, yes_task_set, no_task_set) " +
+//                    "VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)";
+//        } else {
+//            sql = "UPDATE users SET name = ?, phone_number = ?, password = ?, " +
+//                    "group_set = ?::jsonb, yes_task_set = ?::jsonb, no_task_set = ?::jsonb " +
+//                    "WHERE id = ?";
+//        }
+//
+//        try {
+//            String groupSetJson = objectMapper.writeValueAsString(user.getGroupSet());
+//            String yesTaskSetJson = objectMapper.writeValueAsString(user.getYesTaskSet());
+//            String noTaskSetJson = objectMapper.writeValueAsString(user.getNoTaskSet());
+//
+//            if (user.getId() == null) {
+//                jdbcTemplate.update(sql,
+//                        user.getId(), user.getName(), user.getPhoneNumber(),
+//                        user.getPassword(), groupSetJson, yesTaskSetJson, noTaskSetJson);
+//            } else {
+//                jdbcTemplate.update(sql,
+//                        user.getName(), user.getPhoneNumber(), user.getPassword(),
+//                        groupSetJson, yesTaskSetJson, noTaskSetJson,
+//                        user.getId());
+//            }
+//            return user;
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to save user", e);
+//        }
+//    }
 
     public User findById(String userId) {
         String sql = "SELECT * FROM users WHERE id = ?";

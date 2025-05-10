@@ -1,13 +1,13 @@
 create table task
 (
-    id                 varchar(8)   not null
+    task_id                 varchar(8)   not null
         primary key,
-    name               varchar(255) null,
-    groupId            varchar(255) null,
-    beginTime          time         null,
-    endTime            time         null,
+    task_name              varchar(255) null,
+    group_id            varchar(255) null,
+    begin_time          time         null,
+    end_time            time         null,
     method             varchar(50)  null,
-    completedUserIds   text         null,
-    uncompletedUserIds text         null
+    completed_user_ids   text         null,
+    uncompleted_user_ids text         null
 );
 

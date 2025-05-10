@@ -70,8 +70,9 @@ public class GroupRepository {
         String sql;
         if (group.getId() == null) {
             group.setId(java.util.UUID.randomUUID().toString());
+            System.out.println(group.toString());
             sql = "INSERT INTO groups (id, name, creator_id, introduction, member_list, yes_task_set, no_task_set) " +
-                    "VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)";
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
         } else {
             sql = "UPDATE groups SET name = ?, creator_id = ?, introduction = ?, " +
                     "member_list = ?::jsonb, yes_task_set = ?::jsonb, no_task_set = ?::jsonb " +

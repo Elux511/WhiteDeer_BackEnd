@@ -4,9 +4,9 @@ create table `group`
         primary key,
     group_name   varchar(20) not null,
     creator_id   varchar(8)  not null,
-    memberList   text        null,
-    yesTaskSet   text        null,
-    noTaskSet    text        null,
-    introduction text        null
+    member_list   text        null,
+    yes_task_set   text        null,
+    no_task_Set    text        null,
+    group_introduction text        null
 );
 

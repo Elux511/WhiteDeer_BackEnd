@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
+/**
+ * 任务管理控制器
+ * 处理任务相关的所有HTTP请求
+ */
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
@@ -21,77 +25,126 @@ public class TaskController {
         this.taskService = taskService;
     }
 
+    /**
+     * 创建新任务
+     * @param taskDto 任务数据传输对象（包含标题、描述等信息）
+     * @return 创建成功的任务数据
+     */
     @PostMapping
-    public ResponseMessage add(@Validated @RequestBody TaskDto taskDto) {
+    public ResponseMessage createTask(@Validated @RequestBody TaskDto taskDto) {
         Task task = taskService.add(taskDto);
         return ResponseMessage.success(task);
     }
 
+    /**
+     * 获取指定任务详情
+     * @param taskId 任务ID
+     * @return 任务详细信息
+     */
     @GetMapping("/{taskId}")
-    public ResponseMessage get(@PathVariable String taskId) {
+    public ResponseMessage getTask(@PathVariable String taskId) {
         Task task = taskService.getTask(taskId);
         return ResponseMessage.success(task);
     }
 
+    /**
+     * 更新任务信息
+     * @param taskDto 包含更新数据的任务DTO
+     * @return 更新后的任务数据
+     */
     @PutMapping
-    public ResponseMessage edit(@Validated @RequestBody TaskDto taskDto) {
+    public ResponseMessage updateTask(@Validated @RequestBody TaskDto taskDto) {
         Task task = taskService.edit(taskDto);
         return ResponseMessage.success(task);
     }
 
+    /**
+     * 删除指定任务
+     * @param taskId 要删除的任务ID
+     * @return 空响应（操作状态）
+     */
     @DeleteMapping("/{taskId}")
-    public ResponseMessage delete(@PathVariable String taskId) {
+    public ResponseMessage deleteTask(@PathVariable String taskId) {
         taskService.delete(taskId);
         return ResponseMessage.success();
     }
 
+    /**
+     * 更新任务签到状态
+     * @param checkInDto 包含任务ID、用户ID和完成状态
+     * @return 更新后的任务数据
+     */
     @PostMapping("/check-in")
-    public ResponseMessage updateCheckInStatus(@Validated @RequestBody TaskCheckInDto checkInDto) {
+    public ResponseMessage checkInTask(@Validated @RequestBody TaskCheckInDto checkInDto) {
         Task task = taskService.updateCheckInStatus(checkInDto);
         return ResponseMessage.success(task);
     }
 
+    /**
+     * 获取任务签到统计
+     * @param taskId 任务ID
+     * @return 包含完成/未完成人数的统计对象
+     */
     @GetMapping("/{taskId}/statistics")
-    public ResponseMessage getCheckInStatistics(@PathVariable String taskId) {
+    public ResponseMessage getTaskStatistics(@PathVariable String taskId) {
         int[] stats = taskService.getCheckInStatistics(taskId);
-        return ResponseMessage.success(new CheckInStatistics(stats[0], stats[1]));
+        return ResponseMessage.success(new TaskStatistics(stats[0], stats[1]));
     }
 
+    /**
+     * 获取已完成任务的用户列表
+     * @param taskId 任务ID
+     * @return 用户ID集合
+     */
     @GetMapping("/{taskId}/completed-users")
-    public ResponseMessage getCompletedUsers(@PathVariable String taskId) {
+    public ResponseMessage getTaskCompletedUsers(@PathVariable String taskId) {
         Set<String> users = taskService.getCompletedUsers(taskId);
         return ResponseMessage.success(users);
     }
 
+    /**
+     * 获取未完成任务的用户列表
+     * @param taskId 任务ID
+     * @return 用户ID集合
+     */
     @GetMapping("/{taskId}/uncompleted-users")
-    public ResponseMessage getUncompletedUsers(@PathVariable String taskId) {
+    public ResponseMessage getTaskUncompletedUsers(@PathVariable String taskId) {
         Set<String> users = taskService.getUncompletedUsers(taskId);
         return ResponseMessage.success(users);
     }
 
+    /**
+     * 检查用户任务完成状态
+     * @param taskId 任务ID
+     * @param userId 用户ID
+     * @return 完成状态字符串（"completed"/"uncompleted"）
+     */
     @GetMapping("/{taskId}/users/{userId}/status")
-    public ResponseMessage checkUserStatus(
+    public ResponseMessage getUserTaskStatus(
             @PathVariable String taskId,
             @PathVariable String userId) {
         boolean isCompleted = taskService.checkUserCompletionStatus(taskId, userId);
         return ResponseMessage.success(isCompleted ? "completed" : "uncompleted");
     }
 
-    private static class CheckInStatistics {
-        private final int completedCount;
-        private final int uncompletedCount;
+    /**
+     * 任务统计内部类
+     */
+    private static class TaskStatistics {
+        private final int completed;
+        private final int uncompleted;
 
-        public CheckInStatistics(int completedCount, int uncompletedCount) {
-            this.completedCount = completedCount;
-            this.uncompletedCount = uncompletedCount;
+        public TaskStatistics(int completed, int uncompleted) {
+            this.completed = completed;
+            this.uncompleted = uncompleted;
         }
 
-        public int getCompletedCount() {
-            return completedCount;
+        public int getCompleted() {
+            return completed;
         }
 
-        public int getUncompletedCount() {
-            return uncompletedCount;
+        public int getUncompleted() {
+            return uncompleted;
         }
     }
 }

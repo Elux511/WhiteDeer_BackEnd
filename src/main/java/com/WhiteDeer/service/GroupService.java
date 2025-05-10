@@ -4,91 +4,88 @@ import com.WhiteDeer.entity.Group;
 import com.WhiteDeer.entity.GroupMember;
 import com.WhiteDeer.exception.GroupNotFoundException;
 import com.WhiteDeer.mapper.dto.GroupDto;
-import com.WhiteDeer.repository.GroupRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Set;
 
-@Service
-public class GroupService {
-    private final GroupRepository groupRepository;
+/**
+ * 群组服务接口
+ */
+public interface GroupService {
 
-    public GroupService(GroupRepository groupRepository) {
-        this.groupRepository = groupRepository;
-    }
+    /**
+     * 创建群组
+     * @param groupDto 群组数据传输对象
+     * @return 创建的群组实体
+     */
+    Group createGroup(GroupDto groupDto);
 
-    @Transactional
-    public Group createGroup(GroupDto groupDto) {
-        Group group = new Group();
-        BeanUtils.copyProperties(groupDto, group);
+    /**
+     * 获取群组信息
+     * @param groupId 群组ID
+     * @return 群组实体
+     * @throws GroupNotFoundException 当群组不存在时抛出
+     */
+    Group getGroup(String groupId) throws GroupNotFoundException;
 
-        // 添加创建者为管理员
-        GroupMember creator = new GroupMember(
-                groupDto.getCreatorId(),
-                "admin",
-                java.time.LocalDateTime.now().toString()
-        );
-        group.addMember(creator);
+    /**
+     * 更新群组信息
+     * @param groupDto 群组数据传输对象
+     * @return 更新后的群组实体
+     */
+    Group updateGroup(GroupDto groupDto);
 
-        return groupRepository.save(group);
-    }
+    /**
+     * 删除群组
+     * @param groupId 群组ID
+     */
+    void deleteGroup(String groupId);
 
-    public Group getGroup(String groupId) {
-        Group group = groupRepository.findById(groupId);
-        if (group == null) {
-            throw new GroupNotFoundException(groupId);
-        }
-        return group;
-    }
+    /**
+     * 添加成员到群组
+     * @param groupId 群组ID
+     * @param userId 用户ID
+     * @param role 成员角色
+     */
+    void addMemberToGroup(String groupId, String userId, String role);
 
-    @Transactional
-    public Group updateGroup(GroupDto groupDto) {
-        Group existingGroup = getGroup(groupDto.getId());
-        BeanUtils.copyProperties(groupDto, existingGroup);
-        return groupRepository.save(existingGroup);
-    }
+    /**
+     * 从群组移除成员
+     * @param groupId 群组ID
+     * @param userId 用户ID
+     */
+    void removeMemberFromGroup(String groupId, String userId);
 
-    @Transactional
-    public void deleteGroup(String groupId) {
-        groupRepository.deleteById(groupId);
-    }
+    /**
+     * 标记任务为已完成
+     * @param groupId 群组ID
+     * @param taskId 任务ID
+     */
+    void markTaskAsCompleted(String groupId, String taskId);
 
-    @Transactional
-    public void addMemberToGroup(String groupId, String userId, String role) {
-        GroupMember member = new GroupMember(
-                userId,
-                role,
-                java.time.LocalDateTime.now().toString()
-        );
-        groupRepository.addMember(groupId, member);
-    }
+    /**
+     * 标记任务为未完成
+     * @param groupId 群组ID
+     * @param taskId 任务ID
+     */
+    void markTaskAsNotCompleted(String groupId, String taskId);
 
-    @Transactional
-    public void removeMemberFromGroup(String groupId, String userId) {
-        groupRepository.removeMember(groupId, userId);
-    }
+    /**
+     * 获取群组成员列表
+     * @param groupId 群组ID
+     * @return 成员集合
+     */
+    Set<GroupMember> getGroupMembers(String groupId);
 
-    @Transactional
-    public void markTaskAsCompleted(String groupId, String taskId) {
-        groupRepository.addYesTask(groupId, taskId);
-    }
+    /**
+     * 获取群组已完成任务列表
+     * @param groupId 群组ID
+     * @return 任务ID集合
+     */
+    Set<String> getCompletedTasks(String groupId);
 
-    @Transactional
-    public void markTaskAsNotCompleted(String groupId, String taskId) {
-        groupRepository.addNoTask(groupId, taskId);
-    }
-
-    public Set<GroupMember> getGroupMembers(String groupId) {
-        return getGroup(groupId).getMemberList();
-    }
-
-    public Set<String> getCompletedTasks(String groupId) {
-        return getGroup(groupId).getYesTaskSet();
-    }
-
-    public Set<String> getNotCompletedTasks(String groupId) {
-        return getGroup(groupId).getNoTaskSet();
-    }
+    /**
+     * 获取群组未完成任务列表
+     * @param groupId 群组ID
+     * @return 任务ID集合
+     */
+    Set<String> getNotCompletedTasks(String groupId);
 }

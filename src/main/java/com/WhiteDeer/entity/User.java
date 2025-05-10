@@ -1,26 +1,61 @@
 package com.WhiteDeer.entity;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
+@Data
+@NoArgsConstructor
 public class User {
     private String id;
     private String name;
-    private String phoneNumber;
+    private String phone_number;
     private String password;
     private Set<String> groupSet = new HashSet<>();
     private Set<String> yesTaskSet = new HashSet<>();
     private Set<String> noTaskSet = new HashSet<>();
+    @Lob // 大对象注解
+    @Column(name = "face_image", columnDefinition = "LONGBLOB") // MySQL的二进制大对象类型
+    private byte[] faceImage;
 
-    public User() {}
+    @Column(name = "face_image_content_type", length = 100)
+    private String faceImageContentType;
 
-    public User( String name, String phoneNumber, String password) {
+
+
+
+    //public User() {}
+
+    public User( String name, String phoneNumber, String password, Set<String> groupSet, Set<String> yesTaskSet, Set<String> noTaskSet) {
         this.name = name;
-        this.phoneNumber = phoneNumber;
+        this.phone_number = phoneNumber;
+        this.password = password;
+        this.groupSet = groupSet;
+        this.yesTaskSet = yesTaskSet;
+        this.noTaskSet = noTaskSet;
+    }
+
+    // 密码加密存储
+    public void setPassword(String password) {
+        if (password == null || password.length() < 6) {
+            throw new IllegalArgumentException("密码长度不能少于6位");
+        }
+        // 实际应用中应加密存储密码
         this.password = password;
     }
 
-    // Getters and Setters
+    public void setPhoneNumber(String phoneNumber) {
+//        if (phoneNumber != null && !phoneNumber.matches("^1[3-9]\\d{9}$")) {
+//            throw new IllegalArgumentException("手机号格式不正确");
+//        }
+        this.phone_number = phoneNumber;
+    }
+
     public String getId() {
         return id;
     }
@@ -38,19 +73,11 @@ public class User {
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        return phone_number;
     }
 
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public Set<String> getGroupSet() {
@@ -66,13 +93,6 @@ public class User {
     }
 
     // 操作方法
-    public void addGroup(String groupId) {
-        groupSet.add(groupId);
-    }
-
-    public void removeGroup(String groupId) {
-        groupSet.remove(groupId);
-    }
 
     public void addYesTask(String taskId) {
         yesTaskSet.add(taskId);
@@ -103,4 +123,23 @@ public class User {
     public boolean hasNotCompletedTask(String taskId) {
         return noTaskSet.contains(taskId);
     }
+
+    // 新增人脸图片相关方法
+    public byte[] getFaceImage() {
+        return faceImage;
+    }
+
+    public void setFaceImage(byte[] faceImage) {
+        this.faceImage = faceImage;
+    }
+
+    public String getFaceImageContentType() {
+        return faceImageContentType;
+    }
+
+    public void setFaceImageContentType(String faceImageContentType) {
+        this.faceImageContentType = faceImageContentType;
+    }
+
+
 }

@@ -1,16 +1,22 @@
 package com.WhiteDeer.controller;
 
+
 import com.WhiteDeer.entity.User;
+import com.WhiteDeer.mapper.dto.UserDto;
 import com.WhiteDeer.mapper.ResponseMessage;
 import com.WhiteDeer.mapper.dto.UserDto;
 import com.WhiteDeer.service.UserService;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.PutExchange;
 
 import java.util.Set;
 
-@RestController
+@RestController//返回对象，直接转化为json文本
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
@@ -22,7 +28,9 @@ public class UserController {
 
     @PostMapping
     public ResponseMessage createUser(@Validated @RequestBody UserDto userDto) {
+        System.out.println(userDto.getPhoneNumber());
         User user = userService.add(userDto);
+
         return ResponseMessage.success(user);
     }
 
@@ -93,4 +101,7 @@ public class UserController {
         Set<String> tasks = userService.getNotCompletedTasks(userId);
         return ResponseMessage.success(tasks);
     }
+    //人脸部分
+
+
 }

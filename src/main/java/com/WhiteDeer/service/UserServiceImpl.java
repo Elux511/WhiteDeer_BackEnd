@@ -8,9 +8,12 @@ import com.WhiteDeer.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Set;
 
+/**
+ * 用户服务实现类
+ * 实现UserService接口定义的所有功能
+ */
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -22,8 +25,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User add(UserDto userDto) {
+        System.out.println(userDto.getPhoneNumber());
         User user = new User();
         BeanUtils.copyProperties(userDto, user);
+        System.out.println(user.toString());
         return userRepository.save(user);
     }
 
@@ -87,5 +92,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public Set<String> getNotCompletedTasks(String userId) {
         return getUser(userId).getNoTaskSet();
+    }
+    //face操作
+    @Override
+    @Transactional
+    public void uploadFaceImage(String userId, byte[] imageData, String contentType) {
+        User user = getUser(userId);
+        user.setFaceImage(imageData);
+        user.setFaceImageContentType(contentType);
+        userRepository.save(user);
+    }
+
+    @Override
+    public byte[] getFaceImage(String userId) {
+        return getUser(userId).getFaceImage();
+    }
+
+    @Override
+    public String getFaceImageContentType(String userId) {
+        return getUser(userId).getFaceImageContentType();
     }
 }
