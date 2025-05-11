@@ -68,13 +68,12 @@ public class UserRepository {
     public User save(User user) {
         String sql;
         if (user.getId() == null) {
-            user.setId(java.util.UUID.randomUUID().toString());
-            sql = "INSERT INTO users (id, name, phone_number, password, group_set, yes_task_set, no_task_set) " +
-                    "VALUES (?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb)";
+            sql = "INSERT INTO users (user_name, phone_number, password, group_set, yes_task_set, no_task_set) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
         } else {
-            sql = "UPDATE users SET name = ?, phone_number = ?, password = ?, " +
-                    "group_set = ?::jsonb, yes_task_set = ?::jsonb, no_task_set = ?::jsonb " +
-                    "WHERE id = ?";
+            sql = "UPDATE users SET user_name = ?, phone_number = ?, password = ?, " +
+                    "group_set = ?, yes_task_set = ?, no_task_set = ?" +
+                    "WHERE user_id = ?";
         }
 
         try {
@@ -84,13 +83,13 @@ public class UserRepository {
 
             if (user.getId() == null) {
                 jdbcTemplate.update(sql,
-                        user.getId(), user.getName(), user.getPhoneNumber(),
+                        user.getName(), user.getPhoneNumber(),
                         user.getPassword(), groupSetJson, yesTaskSetJson, noTaskSetJson);
             } else {
                 jdbcTemplate.update(sql,
                         user.getName(), user.getPhoneNumber(), user.getPassword(),
                         groupSetJson, yesTaskSetJson, noTaskSetJson,
-                        user.getId());
+                        Long.parseLong(user.getId()));
             }
             return user;
         } catch (Exception e) {

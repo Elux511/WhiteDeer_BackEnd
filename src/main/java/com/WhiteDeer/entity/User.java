@@ -2,6 +2,8 @@ package com.WhiteDeer.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.HashSet;
@@ -14,7 +16,9 @@ import java.util.List;
 public class User {
     private String id;
     private String name;
-    private String phoneNumber;
+    @NotNull(message = "手机号不能为空")
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
+    private String phone_number;
     private String password;
     private Set<String> groupSet = new HashSet<>();
     private Set<String> yesTaskSet = new HashSet<>();
@@ -33,7 +37,7 @@ public class User {
 
     public User( String name, String phoneNumber, String password, Set<String> groupSet, Set<String> yesTaskSet, Set<String> noTaskSet) {
         this.name = name;
-        this.phoneNumber = phoneNumber;
+        this.phone_number = phoneNumber;
         this.password = password;
         this.groupSet = groupSet;
         this.yesTaskSet = yesTaskSet;
@@ -42,8 +46,8 @@ public class User {
 
     // 密码加密存储
     public void setPassword(String password) {
-        if (password == null || password.length() < 6) {
-            throw new IllegalArgumentException("密码长度不能少于6位");
+        if (password == null || password.length() < 4) {
+            throw new IllegalArgumentException("密码长度不能少于4位");
         }
         // 实际应用中应加密存储密码
         this.password = password;
@@ -53,7 +57,7 @@ public class User {
         if (phoneNumber != null && !phoneNumber.matches("^1[3-9]\\d{9}$")) {
             throw new IllegalArgumentException("手机号格式不正确");
         }
-        this.phoneNumber = phoneNumber;
+        this.phone_number = phoneNumber;
     }
 
     public String getId() {
@@ -73,7 +77,7 @@ public class User {
     }
 
     public String getPhoneNumber() {
-        return phoneNumber;
+        return phone_number;
     }
 
     public String getPassword() {

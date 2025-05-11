@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User update(UserDto userDto) {
-        User existingUser = getUser(userDto.getId());
+        User existingUser = getUser(String.valueOf(userDto.getId()));
         BeanUtils.copyProperties(userDto, existingUser);
         return userRepository.save(existingUser);
     }

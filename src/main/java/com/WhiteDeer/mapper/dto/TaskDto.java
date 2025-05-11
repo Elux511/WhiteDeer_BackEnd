@@ -6,9 +6,9 @@ import java.time.LocalTime;
 public class TaskDto {
     private String id;
     private String name;
-    private String groupId;
-    private LocalTime beginTime;
-    private LocalTime endTime;
+    private String group_id;
+    private LocalTime begin_time;
+    private LocalTime end_time;
     private CheckInMethod method;
 
     // Getters and Setters
@@ -29,27 +29,27 @@ public class TaskDto {
     }
 
     public String getGroupId() {
-        return groupId;
+        return group_id;
     }
 
     public void setGroupId(String groupId) {
-        this.groupId = groupId;
+        this.group_id = groupId;
     }
 
     public LocalTime getBeginTime() {
-        return beginTime;
+        return begin_time;
     }
 
     public void setBeginTime(LocalTime beginTime) {
-        this.beginTime = beginTime;
+        this.begin_time = beginTime;
     }
 
     public LocalTime getEndTime() {
-        return endTime;
+        return end_time;
     }
 
     public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
+        this.end_time = endTime;
     }
 
     public CheckInMethod getMethod() {
