@@ -13,3 +13,6 @@ create table users
         unique (user_id)
 );
 ALTER TABLE users AUTO_INCREMENT = 10000000; -- 将自增初始值改为100
+
+DESCRIBE users;
+DESCRIBE tasks;
