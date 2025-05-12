@@ -21,30 +21,36 @@ public class UserController {
     @PostMapping("/api/login1")
     public Response<Map<String, Object>> loginByPhoneNumber(@RequestBody UserDTO userDTO) {
         UserDTO user = userService.getUserByPhoneNumber(userDTO.getPhoneNumber());
-        if (user.equals(null)) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", null);
-            data.put("haveface", null);
-            return Response.newSuccess(data);
-        } else {
+        if (user!=null) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", user.getId());
             data.put("haveface", user.isHaveface());
-            return Response.newSuccess(data);
+            return Response.loginSuccess(data);
+        } else {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", null);
+            data.put("haveface", null);
+            return Response.loginFailed(data);
         }
     }
 
     //账号密码登录
     @PostMapping("/api/login2")
-    public Response<Void> loginByPhoneNumber2(@RequestBody UserDTO userDTO){
+    public Response<Map<String, Object>> loginByPhoneNumber2(@RequestBody UserDTO userDTO) {
         UserDTO user = userService.getUserById(userDTO.getId());
-        if(user.equals(null)) {
-            return Response.newstate(2);
-        }else if(!user.getPassword().equals(userDTO.getPassword())) {
-            return Response.newstate(3);
+        if (user == null) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("haveface", null);
+            return Response.loginFailed(data);
+        } else if (!user.getPassword().equals(userDTO.getPassword())) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("haveface", null);
+            return Response.passwordFailed(data);
+        } else {
+            Map<String, Object> data = new HashMap<>();
+            data.put("haveface", user.isHaveface());
+            return Response.loginSuccess(data);
         }
-        else
-            return Response.newstate(1);
     }
 
     //获取个人信息

@@ -27,6 +27,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO getUserByPhoneNumber(String phoneNumber) {
         List<User> userList = userRepository.findByPhoneNumber(phoneNumber);
+        if (userList.isEmpty()) {
+            return null;
+        }
         return UserConverter.converterUser(userList.get(0));
     }
 
