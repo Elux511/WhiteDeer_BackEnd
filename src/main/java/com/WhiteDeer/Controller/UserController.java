@@ -36,7 +36,7 @@ public class UserController {
 
     //账号密码登录
     @PostMapping("/api/login2")
-    public Response<Map<String, Object>> loginByPhoneNumber2(@RequestBody UserDTO userDTO) {
+    public Response<Map<String, Object>> loginByID(@RequestBody UserDTO userDTO) {
         UserDTO user = userService.getUserById(userDTO.getId());
         if (user == null) {
             Map<String, Object> data = new HashMap<>();
