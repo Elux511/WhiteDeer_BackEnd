@@ -1,0 +1,120 @@
+package com.WhiteDeer.dto;
+
+import com.WhiteDeer.dao.Task;
+
+import java.time.LocalDateTime;
+
+public class TaskDTO {
+    private long id;
+    private long groupId;
+    private String groupName;
+    private String name;
+    private LocalDateTime beginTime;
+    private LocalDateTime endTime;
+    private String type;
+    private String description;
+    private double latitude;
+    private double longitude;
+    private double accuracy;
+    private int shouldCount;
+    private int actualCount;
+    private boolean isQRcode;
+
+    public long getId() {
+        return id;
+    }
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getGroupId() {
+        return groupId;
+    }
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public LocalDateTime getBeginTime() {
+        return beginTime;
+    }
+    public void setBeginTime(LocalDateTime beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public String getType() {
+        return type;
+    }
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getAccuracy() {
+        return accuracy;
+    }
+    public void setAccuracy(double accuracy) {
+        this.accuracy = accuracy;
+    }
+
+    public int getShouldCount() {
+        return shouldCount;
+    }
+    public void setShouldCount(int shouldCount) {
+        this.shouldCount = shouldCount;
+    }
+
+    public int getActualCount() {
+        return actualCount;
+    }
+    public void setActualCount(int actualCount) {
+        this.actualCount = actualCount;
+    }
+
+    public boolean isQRcode() {
+        return isQRcode;
+    }
+    public void setQRcode(boolean QRcode) {
+        isQRcode = QRcode;
+    }
+}

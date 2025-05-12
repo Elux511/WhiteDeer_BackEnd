@@ -8,6 +8,9 @@ import com.WhiteDeer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 public class UserController {
 
@@ -16,8 +19,19 @@ public class UserController {
 
     //手机号登录
     @PostMapping("/api/login1")
-    public Response<Long> loginByPhoneNumber(@RequestBody UserDTO userDTO){
-        return Response.newSuccess(userService.getUserByPhoneNumber(userDTO.getPhoneNumber()).getId());
+    public Response<Map<String, Object>> loginByPhoneNumber(@RequestBody UserDTO userDTO) {
+        UserDTO user = userService.getUserByPhoneNumber(userDTO.getPhoneNumber());
+        if (user.equals(null)) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", null);
+            data.put("haveface", null);
+            return Response.newSuccess(data);
+        } else {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", user.getId());
+            data.put("haveface", user.isHaveface());
+            return Response.newSuccess(data);
+        }
     }
 
     //账号密码登录
@@ -34,7 +48,7 @@ public class UserController {
     }
 
     //获取个人信息
-    @GetMapping("/api/myinfo")//存疑
+    @GetMapping("/api/myinfo/")
     public Response<UserDTO> getUserById(@RequestParam long id) {
         return Response.newSuccess(userService.getUserById(id));
     }

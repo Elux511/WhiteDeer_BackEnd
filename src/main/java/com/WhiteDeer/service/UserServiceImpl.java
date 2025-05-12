@@ -26,14 +26,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserByPhoneNumber(String phoneNumber) {
-        User user = userRepository.findByPhoneNumber(phoneNumber);
-        return UserConverter.converterUser(user);
+        List<User> userList = userRepository.findByPhoneNumber(phoneNumber);
+        return UserConverter.converterUser(userList.get(0));
     }
 
     @Override
     public Long createUser(UserDTO userDTO) throws IllegalAccessException {
-        User userTemp = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
-        if(!userTemp.equals(null)){
+        List<User> userList = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
+        if(!userList.isEmpty()){
             throw new IllegalAccessException("电话已被占用");
         }
         User user = userRepository.save(UserConverter.converterUser(userDTO));

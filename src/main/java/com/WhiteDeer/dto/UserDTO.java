@@ -3,6 +3,7 @@ package com.WhiteDeer.dto;
 import jakarta.persistence.Column;
 
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Vector;
 
 public class UserDTO {
@@ -11,10 +12,10 @@ public class UserDTO {
     private String password;
     private String phoneNumber;
     private Blob face;
-    private Vector<String> yesTaskSet;
-    private Vector<String> noTaskSet;
-    private Vector<String> createGroupSet;
-    private Vector<String> joinGroupSet;
+    private Vector<Long> yesTaskSet;
+    private Vector<Long> noTaskSet;
+    private Vector<Long> createGroupSet;
+    private Vector<Long> joinGroupSet;
 
 
 
@@ -53,31 +54,41 @@ public class UserDTO {
         this.face = face;
     }
 
-    public Vector<String> getYesTaskSet() {
+    public Vector<Long> getYesTaskSet() {
         return yesTaskSet;
     }
-    public void setYesTaskSet(Vector<String> yesTaskSet) {
+    public void setYesTaskSet(Vector<Long> yesTaskSet) {
         this.yesTaskSet = yesTaskSet;
     }
 
-    public Vector<String> getJoinGroupSet() {
+    public Vector<Long> getJoinGroupSet() {
         return joinGroupSet;
     }
-    public void setJoinGroupSet(Vector<String> joinGroupSet) {
+    public void setJoinGroupSet(Vector<Long> joinGroupSet) {
         this.joinGroupSet = joinGroupSet;
     }
 
-    public Vector<String> getCreateGroupSet() {
+    public Vector<Long> getCreateGroupSet() {
         return createGroupSet;
     }
-    public void setCreateGroupSet(Vector<String> createGroupSet) {
+    public void setCreateGroupSet(Vector<Long> createGroupSet) {
         this.createGroupSet = createGroupSet;
     }
 
-    public Vector<String> getNoTaskSet() {
+    public Vector<Long> getNoTaskSet() {
         return noTaskSet;
     }
-    public void setNoTaskSet(Vector<String> noTaskSet) {
+    public void setNoTaskSet(Vector<Long> noTaskSet) {
         this.noTaskSet = noTaskSet;
     }
+
+    public boolean isHaveface() {
+        try {
+            return face != null && face.length() > 0;
+        } catch (SQLException e) {
+            // 处理异常，例如记录日志或返回默认值
+            return false;
+        }
+    }
+
 }

@@ -4,7 +4,9 @@ package com.WhiteDeer.dao;
 import jakarta.persistence.*;
 
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Vector;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Table(name="users")
@@ -27,16 +29,16 @@ public class User {
     private Blob face;
 
     @Column(name = "yes_task_set")
-    private Vector<String> yesTaskSet;
+    private Vector<Long> yesTaskSet;
 
     @Column(name = "no_task_set")
-    private Vector<String> noTaskSet;
+    private Vector<Long> noTaskSet;
 
     @Column(name = "create_group_set")
-    private Vector<String> createGroupSet;
+    private Vector<Long> createGroupSet;
 
     @Column(name = "join_group_set")
-    private Vector<String> joinGroupSet;
+    private Vector<Long> joinGroupSet;
 
     public long getId() {
         return id;
@@ -73,32 +75,40 @@ public class User {
         this.face = face;
     }
 
-    public Vector<String> getYesTaskSet() {
+    public Vector<Long> getJoinGroupSet() {
+        return joinGroupSet;
+    }
+    public void setJoinGroupSet(Vector<Long> joinGroupSet) {
+        this.joinGroupSet = joinGroupSet;
+    }
+
+    public Vector<Long> getYesTaskSet() {
         return yesTaskSet;
     }
-    public void setYesTaskSet(Vector<String> yesTaskSet) {
+    public void setYesTaskSet(Vector<Long> yesTaskSet) {
         this.yesTaskSet = yesTaskSet;
     }
 
-    public Vector<String> getNoTaskSet() {
+    public Vector<Long> getNoTaskSet() {
         return noTaskSet;
     }
-    public void setNoTaskSet(Vector<String> noTaskSet) {
+    public void setNoTaskSet(Vector<Long> noTaskSet) {
         this.noTaskSet = noTaskSet;
     }
 
-    public Vector<String> getCreateGroupSet() {
+    public Vector<Long> getCreateGroupSet() {
         return createGroupSet;
     }
-    public void setCreateGroupSet(Vector<String> createGroupSet) {
+    public void setCreateGroupSet(Vector<Long> createGroupSet) {
         this.createGroupSet = createGroupSet;
     }
 
-    public Vector<String> getJoinGroupSet() {
-        return joinGroupSet;
-    }
-    public void setJoinGroupSet(Vector<String> joinGroupSet) {
-        this.joinGroupSet = joinGroupSet;
+    public boolean isHaveface() {
+        try {
+            return face != null && face.length() > 0;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 }
 
