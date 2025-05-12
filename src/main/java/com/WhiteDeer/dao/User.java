@@ -3,6 +3,7 @@ package com.WhiteDeer.dao;
 
 import jakarta.persistence.*;
 
+import java.sql.Blob;
 import java.util.Vector;
 
 @Entity
@@ -23,7 +24,7 @@ public class User {
     private String phoneNumber;
 
     @Column(name = "face")
-    private byte[] face;
+    private Blob face;
 
     @Column(name = "yes_task_set")
     private Vector<String> yesTaskSet;
@@ -65,10 +66,10 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public byte[] getFace() {
+    public Blob getFace() {
         return face;
     }
-    public void setFace(byte[] face) {
+    public void setFace(Blob face) {
         this.face = face;
     }
 

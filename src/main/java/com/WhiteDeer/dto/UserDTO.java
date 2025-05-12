@@ -1,11 +1,13 @@
 package com.WhiteDeer.dto;
 
+import java.sql.Blob;
+
 public class UserDTO {
     private Long id;
     private String name;
     private String password;
     private String phoneNumber;
-    private byte[] face;
+    private Blob face;
 
 
 
@@ -37,10 +39,10 @@ public class UserDTO {
         this.phoneNumber = phoneNumber;
     }
 
-    public byte[] getFace() {
+    public Blob getFace() {
         return face;
     }
-    public void setFace(byte[] face) {
+    public void setFace(Blob face) {
         this.face = face;
     }
 }
