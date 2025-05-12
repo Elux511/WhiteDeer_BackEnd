@@ -12,4 +12,4 @@ create table users
     constraint users_pk
         unique (user_id)
 );
-
+ALTER TABLE users AUTO_INCREMENT = 10000000; -- 将自增初始值改为100
