@@ -1,6 +1,9 @@
 package com.WhiteDeer.dto;
 
+import jakarta.persistence.Column;
+
 import java.sql.Blob;
+import java.util.Vector;
 
 public class UserDTO {
     private Long id;
@@ -8,6 +11,10 @@ public class UserDTO {
     private String password;
     private String phoneNumber;
     private Blob face;
+    private Vector<String> yesTaskSet;
+    private Vector<String> noTaskSet;
+    private Vector<String> createGroupSet;
+    private Vector<String> joinGroupSet;
 
 
 
@@ -44,5 +51,33 @@ public class UserDTO {
     }
     public void setFace(Blob face) {
         this.face = face;
+    }
+
+    public Vector<String> getYesTaskSet() {
+        return yesTaskSet;
+    }
+    public void setYesTaskSet(Vector<String> yesTaskSet) {
+        this.yesTaskSet = yesTaskSet;
+    }
+
+    public Vector<String> getJoinGroupSet() {
+        return joinGroupSet;
+    }
+    public void setJoinGroupSet(Vector<String> joinGroupSet) {
+        this.joinGroupSet = joinGroupSet;
+    }
+
+    public Vector<String> getCreateGroupSet() {
+        return createGroupSet;
+    }
+    public void setCreateGroupSet(Vector<String> createGroupSet) {
+        this.createGroupSet = createGroupSet;
+    }
+
+    public Vector<String> getNoTaskSet() {
+        return noTaskSet;
+    }
+    public void setNoTaskSet(Vector<String> noTaskSet) {
+        this.noTaskSet = noTaskSet;
     }
 }
