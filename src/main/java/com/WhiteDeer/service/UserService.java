@@ -7,6 +7,8 @@ public interface UserService {
 
     UserDTO getUserById(Long id);
 
+    UserDTO getUserByPhoneNumber(String phoneNumber);
+
     Long createUser(UserDTO userDTO) throws IllegalAccessException;
 
     void deleteUserById(long id);
