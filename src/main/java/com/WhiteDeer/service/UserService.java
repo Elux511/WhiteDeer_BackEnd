@@ -1,61 +1,24 @@
 package com.WhiteDeer.service;
 
-import com.WhiteDeer.entity.User;
-import com.WhiteDeer.exception.UserNotFoundException;
-import com.WhiteDeer.mapper.dto.UserDto;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.Set;
+import com.WhiteDeer.dto.UserDTO;
 
-/**
- * 用户服务接口
- * 定义用户管理的核心操作契约
- */
+import java.util.Optional;
+
 public interface UserService {
-    // 添加用户
-    @Transactional
-    User add(UserDto userDto);
 
-    // 根据ID获取用户
-    User getUser(String userId) throws UserNotFoundException;
+    Optional<UserDTO> getUserById(Long id);
 
-    // 更新用户信息
-    @Transactional
-    User update(UserDto userDto);
+    Optional<UserDTO> getUserByPhoneNumber(String phoneNumber);
 
-    // 删除用户
-    @Transactional
-    void delete(String userId);
+    Long createUser(UserDTO userDTO) throws IllegalAccessException;
 
-    // 添加用户到组
-    @Transactional
-    void addUserToGroup(String userId, String groupId);
+    void deleteUserById(long id);
 
-    // 从组移除用户
-    @Transactional
-    void removeUserFromGroup(String userId, String groupId);
+    void updateNameById(UserDTO userDTO);
 
-    // 标记任务为已完成
-    @Transactional
-    void markTaskAsCompleted(String userId, String taskId);
+    void updatePhoneNumberById(UserDTO userDTO);
 
-    // 标记任务为未完成
-    @Transactional
-    void markTaskAsNotCompleted(String userId, String taskId);
+    void updateFaceById(UserDTO userDTO);
 
-    // 获取用户所属组
-    Set<String> getUserGroups(String userId);
-
-    // 获取用户已完成任务
-    Set<String> getCompletedTasks(String userId);
-
-    // 获取用户未完成任务
-    Set<String> getNotCompletedTasks(String userId);
-
-    //face操作
-    @Transactional
-    void uploadFaceImage(String userId, byte[] imageData, String contentType);
-
-    byte[] getFaceImage(String userId);
-
-    String getFaceImageContentType(String userId);
+    void finishTaskById(long userId, long taskId);
 }

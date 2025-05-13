@@ -1,6 +1,6 @@
-import os
+import base64
 import sys
-
+from io import BytesIO
 import cv2 as cv
 import numpy as np
 from PIL import Image
@@ -14,10 +14,15 @@ recognizer = cv.face.LBPHFaceRecognizer_create()
 
 #人脸识别（用于后续打卡）
 #将传入的人脸图片与训练模型中的图片一一对照
-def checkFace(user_id, img_path):
+def checkFace(user_id, img_base64):
+
+    # 解码Base64字符串为字节数据
+    decoded_data = base64.b64decode(img_base64)
+    # 使用BytesIO将字节数据转换为文件对象
+    img_path = BytesIO(decoded_data)
 
     recognizer.read(f"trainer/{user_id}_trainer.yml")
-    img = cv.imread(img_path)
+    #img = cv.imread(img_path)
     PIL_image = Image.open(img_path).convert('L')
     img_numpy = np.array(PIL_image, 'uint8')
     face = face_detector.detectMultiScale(img_numpy, 1.1, 5, 0)

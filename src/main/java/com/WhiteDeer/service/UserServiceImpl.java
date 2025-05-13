@@ -1,115 +1,129 @@
-package com.WhiteDeer.service.impl;
+package com.WhiteDeer.service;
 
-import com.WhiteDeer.entity.User;
-import com.WhiteDeer.exception.UserNotFoundException;
-import com.WhiteDeer.mapper.dto.UserDto;
-import com.WhiteDeer.repository.UserRepository;
-import com.WhiteDeer.service.UserService;
-import org.springframework.beans.BeanUtils;
+import com.WhiteDeer.converter.UserConverter;
+import com.WhiteDeer.dao.User;
+import com.WhiteDeer.dao.UserRepository;
+import com.WhiteDeer.dto.UserDTO;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Set;
 
-/**
- * 用户服务实现类
- * 实现UserService接口定义的所有功能
- */
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    //通过ID获取用户
+    @Override
+    public Optional<UserDTO> getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(UserConverter::converterUser);
     }
 
+    //通过手机号获取用户 注意：只会获取第一个
     @Override
-    @Transactional
-    public User add(UserDto userDto) {
-        System.out.println(userDto.getPhoneNumber());
-        User user = new User();
-        BeanUtils.copyProperties(userDto, user);
-        System.out.println(user.toString());
-        return userRepository.save(user);
+    public Optional<UserDTO> getUserByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber)
+                .stream()
+                .findFirst()
+                .map(UserConverter::converterUser);
     }
 
+    //创建用户
     @Override
-    public User getUser(String userId) {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new UserNotFoundException(userId);
+    public Long createUser(UserDTO userDTO) throws IllegalArgumentException {
+        // 检查手机号是否已存在
+        Optional<User> existingUser = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
+        if (existingUser.isPresent()) {
+            throw new IllegalArgumentException("手机号已被注册: " + userDTO.getPhoneNumber());
         }
-        return user;
+
+        // 转换DTO并保存用户
+        User user = UserConverter.converterUser(userDTO);
+        User savedUser = userRepository.save(user);
+        return savedUser.getId();
     }
 
+    //根据ID删除用户
+    public void deleteUserById(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("用户ID不存在: " + id));
+        userRepository.delete(user); //删除所查询到的实体
+    }
+
+    //根据ID更新用户名
     @Override
     @Transactional
-    public User update(UserDto userDto) {
-        User existingUser = getUser(userDto.getId());
-        BeanUtils.copyProperties(userDto, existingUser);
-        return userRepository.save(existingUser);
+    public void updateNameById(UserDTO userDTO) {
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setName(userDTO.getName());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
     }
 
+    //根据ID更新手机号
     @Override
     @Transactional
-    public void delete(String userId) {
-        userRepository.deleteById(userId);
+    public void updatePhoneNumberById(UserDTO userDTO) {
+        // 检查新手机号是否已被其他用户使用
+        getUserByPhoneNumber(userDTO.getPhoneNumber())
+                .ifPresent(existingUser -> {
+                    if (!existingUser.getId().equals(userDTO.getId())) {
+                        throw new IllegalArgumentException("手机号已被其他用户占用: " + userDTO.getPhoneNumber());
+                    }
+                });
+
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setPhoneNumber(userDTO.getPhoneNumber());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
     }
 
+    //根据ID更新人脸
+    public void updateFaceById(UserDTO userDTO) {
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setFace(userDTO.getFace());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
+    }
+
+    //根据ID完成打卡任务
     @Override
     @Transactional
-    public void addUserToGroup(String userId, String groupId) {
-        userRepository.addGroup(userId, groupId);
-    }
-
-    @Override
-    @Transactional
-    public void removeUserFromGroup(String userId, String groupId) {
-        userRepository.removeGroup(userId, groupId);
-    }
-
-    @Override
-    @Transactional
-    public void markTaskAsCompleted(String userId, String taskId) {
-        userRepository.addYesTask(userId, taskId);
-    }
-
-    @Override
-    @Transactional
-    public void markTaskAsNotCompleted(String userId, String taskId) {
-        userRepository.addNoTask(userId, taskId);
-    }
-
-    @Override
-    public Set<String> getUserGroups(String userId) {
-        return getUser(userId).getGroupSet();
-    }
-
-    @Override
-    public Set<String> getCompletedTasks(String userId) {
-        return getUser(userId).getYesTaskSet();
-    }
-
-    @Override
-    public Set<String> getNotCompletedTasks(String userId) {
-        return getUser(userId).getNoTaskSet();
-    }
-    //face操作
-    @Override
-    @Transactional
-    public void uploadFaceImage(String userId, byte[] imageData, String contentType) {
-        User user = getUser(userId);
-        user.setFaceImage(imageData);
-        user.setFaceImageContentType(contentType);
-        userRepository.save(user);
-    }
-
-    @Override
-    public byte[] getFaceImage(String userId) {
-        return getUser(userId).getFaceImage();
-    }
-
-    @Override
-    public String getFaceImageContentType(String userId) {
-        return getUser(userId).getFaceImageContentType();
+    public void finishTaskById(long userId, long taskId) {
+        userRepository.findById(userId)
+                .ifPresentOrElse(
+                        user -> {
+                            user.addYes(taskId);
+                            user.deleteNo(taskId);
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userId);
+                        }
+                );
     }
 }
