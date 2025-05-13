@@ -27,6 +27,8 @@ public class TaskConverter {
         task.setType(taskDTO.getType());
         task.setDescription(taskDTO.getDescription());
         task.setQRcode(taskDTO.isQRcode());
+        task.setCompletedUserList(taskDTO.getCompletedUserList());
+        task.setIncompleteUserList(taskDTO.getIncompleteUserList());
         if(taskDTO.getType() == "定位打卡" || taskDTO.getType() == "都")
         {
             task.setLatitude(taskDTO.getLatitude());

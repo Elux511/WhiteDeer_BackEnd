@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RestController
@@ -59,8 +60,13 @@ public class TaskController {
 
     //删除打卡任务
     @DeleteMapping("/api/deletetask")
-    public void deleteTask(@RequestParam long id) {
-        taskService.deleteTaskById(id);
+    public Response<Void> deleteTask(@RequestParam long id) {
+        try{
+            taskService.deleteTaskById(id);
+            return Response.newState(1);
+        }catch (IllegalArgumentException e){
+            return Response.newState(2);
+        }
     }
 
     //打卡
