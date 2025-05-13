@@ -25,13 +25,13 @@ public class UserController {
                     Map<String, Object> data = new HashMap<>();
                     data.put("id", user.getId());
                     data.put("haveface", user.isHaveface());
-                    return Response.loginSuccess(data);
+                    return Response.newSuccess(1,data);
                 })
                 .orElseGet(() -> {
                     Map<String, Object> data = new HashMap<>();
                     data.put("id", null);
                     data.put("haveface", null);
-                    return Response.loginFailed(data);
+                    return Response.newFailed(2,data);
                 });
     }
 
@@ -43,20 +43,20 @@ public class UserController {
                     if (!user.getPassword().equals(userDTO.getPassword())) {
                         Map<String, Object> data = new HashMap<>();
                         data.put("haveface", null);
-                        return Response.passwordFailed(data);
+                        return Response.newFailed(3,data);
                     }
                     Map<String, Object> data = new HashMap<>();
                     data.put("haveface", user.isHaveface());
-                    return Response.loginSuccess(data);
+                    return Response.newSuccess(1,data);
                 })
                 .orElseGet(() -> {
                     Map<String, Object> data = new HashMap<>();
                     data.put("haveface", null);
-                    return Response.loginFailed(data);
+                    return Response.newFailed(2,data);
                 });
     }
 
-//    //获取个人信息
+    //获取个人信息
 //    @GetMapping("/api/myinfo/")
 //    public Response<UserDTO> getUserById(@RequestParam long id) {
 //        return userService.getUserById(id)
@@ -66,31 +66,74 @@ public class UserController {
 
     //注册新用户
     @PostMapping("/api/register")
-    public Response<Long> createUser(@RequestBody UserDTO userDTO) throws IllegalAccessException {
-        return Response.newSuccess(userService.createUser(userDTO));
+    public Response<Map<String, Object>> createUser(@RequestBody UserDTO userDTO) {
+        try {
+            Long userId = userService.createUser(userDTO);
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userId);
+            return Response.newSuccess(1, data);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", null);
+            return Response.newFailed(2, data);
+        }
     }
 
     //删除用户
     @DeleteMapping("/api/deleteuser")
-    public void deleteUserById(@RequestParam long id) {
-        userService.deleteUserById(id);
+    public Response<Map<String, Object>> deleteUserById(@RequestParam long id) {
+        try {
+            userService.deleteUserById(id);
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", id);
+            data.put("success", true);
+            return Response.newSuccess(1, data);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", id);
+            data.put("success", false);
+            return Response.newFailed(2, data);
+        }
     }
 
     //修改用户name
     @PatchMapping("/api/changename")
-    public void updateNameById(@RequestBody UserDTO userDTO) throws IllegalAccessException {
-        userService.updateNameById(userDTO);
+    public Response<Void> updateNameById(@RequestBody UserDTO userDTO) {
+        try {
+            userService.updateNameById(userDTO);
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", true);
+            return Response.newState(1);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            return Response.newState(2);
+        }
     }
 
     //修改用户phoneNumber
     @PatchMapping("/api/changephone")
-    public void updatePhoneNumberById(@RequestBody UserDTO userDTO) throws IllegalAccessException {
-        userService.updatePhoneNumberById(userDTO);
+    public Response<Void> updatePhoneNumberById(@RequestBody UserDTO userDTO) {
+        try {
+            userService.updatePhoneNumberById(userDTO);
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", true);
+            return Response.newState(1);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            return Response.newState(2);
+        }
     }
 
-    //修改用户face
-    @PatchMapping("/api/setface")
-    public void updateFaceById(@RequestBody UserDTO userDTO) throws IllegalAccessException {
-        userService.updateFaceById(userDTO);
-    }
+//    //修改用户face
+//    @PatchMapping("/api/setface")
+//    public void updateFaceById(@RequestBody UserDTO userDTO) throws IllegalAccessException {
+//        userService.updateFaceById(userDTO);
+//    }
+
 }

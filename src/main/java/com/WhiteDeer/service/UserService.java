@@ -2,6 +2,7 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.dto.UserDTO;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -10,7 +11,7 @@ public interface UserService {
 
     Optional<UserDTO> getUserByPhoneNumber(String phoneNumber);
 
-    Long createUser(UserDTO userDTO) throws IllegalAccessException;
+    Long createUser(UserDTO userDTO) throws IllegalArgumentException;
 
     void deleteUserById(long id);
 
