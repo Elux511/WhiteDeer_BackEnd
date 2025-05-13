@@ -8,4 +8,8 @@ public interface TaskService {
     void createTask(TaskDTO taskDTO);
 
     TaskDTO getTaskById(Long id);
+
+    void deleteUserById(long id);
+
+    int checkinTask(TaskDTO taskDTO);
 }

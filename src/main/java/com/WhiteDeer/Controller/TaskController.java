@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class TaskController {
@@ -23,17 +24,23 @@ public class TaskController {
     @Autowired
     private UserService userService;
 
-
+    //发布新的打卡任务
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
         taskService.createTask(taskDTO);
-        return Response.newstate(1);
+        return Response.newState(1);
     }
 
+    //初始化打卡列表
     @GetMapping("/api/mycheckin")
     public Response<List<Pair<TaskDTO,String>>> getTask(@RequestParam long id) {
-        UserDTO userDTO = userService.getUserById(id);
+        Optional<UserDTO> userOPT = userService.getUserById(id);
         List<Pair<TaskDTO,String>> taskList = new ArrayList<>();
+
+        if(userOPT.isEmpty()) {
+            return Response.newFailed(taskList);
+        }
+        UserDTO userDTO = userOPT.get();
         for(Long taskId : userDTO.getYesTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
@@ -47,5 +54,23 @@ public class TaskController {
             taskList.add(pair);
         }
         return Response.newSuccess(taskList);
+    }
+
+    //删除打卡任务
+    @DeleteMapping("/api/deletetask")
+    public void deleteTask(@RequestParam long id) {
+        taskService.deleteUserById(id);
+    }
+
+    //打卡
+    @PostMapping("/api/checkin")
+    public Response<Void> checkinTask(@RequestParam long id, @RequestBody TaskDTO taskDTO) throws IllegalAccessException {
+        Optional<UserDTO> userOPT = userService.getUserById(id);
+        if(userOPT.isEmpty()) {
+            return Response.newState(4);
+        }
+        UserDTO userDTO = userOPT.get();
+
+        taskService.checkinTask(taskDTO);
     }
 }

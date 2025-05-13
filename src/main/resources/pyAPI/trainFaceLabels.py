@@ -45,6 +45,8 @@ def getImageLabels(user_id, img_path):
     #让识别器记录id和对应人脸
     recognizer.train(face_sample,np.array(id))
     recognizer.write(f"trainer/{user_id}_trainer.yml")
+    print(1)
+
 
 if __name__ == "__main__":
 

@@ -56,13 +56,13 @@ public class UserController {
                 });
     }
 
-    //获取个人信息
-    @GetMapping("/api/myinfo/")
-    public Response<UserDTO> getUserById(@RequestParam long id) {
-        return userService.getUserById(id)
-                .map(Response::<UserDTO>myinfoSuccess)
-                .orElseGet(() -> Response.myinfoFailed("用户不存在"));
-    }
+//    //获取个人信息
+//    @GetMapping("/api/myinfo/")
+//    public Response<UserDTO> getUserById(@RequestParam long id) {
+//        return userService.getUserById(id)
+//                .map(Response::<UserDTO>myinfoSuccess)
+//                .orElseGet(() -> Response.myinfoFailed("用户不存在"));
+//    }
 
     //注册新用户
     @PostMapping("/api/register")
