@@ -112,6 +112,32 @@ public class User {
         this.createGroupSet = createGroupSet;
     }
 
+    public void addYes(long task_id){
+        yesTaskSet.add(task_id);
+    }
+    public void addNo(long task_id){
+        noTaskSet.add(task_id);
+    }
+    public void deleteYes(long task_id){
+        yesTaskSet.remove(task_id);
+    }
+    public void deleteNo(long task_id){
+        noTaskSet.remove(task_id);
+    }
+
+    public void addCreateGroup(long task_id){
+        createGroupSet.add(task_id);
+    }
+    public void addJoinGroup(long task_id){
+        joinGroupSet.add(task_id);
+    }
+    public void deleteCreateGroup(long task_id){
+        createGroupSet.remove(task_id);
+    }
+    public void deleteJoinGroup(long task_id){
+        joinGroupSet.remove(task_id);
+    }
+
     public boolean isHaveface() {
         try {
             return face != null && face.length() > 0;

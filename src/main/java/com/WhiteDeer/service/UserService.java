@@ -19,4 +19,6 @@ public interface UserService {
     void updatePhoneNumberById(UserDTO userDTO);
 
     void updateFaceById(UserDTO userDTO);
+
+    void finishTaskById(long userId, long taskId);
 }

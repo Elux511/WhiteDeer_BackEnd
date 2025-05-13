@@ -60,7 +60,7 @@ public class TaskController {
     //删除打卡任务
     @DeleteMapping("/api/deletetask")
     public void deleteTask(@RequestParam long id) {
-        taskService.deleteUserById(id);
+        taskService.deleteTaskById(id);
     }
 
     //打卡
@@ -71,7 +71,11 @@ public class TaskController {
             return Response.newState(4);
         }
         UserDTO userDTO = userOPT.get();
-
-        taskService.checkinTask(taskDTO,userDTO.getId());
+        int result = taskService.checkinTask(taskDTO,userDTO.getId());
+        if(result == 1) {
+            userService.finishTaskById(userDTO.getId(),taskDTO.getId());
+            taskService.finishTaskById(userDTO.getId(),taskDTO.getId());
+        }
+        return Response.newState(result);
     }
 }

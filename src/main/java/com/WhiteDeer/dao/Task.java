@@ -38,11 +38,11 @@ public class Task {
 
     @Column(name="completed_user_list")
     @JdbcTypeCode(SqlTypes.JSON)
-    private Vector<String> completedUserList;
+    private Vector<Long> completedUserList;
 
-    @Column(name="uncompleted_user_list")
+    @Column(name="incomplete_user_list")
     @JdbcTypeCode(SqlTypes.JSON)
-    private Vector<String> uncompletedUserList;
+    private Vector<Long> incompleteUserList;
 
     @Column(name="type")
     private String type;
@@ -86,17 +86,17 @@ public class Task {
         this.description = description;
     }
 
-    public Vector<String> getUncompletedUserList() {
-        return uncompletedUserList;
+    public Vector<Long> getIncompleteUserList() {
+        return incompleteUserList;
     }
-    public void setUncompletedUserList(Vector<String> uncompletedUserList) {
-        this.uncompletedUserList = uncompletedUserList;
+    public void setIncompleteUserList(Vector<Long> incompleteUserList) {
+        this.incompleteUserList = incompleteUserList;
     }
 
-    public Vector<String> getCompletedUserList() {
+    public Vector<Long> getCompletedUserList() {
         return completedUserList;
     }
-    public void setCompletedUserList(Vector<String> completedUserList) {
+    public void setCompletedUserList(Vector<Long> completedUserList) {
         this.completedUserList = completedUserList;
     }
 
@@ -182,5 +182,18 @@ public class Task {
     }
     public void setType(String type) {
         this.type = type;
+    }
+
+    public void addCompletedUser(long userId) {
+        completedUserList.add(userId);
+    }
+    public void addIncompleteUser(long userId) {
+        incompleteUserList.add(userId);
+    }
+    public void deleteCompletedUser(long userId) {
+        completedUserList.remove(userId);
+    }
+    public void deleteIncompleteUser(long userId) {
+        incompleteUserList.remove(userId);
     }
 }

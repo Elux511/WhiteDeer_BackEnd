@@ -20,24 +20,28 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    //创建task
     @Override
     public void createTask(TaskDTO taskDTO) {
         taskRepository.save(TaskConverter.convertTask(taskDTO));
     }
 
+    //通过id获取task
     @Override
     public TaskDTO getTaskById(Long id) {
        Task task = taskRepository.getById(id);
        return TaskConverter.convertTask(task);
     }
 
+    //通过id删除task
     @Override
-    public void deleteUserById(long id) {
+    public void deleteTaskById(long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("打卡任务ID不存在: " + id));
         taskRepository.delete(task); //删除所查询到的实体
     }
 
+    //用户打卡过程
     @Override
     public int checkinTask(TaskDTO taskDTO, long userId) throws IOException {
         Task task = taskRepository.getById(taskDTO.getId());
@@ -68,6 +72,15 @@ public class TaskServiceImpl implements TaskService {
                 return 3;
             }
         }
+    }
+
+    //用户打卡完成后
+    @Override
+    public void finishTaskById(long userId, long taskId) {
+        Task task = taskRepository.getById(taskId);
+        task.addCompletedUser(userId);
+        task.deleteIncompleteUser(userId);
+        taskRepository.save(task);
     }
 
 }

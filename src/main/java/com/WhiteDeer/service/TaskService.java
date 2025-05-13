@@ -11,7 +11,9 @@ public interface TaskService {
 
     TaskDTO getTaskById(Long id);
 
-    void deleteUserById(long id);
+    void deleteTaskById(long id);
 
     int checkinTask(TaskDTO taskDTO,long userId) throws IOException;
+
+    void finishTaskById(long userId, long taskId) throws IOException;
 }

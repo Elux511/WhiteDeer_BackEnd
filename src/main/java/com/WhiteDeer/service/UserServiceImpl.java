@@ -109,4 +109,21 @@ public class UserServiceImpl implements UserService {
                         }
                 );
     }
+
+    //根据ID完成打卡任务
+    @Override
+    @Transactional
+    public void finishTaskById(long userId, long taskId) {
+        userRepository.findById(userId)
+                .ifPresentOrElse(
+                        user -> {
+                            user.addYes(taskId);
+                            user.deleteNo(taskId);
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userId);
+                        }
+                );
+    }
 }
