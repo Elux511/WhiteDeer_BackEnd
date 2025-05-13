@@ -1,41 +1,35 @@
 package com.WhiteDeer;
 
+import java.util.Map;
+
 public class Response <T>{
     private T data;
     private int state;
 
-
-    public static <K> Response<K> newSuccess(K data) {
+    //基础成功相应模板
+    public static <K> Response<K> newSuccess(int state,K data) {
         Response<K> response = new Response<K>();
-        response.setState(1);
-        response.setData(data);
-        return response;
-    }
-    public static <K> Response<K> loginSuccess(K data) {
-        Response<K> response = new Response<K>();
-        response.setState(1);
-        response.setData(data);
-        return response;
-    }
-    public static <K> Response<K> loginFailed(K data) {
-        Response<K> response = new Response<K>();
-        response.setState(2);
+        response.setState(state);
         response.setData(data);
         return response;
     }
 
-    public static <K> Response<K> passwordFailed(K data) {
+    //基础响应失败模板
+    public static <K> Response<K> newFailed(int state,K data) {
         Response<K> response = new Response<K>();
-        response.setState(3);
+        response.setState(state);
         response.setData(data);
         return response;
     }
-    public static Response<Void> newstate(int state) {
+
+    //基础成功响应码模板
+    public static Response<Void> newState(int state) {
         Response<Void> response = new Response<>();
         response.setState(state);
         return response;
     }
 
+    //Getter和Setter
     public T getData() {
         return data;
     }
@@ -49,4 +43,5 @@ public class Response <T>{
     public void setState(int state) {
         this.state = state;
     }
+
 }
