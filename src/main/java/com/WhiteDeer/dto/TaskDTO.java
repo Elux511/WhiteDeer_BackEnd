@@ -19,6 +19,7 @@ public class TaskDTO {
     private int shouldCount;
     private int actualCount;
     private boolean isQRcode;
+    private String status;
 
     public long getId() {
         return id;
@@ -116,5 +117,12 @@ public class TaskDTO {
     }
     public void setQRcode(boolean QRcode) {
         isQRcode = QRcode;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

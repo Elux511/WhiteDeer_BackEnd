@@ -18,6 +18,7 @@ public class TaskConverter {
     }
 
     public static Task convertTask(TaskDTO taskDTO){
+        System.out.println(6);
         Task task = new Task();
         task.setName(taskDTO.getName());
         task.setGroupId(taskDTO.getGroupId());

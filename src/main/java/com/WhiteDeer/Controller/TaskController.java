@@ -4,6 +4,7 @@ import com.WhiteDeer.Response;
 import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.TaskDTO;
+import com.WhiteDeer.dto.TaskListDTO;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.TaskService;
 import com.WhiteDeer.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 @RestController
 public class TaskController {
@@ -31,25 +33,26 @@ public class TaskController {
     }
 
     @GetMapping("/api/mycheckin")
-    public Response<List<Pair<TaskDTO,String>>> getTask(@RequestParam long id) {
+    public Response<TaskListDTO> getTask(@RequestParam long id) {
         System.out.println(1);
         UserDTO userDTO = userService.getUserById(id);
         System.out.println(2);
-        List<Pair<TaskDTO,String>> taskList = new ArrayList<>();
+        Vector<TaskDTO> taskList = new Vector<>();
+        TaskListDTO taskListDTO = new TaskListDTO(taskList);
         for(Long taskId : userDTO.getYesTaskSet())
         {
             System.out.println(3);
             TaskDTO taskDTO = taskService.getTaskById(taskId);
             System.out.println(6);
-            Pair<TaskDTO,String> pair = Pair.of(taskDTO,"completed");
-            taskList.add(pair);
+            taskDTO.setStatus("completed");
+            taskList.add(taskDTO);
         }
         for(Long taskId : userDTO.getNoTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
-            Pair<TaskDTO,String> pair = Pair.of(taskDTO,"uncompleted");
-            taskList.add(pair);
+            taskDTO.setStatus("incomplete");
+            taskList.add(taskDTO);
         }
-        return Response.newSuccess(taskList);
+        return Response.newSuccess(taskListDTO);
     }
 }
