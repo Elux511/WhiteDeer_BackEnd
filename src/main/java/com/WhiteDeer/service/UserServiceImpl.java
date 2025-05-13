@@ -1,16 +1,20 @@
 package com.WhiteDeer.service;
 
-import com.WhiteDeer.converter.UserConverter;
+
 import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dao.UserRepository;
 import com.WhiteDeer.dto.UserDTO;
+import com.WhiteDeer.converter.UserConverter;
+
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -51,9 +55,11 @@ public class UserServiceImpl implements UserService {
 
     //根据ID删除用户
     public void deleteUserById(long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("用户ID不存在: " + id));
-        userRepository.delete(user); //删除所查询到的实体
+        userRepository.findById(id)
+                .ifPresentOrElse(
+                        user -> userRepository.delete(user),
+                        () -> { throw new IllegalArgumentException("用户ID不存在: " + id); }
+                );
     }
 
     //根据ID更新用户名
@@ -109,4 +115,6 @@ public class UserServiceImpl implements UserService {
                         }
                 );
     }
+
+
 }

@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Vector;
-import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Table(name="users")

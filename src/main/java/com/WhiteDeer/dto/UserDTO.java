@@ -18,7 +18,6 @@ public class UserDTO {
     private Vector<Long> joinGroupSet;
 
 
-
     public Long getId() {
         return id;
     }
@@ -86,9 +85,8 @@ public class UserDTO {
         try {
             return face != null && face.length() > 0;
         } catch (SQLException e) {
-            // 处理异常，例如记录日志或返回默认值
             return false;
         }
-    }
+    }//可能有优化空间
 
 }
