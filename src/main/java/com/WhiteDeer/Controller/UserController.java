@@ -20,43 +20,48 @@ public class UserController {
     //手机号登录
     @PostMapping("/api/login1")
     public Response<Map<String, Object>> loginByPhoneNumber(@RequestBody UserDTO userDTO) {
-        UserDTO user = userService.getUserByPhoneNumber(userDTO.getPhoneNumber());
-        if (user!=null) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", user.getId());
-            data.put("haveface", user.isHaveface());
-            return Response.loginSuccess(data);
-        } else {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", null);
-            data.put("haveface", null);
-            return Response.loginFailed(data);
-        }
+        return userService.getUserByPhoneNumber(userDTO.getPhoneNumber())
+                .map(user -> {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("id", user.getId());
+                    data.put("haveface", user.isHaveface());
+                    return Response.loginSuccess(data);
+                })
+                .orElseGet(() -> {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("id", null);
+                    data.put("haveface", null);
+                    return Response.loginFailed(data);
+                });
     }
 
     //账号密码登录
     @PostMapping("/api/login2")
     public Response<Map<String, Object>> loginByID(@RequestBody UserDTO userDTO) {
-        UserDTO user = userService.getUserById(userDTO.getId());
-        if (user == null) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("haveface", null);
-            return Response.loginFailed(data);
-        } else if (!user.getPassword().equals(userDTO.getPassword())) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("haveface", null);
-            return Response.passwordFailed(data);
-        } else {
-            Map<String, Object> data = new HashMap<>();
-            data.put("haveface", user.isHaveface());
-            return Response.loginSuccess(data);
-        }
+        return userService.getUserById(userDTO.getId())
+                .map(user -> {
+                    if (!user.getPassword().equals(userDTO.getPassword())) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("haveface", null);
+                        return Response.passwordFailed(data);
+                    }
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("haveface", user.isHaveface());
+                    return Response.loginSuccess(data);
+                })
+                .orElseGet(() -> {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("haveface", null);
+                    return Response.loginFailed(data);
+                });
     }
 
     //获取个人信息
     @GetMapping("/api/myinfo/")
     public Response<UserDTO> getUserById(@RequestParam long id) {
-        return Response.newSuccess(userService.getUserById(id));
+        return userService.getUserById(id)
+                .map(Response::<UserDTO>myinfoSuccess)
+                .orElseGet(() -> Response.myinfoFailed("用户不存在"));
     }
 
     //注册新用户

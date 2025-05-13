@@ -1,13 +1,14 @@
 package com.WhiteDeer.service;
 
-import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.UserDTO;
+
+import java.util.Optional;
 
 public interface UserService {
 
-    UserDTO getUserById(Long id);
+    Optional<UserDTO> getUserById(Long id);
 
-    UserDTO getUserByPhoneNumber(String phoneNumber);
+    Optional<UserDTO> getUserByPhoneNumber(String phoneNumber);
 
     Long createUser(UserDTO userDTO) throws IllegalAccessException;
 
