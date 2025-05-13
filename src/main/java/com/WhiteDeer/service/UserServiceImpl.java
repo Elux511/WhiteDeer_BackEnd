@@ -4,12 +4,13 @@ import com.WhiteDeer.converter.UserConverter;
 import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dao.UserRepository;
 import com.WhiteDeer.dto.UserDTO;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -17,59 +18,95 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    //通过ID获取用户
     @Override
-    public UserDTO getUserById(Long id) {
-        //return userRepository.getById(id).orElseThrow(Exception::new);
-        User user = userRepository.getById(id);
-        return UserConverter.converterUser(user);
+    public Optional<UserDTO> getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(UserConverter::converterUser);
     }
 
+    //通过手机号获取用户 注意：只会获取第一个
     @Override
-    public UserDTO getUserByPhoneNumber(String phoneNumber) {
-        List<User> userList = userRepository.findByPhoneNumber(phoneNumber);
-        if (userList.isEmpty()) {
-            return null;
+    public Optional<UserDTO> getUserByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber)
+                .stream()
+                .findFirst()
+                .map(UserConverter::converterUser);
+    }
+
+    //创建用户
+    @Override
+    public Long createUser(UserDTO userDTO) throws IllegalArgumentException {
+        // 检查手机号是否已存在
+        Optional<User> existingUser = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
+        if (existingUser.isPresent()) {
+            throw new IllegalArgumentException("手机号已被注册: " + userDTO.getPhoneNumber());
         }
-        return UserConverter.converterUser(userList.get(0));
+
+        // 转换DTO并保存用户
+        User user = UserConverter.converterUser(userDTO);
+        User savedUser = userRepository.save(user);
+        return savedUser.getId();
     }
 
-    @Override
-    public Long createUser(UserDTO userDTO) throws IllegalAccessException {
-        List<User> userList = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
-        if(!userList.isEmpty()){
-            throw new IllegalAccessException("电话已被占用");
-        }
-        User user = userRepository.save(UserConverter.converterUser(userDTO));
-        return user.getId();
-    }
-
-    @Override
+    //根据ID删除用户
     public void deleteUserById(long id) {
-        userRepository.findById(id).orElseThrow(()->new IllegalArgumentException("id"+id+"doesn`t exist"));
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("用户ID不存在: " + id));
+        userRepository.delete(user); //删除所查询到的实体
     }
 
+    //根据ID更新用户名
     @Override
     @Transactional
     public void updateNameById(UserDTO userDTO) {
-        User user = userRepository.findById(userDTO.getId()).orElseThrow(()->new IllegalArgumentException("id"+userDTO.getId()+"doesn`t exist"));
-        user.setName(userDTO.getName());
-        userRepository.save(user);
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setName(userDTO.getName());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
     }
 
+    //根据ID更新手机号
     @Override
     @Transactional
     public void updatePhoneNumberById(UserDTO userDTO) {
-        User user = userRepository.findById(userDTO.getId()).orElseThrow(()->new IllegalArgumentException("id"+userDTO.getId()+"doesn`t exist"));
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        userRepository.save(user);
+        // 检查新手机号是否已被其他用户使用
+        getUserByPhoneNumber(userDTO.getPhoneNumber())
+                .ifPresent(existingUser -> {
+                    if (!existingUser.getId().equals(userDTO.getId())) {
+                        throw new IllegalArgumentException("手机号已被其他用户占用: " + userDTO.getPhoneNumber());
+                    }
+                });
+
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setPhoneNumber(userDTO.getPhoneNumber());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
     }
 
-    @Override
-    @Transactional
+    //根据ID更新人脸
     public void updateFaceById(UserDTO userDTO) {
-        User user = userRepository.findById(userDTO.getId()).orElseThrow(()->new IllegalArgumentException("id"+userDTO.getId()+"doesn`t exist"));
-        user.setFace(userDTO.getFace());
-        userRepository.save(user);
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setFace(userDTO.getFace());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
     }
 }
