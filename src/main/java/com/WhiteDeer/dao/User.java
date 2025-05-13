@@ -2,11 +2,13 @@ package com.WhiteDeer.dao;
 
 
 import jakarta.persistence.*;
-
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Vector;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name="users")
@@ -26,18 +28,25 @@ public class User {
     private String phoneNumber;
 
     @Column(name = "face")
+    @JdbcTypeCode(SqlTypes.BLOB)
     private Blob face;
 
     @Column(name = "yes_task_set")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = com.WhiteDeer.converter.LongVectorConverter.class)
     private Vector<Long> yesTaskSet;
 
     @Column(name = "no_task_set")
+    @Convert(converter = com.WhiteDeer.converter.LongVectorConverter.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     private Vector<Long> noTaskSet;
 
     @Column(name = "create_group_set")
+    @JdbcTypeCode(SqlTypes.JSON)
     private Vector<Long> createGroupSet;
 
     @Column(name = "join_group_set")
+    @JdbcTypeCode(SqlTypes.JSON)
     private Vector<Long> joinGroupSet;
 
     public long getId() {

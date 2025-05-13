@@ -32,11 +32,15 @@ public class TaskController {
 
     @GetMapping("/api/mycheckin")
     public Response<List<Pair<TaskDTO,String>>> getTask(@RequestParam long id) {
+        System.out.println(1);
         UserDTO userDTO = userService.getUserById(id);
+        System.out.println(2);
         List<Pair<TaskDTO,String>> taskList = new ArrayList<>();
         for(Long taskId : userDTO.getYesTaskSet())
         {
+            System.out.println(3);
             TaskDTO taskDTO = taskService.getTaskById(taskId);
+            System.out.println(6);
             Pair<TaskDTO,String> pair = Pair.of(taskDTO,"completed");
             taskList.add(pair);
         }

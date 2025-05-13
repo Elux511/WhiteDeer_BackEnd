@@ -30,6 +30,7 @@ public class Response <T>{
         response.setData(data);
         return response;
     }
+
     public static Response<Void> newstate(int state) {
         Response<Void> response = new Response<>();
         response.setState(state);

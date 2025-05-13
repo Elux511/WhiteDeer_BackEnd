@@ -21,7 +21,9 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskDTO getTaskById(Long id) {
+       System.out.println(4);
        Task task = taskRepository.getById(id);
+       System.out.println(5);
        return TaskConverter.convertTask(task);
     }
 }
