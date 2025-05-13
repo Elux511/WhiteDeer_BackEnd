@@ -39,7 +39,7 @@ public class TaskController {
         List<Pair<TaskDTO,String>> taskList = new ArrayList<>();
 
         if(userOPT.isEmpty()) {
-            return Response.newFailed(taskList);
+            return Response.newFailed(2,taskList);
         }
         UserDTO userDTO = userOPT.get();
         for(Long taskId : userDTO.getYesTaskSet())
@@ -54,7 +54,7 @@ public class TaskController {
             Pair<TaskDTO,String> pair = Pair.of(taskDTO,"uncompleted");
             taskList.add(pair);
         }
-        return Response.newSuccess(taskList);
+        return Response.newSuccess(1,taskList);
     }
 
     //删除打卡任务
