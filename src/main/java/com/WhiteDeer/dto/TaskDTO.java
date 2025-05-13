@@ -2,6 +2,7 @@ package com.WhiteDeer.dto;
 
 import com.WhiteDeer.dao.Task;
 
+import java.sql.Blob;
 import java.time.LocalDateTime;
 
 public class TaskDTO {
@@ -20,6 +21,7 @@ public class TaskDTO {
     private int actualCount;
     private boolean isQRcode;
     private String status;
+    private Blob face;
 
     public long getId() {
         return id;
@@ -124,5 +126,12 @@ public class TaskDTO {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Blob getFace() {
+        return face;
+    }
+    public void setFace(Blob face) {
+        this.face = face;
     }
 }

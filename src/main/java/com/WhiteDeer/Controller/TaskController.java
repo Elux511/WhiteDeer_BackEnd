@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,13 +65,13 @@ public class TaskController {
 
     //打卡
     @PostMapping("/api/checkin")
-    public Response<Void> checkinTask(@RequestParam long id, @RequestBody TaskDTO taskDTO) throws IllegalAccessException {
+    public Response<Void> checkinTask(@RequestParam long id, @RequestBody TaskDTO taskDTO) throws IllegalAccessException, IOException {
         Optional<UserDTO> userOPT = userService.getUserById(id);
         if(userOPT.isEmpty()) {
             return Response.newState(4);
         }
         UserDTO userDTO = userOPT.get();
 
-        taskService.checkinTask(taskDTO);
+        taskService.checkinTask(taskDTO,userDTO.getId());
     }
 }

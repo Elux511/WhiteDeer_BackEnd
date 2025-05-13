@@ -2,6 +2,8 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.dto.TaskDTO;
 
+import java.io.IOException;
+
 public interface TaskService {
 
 
@@ -11,5 +13,5 @@ public interface TaskService {
 
     void deleteUserById(long id);
 
-    int checkinTask(TaskDTO taskDTO);
+    int checkinTask(TaskDTO taskDTO,long userId) throws IOException;
 }

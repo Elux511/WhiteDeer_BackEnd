@@ -1,5 +1,6 @@
+import base64
 import sys
-
+from io import BytesIO
 import cv2 as cv
 import numpy as np
 from PIL import Image
@@ -13,13 +14,18 @@ recognizer = cv.face.LBPHFaceRecognizer_create()
 
 #获得用户人脸的特征（用于初次记录）
 #传入用户人脸图片，保存人脸特征
-def getImageLabels(user_id, img_path):
+def getImageLabels(user_id, img_base64):
     #为用户赋值id
     id = []
     face_sample = []
 
+    # 解码Base64字符串为字节数据
+    decoded_data = base64.b64decode(img_base64)
+    # 使用BytesIO将字节数据转换为文件对象
+    img_path = BytesIO(decoded_data)
+
     #获取传入的用户人脸特征
-    img = cv.imread(img_path)
+    #img = cv.imread(img_path)
     PIL_image = Image.open(img_path).convert('L')
     img_numpy = np.array(PIL_image, 'uint8')
     face = face_detector.detectMultiScale(img_numpy, 1.1, 5, 0)
