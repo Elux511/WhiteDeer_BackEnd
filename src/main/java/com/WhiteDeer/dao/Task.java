@@ -185,9 +185,15 @@ public class Task {
     }
 
     public void addCompletedUser(long userId) {
+        if(completedUserList == null) {
+            completedUserList = new Vector<>();
+        }
         completedUserList.add(userId);
     }
     public void addIncompleteUser(long userId) {
+        if(incompleteUserList == null) {
+            incompleteUserList = new Vector<>();
+        }
         incompleteUserList.add(userId);
     }
     public void deleteCompletedUser(long userId) {
