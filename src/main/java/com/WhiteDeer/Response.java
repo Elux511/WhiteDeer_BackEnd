@@ -22,7 +22,7 @@ public class Response <T>{
         return response;
     }
 
-    //基础成功响应码模板
+    //基础响应码模板
     public static Response<Void> newState(int state) {
         Response<Void> response = new Response<>();
         response.setState(state);

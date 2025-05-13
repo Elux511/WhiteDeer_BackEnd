@@ -74,6 +74,22 @@ public class UserServiceImpl implements UserService {
                 );
     }
 
+    //根据ID更新密码
+    @Override
+    @Transactional
+    public void updatePasswordById(UserDTO userDTO) {
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setPassword(userDTO.getPassword());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
+    }
+
     //根据ID更新手机号
     @Override
     @Transactional
