@@ -12,10 +12,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class TaskController {
@@ -27,6 +24,7 @@ public class TaskController {
     private UserService userService;
 
     //发布新的打卡任务
+    //应到未到未初始化
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
         taskService.createTask(taskDTO);
@@ -83,5 +81,40 @@ public class TaskController {
             taskService.finishTaskById(userDTO.getId(),taskDTO.getId());
         }
         return Response.newState(result);
+    }
+
+    //查询task详细信息
+    @GetMapping("/api/task")
+    public Response<TaskDTO> getTasks(@RequestParam long id) throws IllegalAccessException {
+        TaskDTO taskDTO = taskService.getTaskById(id);
+        Vector<String> completed = new Vector<>();
+        Vector<String> incomplete = new Vector<>();
+        if(taskDTO.getCompletedUserList() != null) {//判断是否非空
+            for(Long userId : taskDTO.getCompletedUserList())//添加到已完成用户名单
+            {
+                Optional<UserDTO> userOPT = userService.getUserById(userId);
+                userOPT.ifPresentOrElse(userDTO -> {
+                            completed.add(userDTO.getName());},
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userId);
+                        });
+            }
+        }
+        if(taskDTO.getIncompleteUserList() != null) {//判断是否非空
+            for(Long userId : taskDTO.getIncompleteUserList())//添加到未完成用户名单
+            {
+                Optional<UserDTO> userOPT = userService.getUserById(userId);
+                userOPT.ifPresentOrElse(userDTO -> {
+                            incomplete.add(userDTO.getName());},
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userId);
+                        });
+            }
+        }
+
+
+        taskDTO.setCompletedNameList(completed);
+        taskDTO.setIncompleteNameList(incomplete);
+        return Response.newSuccess(1,taskDTO);
     }
 }

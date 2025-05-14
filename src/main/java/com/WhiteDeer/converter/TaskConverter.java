@@ -15,6 +15,13 @@ public class TaskConverter {
         taskDTO.setBeginTime(task.getBeginTime());
         taskDTO.setEndTime(task.getEndTime());
         taskDTO.setType(task.getType());
+        taskDTO.setShouldCount(task.getShouldCount());
+        taskDTO.setActualCount(task.getActualCount());
+        taskDTO.setCompletedUserList(task.getCompletedUserList());
+        taskDTO.setIncompleteUserList(task.getIncompleteUserList());
+        taskDTO.setLatitude(task.getLatitude());
+        taskDTO.setLongitude(task.getLongitude());
+        taskDTO.setAccuracy(task.getAccuracy());
         return taskDTO;
     }
 
@@ -35,6 +42,8 @@ public class TaskConverter {
             task.setLongitude(taskDTO.getLongitude());
             task.setAccuracy(taskDTO.getAccuracy());
         }
+        task.setShouldCount(taskDTO.getShouldCount());
+        task.setActualCount(taskDTO.getActualCount());
         return task;
     }
 }
