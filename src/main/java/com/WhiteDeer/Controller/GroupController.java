@@ -133,22 +133,23 @@ public class GroupController {
 
     //创建团队
     //（POST）http://localhost:8080/api/creategroup
-    //请求体数据：{
-    //groupname:团队1
-    //maxmember:123//(最大人数)
-    //introduction:团队介绍
+    //请求体：{
+    //“id”:123456 //创建者的id
+    //“groupName”:“团队1“，
+    //“maxMember“:123，//(最大人数)
+    //“introduction”:“团队介绍”
     //}
-    //返回:{state（1（成功）；2（失败） }
+    //返回:{“state”（1（创建成功）；2（失败） }
     @PostMapping("/api/creategroup")
     public Response<Map<String, Object>> createGroup(@RequestBody Map<String, Object> payload) {
 
         try {
             Map<String, Object> data = new HashMap<>();
-            String groupname = (String) payload.get("groupname");
-            Long maxmember = Long.parseLong(payload.get("maxmember").toString());
+            String groupName = (String) payload.get("groupName");
+            Long maxMember = Long.parseLong(payload.get("maxMember").toString());
             String introduction = (String) payload.get("introduction");
-            Long creatorId = Long.valueOf(payload.get("creatorid").toString());
-            boolean success = groupInfoService.createGroup(groupname, maxmember, introduction, creatorId);
+            Long creatorId = Long.valueOf(payload.get("id").toString());
+            boolean success = groupInfoService.createGroup(groupName, maxMember, introduction, creatorId);
             return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
             Map<String,Object> data = new HashMap<>();

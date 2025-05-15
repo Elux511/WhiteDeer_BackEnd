@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Vector;
 
 
 @Service
@@ -23,46 +26,51 @@ public class TaskServiceImpl implements TaskService {
     //创建task
     @Override
     public void createTask(TaskDTO taskDTO) {
+        taskDTO.setCompletedUserList(new Vector<>());
+        taskDTO.setIncompleteUserList(new Vector<>());
         taskRepository.save(TaskConverter.convertTask(taskDTO));
     }
 
     //通过id获取task
     @Override
-    public TaskDTO getTaskById(Long id) {
-       Task task = taskRepository.getById(id);
-       return TaskConverter.convertTask(task);
+    public TaskDTO getTaskById(Long id) throws NoSuchElementException {
+       Optional<Task> task = taskRepository.findById(id);
+       return TaskConverter.convertTask(task.orElseThrow());
     }
 
     //通过id删除task
     @Override
     public void deleteTaskById(long id) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("打卡任务ID不存在: " + id));
-        taskRepository.delete(task); //删除所查询到的实体
+        taskRepository.findById(id).ifPresentOrElse(
+                task -> taskRepository.delete(task),
+                () -> { throw new IllegalArgumentException("打卡任务ID不存在: " + id); }
+        );
     }
 
     //用户打卡过程
     @Override
-    public int checkinTask(TaskDTO taskDTO, long userId) throws IOException {
+    public int checkinTask(TaskDTO taskDTO, long userId) {
         Task task = taskRepository.getById(taskDTO.getId());
-        if(taskDTO.getType() == "人脸打卡"){
-            String img = BlobConverter.blobToBase64(taskDTO.getFace());
+        if(taskDTO.getType().equals("人脸识别")){
+            String img = null;
+            try {img = BlobConverter.blobToBase64(taskDTO.getFace());} catch (IOException e) {return 2;}//尝试将Blob转为base64
             if(PyAPI.faceRecognition(String.valueOf(userId),img)){//人脸识别成功
                 return 1;
             }else {//人脸识别失败
                 return 2;
             }
-        }else if(taskDTO.getType() == "定位打卡"){
+        }else if(taskDTO.getType().equals("定位打卡")){
             double distance = GeoDistanceCalculator.haversine(task.getLatitude(),task.getLongitude(),taskDTO.getLatitude(),taskDTO.getLongitude());
-            if(distance < task.getAccuracy()){//打卡位置在允许范围内
+            if(distance <= task.getAccuracy()){//打卡位置在允许范围内
                 return 1;
             }else{//打卡位置不在允许范围内
                 return 3;
             }
         }else{
-            String img = BlobConverter.blobToBase64(taskDTO.getFace());
+            String img = null;
+            try {img = BlobConverter.blobToBase64(taskDTO.getFace());} catch (IOException e) {return 2;}//尝试将Blob转为base64
             double distance = GeoDistanceCalculator.haversine(task.getLatitude(),task.getLongitude(),taskDTO.getLatitude(),taskDTO.getLongitude());
-            if(distance < task.getAccuracy()){//打卡位置在允许范围内
+            if(distance <= task.getAccuracy()){//打卡位置在允许范围内
                 if(PyAPI.faceRecognition(String.valueOf(userId),img)){//人脸识别成功
                     return 1;
                 }else {//人脸识别失败
@@ -77,9 +85,12 @@ public class TaskServiceImpl implements TaskService {
     //用户打卡完成后
     @Override
     public void finishTaskById(long userId, long taskId) {
+        System.out.println(4);
         Task task = taskRepository.getById(taskId);
         task.addCompletedUser(userId);
         task.deleteIncompleteUser(userId);
+        task.setShouldCount(task.getShouldCount()-1);
+        task.setActualCount(task.getActualCount()+1);
         taskRepository.save(task);
     }
 

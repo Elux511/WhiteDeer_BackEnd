@@ -4,6 +4,7 @@ import com.WhiteDeer.dao.Task;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import java.util.Vector;
 
 public class TaskDTO {
     private long id;
@@ -22,6 +23,10 @@ public class TaskDTO {
     private boolean isQRcode;
     private String status;
     private Blob face;
+    private Vector<Long> completedUserList;
+    private Vector<Long> incompleteUserList;
+    private Vector<String> completedNameList;
+    private Vector<String> incompleteNameList;
 
     public long getId() {
         return id;
@@ -133,5 +138,33 @@ public class TaskDTO {
     }
     public void setFace(Blob face) {
         this.face = face;
+    }
+
+    public Vector<Long> getCompletedUserList() {
+        return completedUserList;
+    }
+    public void setCompletedUserList(Vector<Long> completedUserList) {
+        this.completedUserList = completedUserList;
+    }
+
+    public Vector<Long> getIncompleteUserList() {
+        return incompleteUserList;
+    }
+    public void setIncompleteUserList(Vector<Long> incompleteUserList) {
+        this.incompleteUserList = incompleteUserList;
+    }
+
+    public Vector<String> getCompletedNameList() {
+        return completedNameList;
+    }
+    public void setCompletedNameList(Vector<String> completedNameList) {
+        this.completedNameList = completedNameList;
+    }
+
+    public Vector<String> getIncompleteNameList() {
+        return incompleteNameList;
+    }
+    public void setIncompleteNameList(Vector<String> incompleteNameList) {
+        this.incompleteNameList = incompleteNameList;
     }
 }
