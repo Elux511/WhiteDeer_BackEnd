@@ -64,8 +64,8 @@ public class TaskController {
             return Response.newFailed(2,taskList);
         }
         UserDTO userDTO = userOPT.get();
-        if(userDTO.getYesTaskSet().isEmpty() || userDTO.getNoTaskSet().isEmpty()){
-            return Response.newFailed(2,taskList);
+        if(userDTO.getYesTaskSet() == null || userDTO.getNoTaskSet() == null){
+            return Response.newSuccess(1,taskList);
         }
         for(Long taskId : userDTO.getYesTaskSet())
         {
