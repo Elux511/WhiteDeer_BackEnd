@@ -1,6 +1,6 @@
 package com.WhiteDeer.dto;
 import java.util.List;
-public class TeamDetailDTO {
+public class GroupDetailDTO {
     private List<MemberDTO> memberlist;
     private List<TaskDTO> tasklist;
 
