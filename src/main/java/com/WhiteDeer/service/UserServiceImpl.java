@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public abstract class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -66,6 +66,22 @@ public abstract class UserServiceImpl implements UserService {
                 .ifPresentOrElse(
                         user -> {
                             user.setName(userDTO.getName());
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
+    }
+
+    //根据ID更新密码
+    @Override
+    @Transactional
+    public void updatePasswordById(UserDTO userDTO) {
+        userRepository.findById(userDTO.getId())
+                .ifPresentOrElse(
+                        user -> {
+                            user.setPassword(userDTO.getPassword());
                             userRepository.save(user);
                         },
                         () -> {

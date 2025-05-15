@@ -15,4 +15,5 @@ public class TaskListDTO {
     public void setTasks(Vector<TaskDTO> tasks) {
         this.tasks = tasks;
     }
+
 }
