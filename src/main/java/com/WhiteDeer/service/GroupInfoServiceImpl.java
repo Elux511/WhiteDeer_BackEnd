@@ -35,7 +35,10 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (user == null || user.getJoinGroupSet() == null) {
             return Collections.emptyList();
         }
-        Vector<Long> groupIds = user.getJoinGroupSet();
+        Vector<Long> groupIds = user.getJoinGroupSet()
+                .stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toCollection(Vector::new));
         List<GroupInfo> groups = groupInfoRepository.findAllById(groupIds);
         return groups.stream()
                 .map(GroupInfoConverter::convertToDTO)
@@ -67,6 +70,14 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             optionalGroup.ifPresent(result::add);
         } else if (name != null && !name.isEmpty()) {
             result = groupInfoRepository.findByGroupNameContaining(name);
+        } else if (beginStr != null && !beginStr.isEmpty()&&endStr == null && endStr.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+            LocalDateTime begin = LocalDateTime.parse(beginStr, formatter);
+            result = groupInfoRepository.findByCreateTimeAfter(begin);
+        }else if (beginStr == null && beginStr.isEmpty()&&endStr != null && endStr.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+            LocalDateTime end = LocalDateTime.parse(beginStr, formatter);
+            result = groupInfoRepository.findByCreateTimeBefore(end);
         } else if (beginStr != null && !beginStr.isEmpty() && endStr != null && !endStr.isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             LocalDateTime begin = LocalDateTime.parse(beginStr, formatter);

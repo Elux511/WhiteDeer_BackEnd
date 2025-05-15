@@ -20,7 +20,7 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @Autowired
+    @Autowired(required=true)
     private UserService userService;
 
     //发布新的打卡任务
