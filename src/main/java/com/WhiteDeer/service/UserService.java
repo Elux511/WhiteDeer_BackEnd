@@ -2,6 +2,7 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.dto.UserDTO;
 
+import java.sql.Blob;
 import java.util.List;
 import java.util.Optional;
 

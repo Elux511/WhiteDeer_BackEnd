@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.sql.Blob;
 import java.util.Optional;
 
 @Service
@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     //创建用户
     @Override
+    @Transactional
     public Long createUser(UserDTO userDTO) throws IllegalArgumentException {
         // 检查手机号是否已存在
         Optional<User> existingUser = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
@@ -50,6 +51,8 @@ public class UserServiceImpl implements UserService {
     }
 
     //根据ID删除用户
+    @Override
+    @Transactional
     public void deleteUserById(long id) {
         userRepository.findById(id)
                 .ifPresentOrElse(
@@ -115,6 +118,8 @@ public class UserServiceImpl implements UserService {
     }
 
     //根据ID更新人脸
+    @Override
+    @Transactional
     public void updateFaceById(UserDTO userDTO) {
         userRepository.findById(userDTO.getId())
                 .ifPresentOrElse(
