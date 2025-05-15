@@ -2,11 +2,10 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.converter.GroupInfoConverter;
 import com.WhiteDeer.dao.*;
+import com.WhiteDeer.dto.GroupDetailDTO;
 import com.WhiteDeer.dto.GroupInfoDTO;
 import com.WhiteDeer.dto.MemberDTO;
 import com.WhiteDeer.dto.TaskDTO;
-import com.WhiteDeer.dto.TeamDetailDTO;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,15 +82,15 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     }
 
     @Override
-    public Boolean joinTeam(Long userId, Long teamId) {
+    public Boolean joinGroup(Long userId, Long groupId) {
         User user = userRepository.findById(userId).orElse(null);
-        GroupInfo group = groupInfoRepository.findById(teamId).orElse(null);
+        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
         if (user == null || group == null) {
             return false;
         }
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
-        if (!joinGroupSet.contains(teamId)) {
-            joinGroupSet.add(teamId);
+        if (!joinGroupSet.contains(groupId)) {
+            joinGroupSet.add(groupId);
             user.setJoinGroupSet(joinGroupSet);
             userRepository.save(user);
         }
@@ -105,10 +104,10 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     }
 
     @Override
-    public Boolean createTeam(String teamName, Long maxMember, String introduction, Long creatorId) {
+    public Boolean createGroup(String groupName, Long maxMember, String introduction, Long creatorId) {
 
         GroupInfo group = new GroupInfo();
-        group.setGroupName(teamName);
+        group.setGroupName(groupName);
         group.setGroupIntroduction(introduction);
         group.setCreatorId(creatorId);
         group.setMemberList(new Vector<>(Arrays.asList(creatorId)));
@@ -158,13 +157,13 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     }
 
     @Override
-    public TeamDetailDTO getTeamDetails(Long teamId) {
-        GroupInfo group = groupInfoRepository.findById(teamId).orElse(null);
+    public GroupDetailDTO getGroupDetails(Long groupId) {
+        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
         if (group == null) {
             return null;
         }
 
-        TeamDetailDTO teamDetail = new TeamDetailDTO();
+        GroupDetailDTO groupDetail = new GroupDetailDTO();
         List<MemberDTO> members = new ArrayList<>();
         List<TaskDTO> tasks = new ArrayList<>();
 
@@ -195,23 +194,23 @@ public class GroupInfoServiceImpl implements GroupInfoService{
                 tasks.add(taskDTO);
             }
         }
-        teamDetail.setMemberlist(members);
-        teamDetail.setTasklist(tasks);
+        groupDetail.setMemberlist(members);
+        groupDetail.setTasklist(tasks);
 
-        return teamDetail;
+        return groupDetail;
     }
 
     @Override
-    public Boolean quitTeam(Long userId, Long teamId) {
+    public Boolean quitGroup(Long userId, Long groupId) {
         User user = userRepository.findById(userId).orElse(null);
-        GroupInfo group = groupInfoRepository.findById(teamId).orElse(null);
+        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
         if (user == null || group == null) {
             return false;
         }
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
-        System.out.println(hasContain(joinGroupSet, teamId));
-        if (hasContain(joinGroupSet, teamId)) {
-            joinGroupSet.remove(teamId);
+        System.out.println(hasContain(joinGroupSet, groupId));
+        if (hasContain(joinGroupSet, groupId)) {
+            joinGroupSet.remove(groupId);
             user.setJoinGroupSet(joinGroupSet);
             userRepository.save(user);
         }

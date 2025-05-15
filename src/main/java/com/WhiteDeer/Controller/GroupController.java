@@ -1,8 +1,8 @@
 package com.WhiteDeer.Controller;
 
 import com.WhiteDeer.Response;
+import com.WhiteDeer.dto.GroupDetailDTO;
 import com.WhiteDeer.dto.GroupInfoDTO;
-import com.WhiteDeer.dto.TeamDetailDTO;
 import com.WhiteDeer.service.GroupInfoService;
 import org.hibernate.boot.model.naming.IllegalIdentifierException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.Map;
 public class GroupController {
 
     @Autowired
-    private GroupInfoService groupService;
+    private GroupInfoService groupInfoService;
 
     //获取用户加入的团队列表
     //(GET) http://localhost:8080/api/getjoinedgroups?id=xxxxxxxx
@@ -34,15 +34,14 @@ public class GroupController {
 
         try {
             Map<String, Object> data = new HashMap<>();
-            List<GroupInfoDTO> joinedGroups = groupService.getJoinedGroups(userId);
+            List<GroupInfoDTO> joinedGroups = groupInfoService.getJoinedGroups(userId);
             data.put("joinedGroups", joinedGroups);
-            data.put("state", 1);
-            data.put("data", data);
+            data.put("id", userId);
             return Response.newSuccess(1,data);
         } catch (IllegalIdentifierException e) {
             Map<String, Object> data = new HashMap<>();
-            data.put("state", 2);
-            data.put("data", data);
+            data.put("id", userId);
+            data.put("message", e.getMessage());
             return Response.newFailed(2,data);
         }
     }
@@ -59,11 +58,12 @@ public class GroupController {
     //}
     //}
     @GetMapping("/api/getmanagedgroups")
-    public Response<Map<String, Object>> getManagedTeams(@RequestParam("id") Long userId) {
+    public Response<Map<String, Object>> getManagedGroups(@RequestParam("id") Long userId) {
         try {
             Map<String, Object> data = new HashMap<>();
-            List<GroupInfoDTO> managedGroups = groupService.getManagedGroups(userId);
-            data.put("manegedTeams", managedGroups);
+            List<GroupInfoDTO> managedGroups = groupInfoService.getManagedGroups(userId);
+            data.put("manegedGroups", managedGroups);
+            data.put("id", userId);
             return Response.newSuccess(1,data);
         } catch (IllegalIdentifierException e) {
             Map<String, Object> data = new HashMap<>();
@@ -87,16 +87,14 @@ public class GroupController {
     //（注：如果id不为空则只有一个团队，如果id是空串可能有多个团队符合情况，begin和end是团队创建时间区间格式为ISO 8601 标准时间字符串，如：2025-05-06T16:00:00.000Z)
     //}
     @GetMapping("/api/searchgroup")
-    public Response<Map<String, Object>> searchTeam(@RequestParam(required = false) String id,
+    public Response<Map<String, Object>> searchGroup(@RequestParam(required = false) String id,
                                           @RequestParam(required = false) String name,
                                           @RequestParam(required = false) String begin,
                                           @RequestParam(required = false) String end) {
         try {
             Map<String, Object> data = new HashMap<>();
-            List<GroupInfoDTO> teams = groupService.searchGroups(id, name, begin, end);
-            data.put("groups", teams);
-            data.put("state", 1);
-            data.put("data", data);
+            List<GroupInfoDTO> groups = groupInfoService.searchGroups(id, name, begin, end);
+            data.put("groups", groups);
             return Response.newSuccess(1,data);
         } catch (IllegalIdentifierException e) {
             Map<String, Object> data = new HashMap<>();
@@ -114,13 +112,15 @@ public class GroupController {
     //}
     //返回:{state（1（成功）；2（失败）}
     @PostMapping("/api/joingroup")
-    public Response<Map<String, Object>> joinTeam(@RequestBody Map<String, Object> payload) {
+    public Response<Map<String, Object>> joinGroup(@RequestBody Map<String, Object> payload) {
 
         try {
             Map<String, Object> data = new HashMap<>();
             Long userId = Long.valueOf(payload.get("id").toString());
-            Long teamId = Long.valueOf(payload.get("teamid").toString());
-            boolean success = groupService.joinTeam(userId, teamId);
+            Long groupId = Long.valueOf(payload.get("groupid").toString());
+            boolean success = groupInfoService.joinGroup(userId, groupId);
+            data.put("id", userId);
+            data.put("groupId", groupId);
             return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
             Map<String, Object> data = new HashMap<>();
@@ -140,7 +140,7 @@ public class GroupController {
     //}
     //返回:{state（1（成功）；2（失败） }
     @PostMapping("/api/creategroup")
-    public Response<Map<String, Object>> createTeam(@RequestBody Map<String, Object> payload) {
+    public Response<Map<String, Object>> createGroup(@RequestBody Map<String, Object> payload) {
 
         try {
             Map<String, Object> data = new HashMap<>();
@@ -148,10 +148,11 @@ public class GroupController {
             Long maxmember = Long.parseLong(payload.get("maxmember").toString());
             String introduction = (String) payload.get("introduction");
             Long creatorId = Long.valueOf(payload.get("creatorid").toString());
-            boolean success = groupService.createTeam(groupname, maxmember, introduction, creatorId);
+            boolean success = groupInfoService.createGroup(groupname, maxmember, introduction, creatorId);
             return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
             Map<String,Object> data = new HashMap<>();
+            data.put("id", payload.get("id"));
             data.put("message", e.getMessage());
 
            return Response.newFailed(2,data);
@@ -166,7 +167,7 @@ public class GroupController {
     public Response<Map<String, Object>> deleteGroup(@RequestParam("userid") Long userId,@RequestParam("groupid") Long groupId) {
         try{
             Map<String, Object> data = new HashMap<>();
-            boolean success = groupService.deleteGroup(userId, groupId);
+            boolean success = groupInfoService.deleteGroup(userId, groupId);
             return Response.newSuccess(1,data);
         }catch(IllegalArgumentException e){
             Map<String,Object> data = new HashMap<>();
@@ -198,10 +199,10 @@ public class GroupController {
     @GetMapping("/api/group")
     public Response<Map<String, Object>> getGroup(@RequestParam("groupid") Long groupId) {
         try {
-            TeamDetailDTO teamDetail = groupService.getTeamDetails(groupId);
+            GroupDetailDTO groupDetail = groupInfoService.getGroupDetails(groupId);
             Map<String, Object> data = new HashMap<>();
-            data.put("memberlist", teamDetail.getMemberlist());
-            data.put("tasklist", teamDetail.getTasklist());
+            data.put("memberlist", groupDetail.getMemberlist());
+            data.put("tasklist", groupDetail.getTasklist());
             return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
             Map<String,Object> data = new HashMap<>();
@@ -225,7 +226,7 @@ public class GroupController {
             Map<String, Object> data = new HashMap<>();
             Long userId = Long.valueOf(payload.get("id").toString());
             Long groupId = Long.valueOf(payload.get("groupid").toString());
-            boolean success = groupService.quitTeam(userId, groupId);
+            boolean success = groupInfoService.quitGroup(userId, groupId);
             return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
             Map<String, Object> data = new HashMap<>();
