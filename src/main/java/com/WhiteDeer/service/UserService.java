@@ -22,4 +22,6 @@ public interface UserService {
     void updateFaceById(UserDTO userDTO);
 
     void finishTaskById(long userId, long taskId);
+
+    void deleteGroupById(long id);
 }

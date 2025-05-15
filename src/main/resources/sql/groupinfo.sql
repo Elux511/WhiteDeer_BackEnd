@@ -1,16 +1,13 @@
-create table groupinfo
-(
-    group_id           bigint auto_increment
-        primary key,
-    group_name         varchar(20)  not null,
-    group_introduction varchar(255) null,
-    member_list        json         null,
-    yes_task_set       json         null,
-    no_task_set        json         null,
-    creator_id         bigint       null,
-    constraint groupinfo_pk_2
-        unique (group_id),
-    constraint groupinfo_users_user_id_fk
-        foreign key (creator_id) references users (user_id)
+CREATE TABLE groupinfo (
+                           group_id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+                           group_name         VARCHAR(20) NOT NULL,
+                           group_introduction VARCHAR(255),
+                           member_list        JSON,
+                           yes_task_set       JSON,
+                           no_task_set        JSON,
+                           creator_id         BIGINT,
+                           max_member         INT DEFAULT 0,
+                           create_time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                           CONSTRAINT groupinfo_pk_2 UNIQUE (group_id),
+                           CONSTRAINT groupinfo_users_user_id_fk FOREIGN KEY (creator_id) REFERENCES users(user_id)
 );
-
