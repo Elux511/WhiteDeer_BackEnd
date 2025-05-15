@@ -15,7 +15,7 @@ public interface GroupInfoService {
 
     Boolean joinGroup(Long userId, Long groupId);
 
-    Boolean createGroup(String groupname, Long maxmember, String introduction, Long creatorId);
+    Boolean createGroup(String groupName, Long maxMember, String introduction, Long creatorId);
 
     Boolean deleteGroup( Long userId,Long groupId);
 
