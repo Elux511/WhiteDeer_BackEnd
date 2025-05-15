@@ -3,6 +3,8 @@ package com.WhiteDeer.Controller;
 import com.WhiteDeer.Response;
 import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.User;
+import com.WhiteDeer.dto.GroupDetailDTO;
+import com.WhiteDeer.dto.MemberDTO;
 import com.WhiteDeer.dto.TaskDTO;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.GroupInfoService;
@@ -28,11 +30,19 @@ public class TaskController {
     private GroupInfoService groupInfoService;
 
     //发布新的打卡任务
-    //应到未到未初始化
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
-//        GroupInfoService.
-//        taskDTO.setShouldCount();
+        GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
+
+        //为所有团队成员发布打卡任务
+        if(groupDetailDTO.getMemberlist() != null){
+            for(MemberDTO member : groupDetailDTO.getMemberlist()){
+                long userId = member.getId();
+                userService.acceptTaskById(userId,taskDTO.getId());
+            }
+        }
+        //设置应到实到
+        taskDTO.setShouldCount(groupDetailDTO.getMemberlist().size());
         taskDTO.setActualCount(0);
         taskService.createTask(taskDTO);
         return Response.newState(1);
