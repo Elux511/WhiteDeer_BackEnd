@@ -5,6 +5,7 @@ import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.TaskDTO;
 import com.WhiteDeer.dto.UserDTO;
+import com.WhiteDeer.service.GroupInfoService;
 import com.WhiteDeer.service.TaskService;
 import com.WhiteDeer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,14 @@ public class TaskController {
     private UserService userService;
 
     @Autowired
-    private
+    private GroupInfoService groupInfoService;
 
     //发布新的打卡任务
     //应到未到未初始化
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
-        taskDTO.setShouldCount();
+//        GroupInfoService.
+//        taskDTO.setShouldCount();
         taskDTO.setActualCount(0);
         taskService.createTask(taskDTO);
         return Response.newState(1);
