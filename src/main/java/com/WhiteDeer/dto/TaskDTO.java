@@ -25,6 +25,8 @@ public class TaskDTO {
     private Blob face;
     private Vector<Long> completedUserList;
     private Vector<Long> incompleteUserList;
+    private Vector<String> completedNameList;
+    private Vector<String> incompleteNameList;
 
     public long getId() {
         return id;
@@ -150,5 +152,19 @@ public class TaskDTO {
     }
     public void setIncompleteUserList(Vector<Long> incompleteUserList) {
         this.incompleteUserList = incompleteUserList;
+    }
+
+    public Vector<String> getCompletedNameList() {
+        return completedNameList;
+    }
+    public void setCompletedNameList(Vector<String> completedNameList) {
+        this.completedNameList = completedNameList;
+    }
+
+    public Vector<String> getIncompleteNameList() {
+        return incompleteNameList;
+    }
+    public void setIncompleteNameList(Vector<String> incompleteNameList) {
+        this.incompleteNameList = incompleteNameList;
     }
 }

@@ -6,8 +6,13 @@ import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -71,42 +76,31 @@ public class UserController {
     public Response<Map<String, Object>> getUserById(@RequestParam long id) {
         Optional<UserDTO> userDTOOptional = userService.getUserById(id);
         if (userDTOOptional.isEmpty()) {
-            Map<String, Object> data=new HashMap<>();
+            Map<String, Object> data = new HashMap<>();
             data.put("message", "用户不存在");
             return Response.newFailed(2, data);
         }
         UserDTO userDTO = userDTOOptional.get();
-        if (userDTO.getFace() != null) {
-            try {
-                Blob blob = userDTO.getFace();
-                String base64Image = blobToBase64(blob);
-                String face="data:image/jpeg;base64," + base64Image;
-            } catch (IOException e) {
-                String face= null;
-                Map<String, Object> data = new HashMap<>();
-                data.put("name", userDTO.getName());
-                data.put("id", userDTO.getId());
-                data.put("phoneNumber", userDTO.getPhoneNumber());
-                data.put("face", face);
-                data.put("message", e.getMessage());
-                return Response.newFailed(2, data);
-            }catch (Exception e) {
-                String face= null;
-                Map<String, Object> data = new HashMap<>();
-                data.put("name", userDTO.getName());
-                data.put("id", userDTO.getId());
-                data.put("phoneNumber", userDTO.getPhoneNumber());
-                data.put("face", face);
-                data.put("message", "未知错误获取个人信息失败");
-                data.put("message", e.getMessage());
-                return Response.newFailed(3, data);
-            }
-        }
         Map<String, Object> data = new HashMap<>();
         data.put("name", userDTO.getName());
         data.put("id", userDTO.getId());
         data.put("phoneNumber", userDTO.getPhoneNumber());
-        data.put("face", userDTO.getFace());
+        if (userDTO.getFace() != null) {
+            try {
+                String base64Image = blobToBase64(userDTO.getFace());
+                data.put("face", "data:image/jpeg;base64," + base64Image);
+            } catch (IOException e) {
+                data.put("face", null);
+                data.put("message", "转换照片失败：" + e.getMessage());
+                return Response.newFailed(2, data);
+            } catch (Exception e) {
+                data.put("face", null);
+                data.put("message", "未知错误获取个人信息失败：" + e.getMessage());
+                return Response.newFailed(3, data);
+            }
+        } else {
+            data.put("face", null);
+        }
         return Response.newSuccess(1, data);
     }
 
@@ -234,25 +228,32 @@ public class UserController {
     }
 
     //修改用户face
-    @PatchMapping("/api/setface")
-    public Response<Map<String, Object>> updateFaceById(@RequestBody UserDTO userDTO) {
+    @PatchMapping(value = "/api/setface", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response<Map<String, Object>> updateFaceById(@RequestParam("id") Long id,
+                                                        @RequestParam("face") MultipartFile faceFile) {
         try {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(id);
+            if (!faceFile.isEmpty()) {
+                Blob blob = new SerialBlob(faceFile.getBytes());
+                userDTO.setFace(blob);
+            }
             userService.updateFaceById(userDTO);
             Map<String, Object> data = new HashMap<>();
-            data.put("id", userDTO.getId());
+            data.put("id", id);
             data.put("success", true);
             return Response.newSuccess(1, data);
         } catch (EntityNotFoundException e) {
             Map<String, Object> data = new HashMap<>();
-            data.put("id", userDTO.getId());
+            data.put("id", id);
             data.put("success", false);
             data.put("message", e.getMessage());
             return Response.newFailed(2, data);
         } catch (Exception e) {
             Map<String, Object> data = new HashMap<>();
-            data.put("id", userDTO.getId());
+            data.put("id", id);
             data.put("success", false);
-            data.put("message", "未知错误更新头像失败");
+            data.put("message", "未知错误更新照片失败: ");
             data.put("message", e.getMessage());
             return Response.newFailed(3, data);
         }
