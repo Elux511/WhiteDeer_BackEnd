@@ -33,19 +33,20 @@ public class TaskController {
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
         GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
-
-
-        if(groupDetailDTO.getMemberlist() != null){
-            Vector<Long> incomplete = new Vector<>();
-            //为所有团队成员发布打卡任务
-            for(MemberDTO member : groupDetailDTO.getMemberlist()){
-                long userId = member.getId();
-                userService.acceptTaskById(userId,taskDTO.getId());
-                incomplete.add(taskDTO.getId());
-            }
-            //将所有成员加入到task的未完成列表
-            taskDTO.setIncompleteUserList(incomplete);
+        if(groupDetailDTO.getMemberlist().isEmpty()){
+            return Response.newState(2);
         }
+
+        Vector<Long> incomplete = new Vector<>();
+        //为所有团队成员发布打卡任务
+        for(MemberDTO member : groupDetailDTO.getMemberlist()){
+            long userId = member.getId();
+            userService.acceptTaskById(userId,taskDTO.getId());
+            incomplete.add(taskDTO.getId());
+        }
+
+        //将所有成员加入到task的未完成列表
+        taskDTO.setIncompleteUserList(incomplete);
         //设置应到实到
         taskDTO.setShouldCount(groupDetailDTO.getMemberlist().size());
         taskDTO.setActualCount(0);
@@ -63,6 +64,9 @@ public class TaskController {
             return Response.newFailed(2,taskList);
         }
         UserDTO userDTO = userOPT.get();
+        if(userDTO.getYesTaskSet().isEmpty() || userDTO.getNoTaskSet().isEmpty()){
+            return Response.newFailed(2,taskList);
+        }
         for(Long taskId : userDTO.getYesTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
