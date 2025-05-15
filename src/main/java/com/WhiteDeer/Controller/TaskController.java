@@ -34,12 +34,17 @@ public class TaskController {
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
         GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
 
-        //为所有团队成员发布打卡任务
+
         if(groupDetailDTO.getMemberlist() != null){
+            Vector<Long> incomplete = new Vector<>();
+            //为所有团队成员发布打卡任务
             for(MemberDTO member : groupDetailDTO.getMemberlist()){
                 long userId = member.getId();
                 userService.acceptTaskById(userId,taskDTO.getId());
+                incomplete.add(taskDTO.getId());
             }
+            //将所有成员加入到task的未完成列表
+            taskDTO.setIncompleteUserList(incomplete);
         }
         //设置应到实到
         taskDTO.setShouldCount(groupDetailDTO.getMemberlist().size());
