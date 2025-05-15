@@ -1,14 +1,18 @@
 package com.WhiteDeer.service;
 
+import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.UserConverter;
 import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dao.UserRepository;
 import com.WhiteDeer.dto.UserDTO;
+import com.WhiteDeer.util.PyAPI;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.DOMException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -126,6 +130,9 @@ public class UserServiceImpl implements UserService {
                             throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());
                         }
                 );
+        String img = null;
+        try {img = BlobConverter.blobToBase64(userDTO.getFace());} catch (IOException e) {throw new DOMException((short) 12,"Blob无法转换为base64编码");}//尝试将Blob转为base64
+        PyAPI.trainFaceLabels(String.valueOf(userDTO.getId()), img);
     }
 
     //根据ID获得发布的打卡任务
