@@ -23,10 +23,15 @@ public class TaskController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private
+
     //发布新的打卡任务
     //应到未到未初始化
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
+        taskDTO.setShouldCount();
+        taskDTO.setActualCount(0);
         taskService.createTask(taskDTO);
         return Response.newState(1);
     }

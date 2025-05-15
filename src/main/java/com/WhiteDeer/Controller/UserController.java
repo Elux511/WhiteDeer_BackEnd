@@ -76,6 +76,12 @@ public class UserController {
             Map<String, Object> data = new HashMap<>();
             data.put("id", null);
             return Response.newFailed(2, data);
+        } catch(Exception e){
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", null);
+            data.put("message","未知错误：注册新用户失败");
+            data.put("message",e.getMessage());
+            return Response.newFailed(3, data);
         }
     }
 
