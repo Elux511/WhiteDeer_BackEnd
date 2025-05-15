@@ -3,10 +3,7 @@ package com.WhiteDeer.Controller;
 import com.WhiteDeer.Response;
 import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.User;
-import com.WhiteDeer.dto.GroupDetailDTO;
-import com.WhiteDeer.dto.MemberDTO;
-import com.WhiteDeer.dto.TaskDTO;
-import com.WhiteDeer.dto.UserDTO;
+import com.WhiteDeer.dto.*;
 import com.WhiteDeer.service.GroupInfoService;
 import com.WhiteDeer.service.TaskService;
 import com.WhiteDeer.service.UserService;
@@ -56,30 +53,31 @@ public class TaskController {
 
     //初始化打卡列表
     @GetMapping("/api/mycheckin")
-    public Response<List<Pair<TaskDTO,String>>> getTask(@RequestParam long id) {
+    public Response<TaskListDTO> getTask(@RequestParam long id) {
         Optional<UserDTO> userOPT = userService.getUserById(id);
-        List<Pair<TaskDTO,String>> taskList = new ArrayList<>();
+        Vector<TaskDTO> taskList = new Vector<>();
+        TaskListDTO taskListDTO = new TaskListDTO(taskList);
 
         if(userOPT.isEmpty()) {
-            return Response.newFailed(2,taskList);
+            return Response.newFailed(2,taskListDTO);
         }
         UserDTO userDTO = userOPT.get();
         if(userDTO.getYesTaskSet() == null || userDTO.getNoTaskSet() == null){
-            return Response.newSuccess(1,taskList);
+            return Response.newSuccess(1,taskListDTO);
         }
         for(Long taskId : userDTO.getYesTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
-            Pair<TaskDTO,String> pair = Pair.of(taskDTO,"completed");
-            taskList.add(pair);
+            taskDTO.setStatus("completed");
+            taskList.add(taskDTO);
         }
         for(Long taskId : userDTO.getNoTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
-            Pair<TaskDTO,String> pair = Pair.of(taskDTO,"uncompleted");
-            taskList.add(pair);
+            taskDTO.setStatus("incomplete");
+            taskList.add(taskDTO);
         }
-        return Response.newSuccess(1,taskList);
+        return Response.newSuccess(1,taskListDTO);
     }
 
     //删除打卡任务
