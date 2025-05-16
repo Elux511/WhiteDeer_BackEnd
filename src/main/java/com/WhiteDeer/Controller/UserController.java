@@ -2,15 +2,10 @@ package com.WhiteDeer.Controller;
 
 
 import com.WhiteDeer.Response;
-import com.WhiteDeer.dao.GroupRepository;
-import com.WhiteDeer.dao.TaskRepository;
-import com.WhiteDeer.dao.UserRepository;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.Blob;
-import java.sql.SQLException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
