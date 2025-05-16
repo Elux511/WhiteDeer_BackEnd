@@ -234,10 +234,13 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     }
 
     @Override
-    public void deleteTaskById(long groupId, long taskId) {
+    public String deleteTaskById(long groupId, long taskId) {
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
         if(group == null) {
-            return;
+            return "未找到团队";
+        }
+        if(!hasContain(group.getYesTaskSet(), groupId) && !hasContain(group.getNoTaskSet(), groupId)) {
+            return "未找到任务";
         }
         if(hasContain(group.getYesTaskSet(), taskId)) {
             group.deteleYesTaskSet(taskId);
@@ -245,6 +248,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if(hasContain(group.getNoTaskSet(), taskId)) {
             group.deteleNoTaskSet(taskId);
         }
+        return "团队删除成功";
     }
 
     private boolean hasContain(Vector<Long> nums, Long num) {

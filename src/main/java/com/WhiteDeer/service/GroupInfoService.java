@@ -23,5 +23,5 @@ public interface GroupInfoService {
 
     Boolean quitGroup(Long userId, Long groupId);
 
-    void deleteTaskById(long groupId, long taskId);
+    String deleteTaskById(long groupId, long taskId);
 }

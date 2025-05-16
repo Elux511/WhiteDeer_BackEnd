@@ -167,4 +167,20 @@ public class UserServiceImpl implements UserService {
                         }
                 );
     }
+
+    @Override
+    public void deleteTaskById(long userId, long taskId) {
+        userRepository.findById(userId).ifPresentOrElse(
+                user -> {
+                    if(user.getYesTaskSet() == null || user.getNoTaskSet() == null) {
+                        throw new NullPointerException("用户打卡列表为空");
+                    }
+                    if (user.getYesTaskSet().contains(taskId)) {user.deleteYes(taskId);}
+                    if (user.getNoTaskSet().contains(taskId)) {user.deleteNo(taskId);}
+                },
+                ()->{
+                    throw new IllegalArgumentException("用户ID不存在: " + userId);
+                }
+        );
+    }
 }
