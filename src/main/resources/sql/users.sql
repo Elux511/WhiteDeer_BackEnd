@@ -10,7 +10,7 @@ create table users
     no_task_set      json         null,
     create_group_set json         null,
     join_group_set   json         null,
-    constraint users_pk
-        unique (user_id)
+    /*constraint users_pk
+        unique (user_id)*/
 );
 ALTER TABLE users AUTO_INCREMENT = 10000000;

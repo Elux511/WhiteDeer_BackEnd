@@ -8,7 +8,7 @@ CREATE TABLE groupinfo (
                            creator_id         BIGINT,
                            max_member         INT DEFAULT 0,
                            create_time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           CONSTRAINT groupinfo_pk_2 UNIQUE (group_id),
-                           CONSTRAINT groupinfo_users_user_id_fk FOREIGN KEY (creator_id) REFERENCES users(user_id)
+                           /*CONSTRAINT groupinfo_pk_2 UNIQUE (group_id),--
+                           CONSTRAINT groupinfo_users_user_id_fk FOREIGN KEY (creator_id) REFERENCES users(user_id)*/
 );
 ALTER TABLE groupinfo AUTO_INCREMENT = 10000000;

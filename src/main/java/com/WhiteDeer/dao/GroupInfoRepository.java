@@ -18,4 +18,5 @@ public interface GroupInfoRepository extends JpaRepository<GroupInfo,Long> {
 
 
     List<GroupInfo> findByCreateTimeBefore(LocalDateTime end);
+
 }

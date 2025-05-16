@@ -5,6 +5,7 @@ import com.WhiteDeer.converter.GroupInfoConverter;
 import com.WhiteDeer.dao.*;
 import com.WhiteDeer.dto.GroupDetailDTO;
 import com.WhiteDeer.dto.GroupInfoDTO;
+import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dto.MemberDTO;
 import com.WhiteDeer.dto.TaskDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,6 +129,16 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             groupInfoRepository.save(group);
         }
         return 1;
+    }
+    @Override
+    public GroupInfo getGroupInfo(Long groupId){
+        if(groupId!=null) {
+            GroupInfo groupInfo = groupInfoRepository.findById(groupId).orElse(null);
+            groupInfo = groupInfoRepository.findById(groupId).orElse(null);
+            return groupInfo;
+        }else{
+            return null;
+        }
     }
 
     @Override
@@ -258,5 +269,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         }
         return false;
     }
+
 
 }
