@@ -46,6 +46,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
                 .map(GroupInfoConverter::convertToDTO)
                 .collect(Collectors.toList());
     }
+
     @Override
     public List<Long> getManagedGroupIds(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
@@ -262,6 +263,17 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             group.deteleNoTaskSet(taskId);
         }
         return "团队删除成功";
+    }
+
+    @Override
+    public void finishTaskById(long groupId, long taskId) {
+        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
+        if(group == null) {
+            return;
+        }
+        group.addYesTaskSet(taskId);
+        group.deteleNoTaskSet(taskId);
+        groupInfoRepository.save(group);
     }
 
     private boolean hasContain(Vector<Long> nums, Long num) {

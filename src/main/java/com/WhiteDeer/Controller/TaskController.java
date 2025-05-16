@@ -115,8 +115,12 @@ public class TaskController {
         UserDTO userDTO = userOPT.get();
         int result = taskService.checkinTask(taskDTO,userDTO.getId());
         if(result == 1) {
-            userService.finishTaskById(userDTO.getId(),taskDTO.getId());
-            taskService.finishTaskById(userDTO.getId(),taskDTO.getId());
+            userService.finishTaskById(id,taskDTO.getId());
+            taskService.finishTaskById(id,taskDTO.getId());
+        }
+        TaskDTO taskTemp = taskService.getTaskById(taskDTO.getId());
+        if(taskTemp.getIncompleteUserList().isEmpty()) {
+            groupInfoService.finishTaskById(taskTemp.getGroupId(), taskDTO.getId());
         }
         return Response.newState(result);
     }
