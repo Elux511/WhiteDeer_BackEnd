@@ -27,7 +27,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void createTask(TaskDTO taskDTO) {
         taskDTO.setCompletedUserList(new Vector<>());
-        taskDTO.setIncompleteUserList(new Vector<>());
         taskRepository.save(TaskConverter.convertTask(taskDTO));
     }
 

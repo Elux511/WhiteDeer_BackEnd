@@ -10,6 +10,7 @@ import java.util.Vector;
 
 
 @Entity
+@Data
 @Table(name = "groupinfo")
 public class GroupInfo {
 

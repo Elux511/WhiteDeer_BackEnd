@@ -1,13 +1,11 @@
 package com.WhiteDeer.dto;
 
+import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.Vector;
 
-/**
- * @author hyh
- * @Description
- * @create 2025-05-13 23:55
- */
-
+@Data
 public class GroupInfoDTO {
     private long groupId;
     private String groupName;
@@ -93,11 +91,5 @@ public class GroupInfoDTO {
         this.creatorId = creatorId;
     }
 
-    public String getCreateTime() {
-        return createTime;
-    }
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
 }

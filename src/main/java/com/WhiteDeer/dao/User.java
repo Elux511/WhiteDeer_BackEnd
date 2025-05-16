@@ -113,9 +113,15 @@ public class User {
     }
 
     public void addYes(long task_id){
+        if(yesTaskSet == null) {
+            yesTaskSet = new Vector<>();
+        }
         yesTaskSet.add(task_id);
     }
     public void addNo(long task_id){
+        if(noTaskSet == null) {
+            noTaskSet = new Vector<>();
+        }
         noTaskSet.add(task_id);
     }
     public void deleteYes(long task_id){
@@ -126,9 +132,15 @@ public class User {
     }
 
     public void addCreateGroup(long task_id){
+        if(createGroupSet == null) {
+            createGroupSet = new Vector<>();
+        }
         createGroupSet.add(task_id);
     }
     public void addJoinGroup(long task_id){
+        if(joinGroupSet == null) {
+            joinGroupSet = new Vector<>();
+        }
         joinGroupSet.add(task_id);
     }
     public void deleteCreateGroup(long task_id){

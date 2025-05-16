@@ -1,15 +1,21 @@
 package com.WhiteDeer.service;
 
+import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.UserConverter;
+import com.WhiteDeer.dao.GroupRepository;
+import com.WhiteDeer.dao.TaskRepository;
 import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dao.UserRepository;
 import com.WhiteDeer.dto.UserDTO;
+import com.WhiteDeer.util.PyAPI;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.w3c.dom.DOMException;
 
-import java.sql.Blob;
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +23,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
 
     //通过ID获取用户
     @Override
@@ -38,13 +50,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Long createUser(UserDTO userDTO) throws IllegalArgumentException {
-        // 检查手机号是否已存在
         Optional<User> existingUser = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("手机号已被注册: " + userDTO.getPhoneNumber());
         }
-
-        // 转换DTO并保存用户
         User user = UserConverter.converterUser(userDTO);
         User savedUser = userRepository.save(user);
         return savedUser.getId();
@@ -56,8 +65,14 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(long id) {
         userRepository.findById(id)
                 .ifPresentOrElse(
-                        user -> userRepository.delete(user),
-                        () -> { throw new IllegalArgumentException("用户ID不存在: " + id); }
+                        user -> {
+                            taskRepository.removeUserFromAllTasks(id);
+                            groupRepository.removeUserFromAllGroups(id);
+                            userRepository.delete(user);
+                            },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + id);
+                        }
                 );
     }
 
@@ -97,14 +112,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updatePhoneNumberById(UserDTO userDTO) {
-        // 检查新手机号是否已被其他用户使用
         getUserByPhoneNumber(userDTO.getPhoneNumber())
                 .ifPresent(existingUser -> {
                     if (!existingUser.getId().equals(userDTO.getId())) {
                         throw new IllegalArgumentException("手机号已被其他用户占用: " + userDTO.getPhoneNumber());
                     }
                 });
-
         userRepository.findById(userDTO.getId())
                 .ifPresentOrElse(
                         user -> {
@@ -129,6 +142,25 @@ public class UserServiceImpl implements UserService {
                         },
                         () -> {
                             throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());
+                        }
+                );
+        String img = null;
+        try {img = BlobConverter.blobToBase64(userDTO.getFace());} catch (IOException e) {throw new DOMException((short) 12,"Blob无法转换为base64编码");}//尝试将Blob转为base64
+        PyAPI.trainFaceLabels(String.valueOf(userDTO.getId()), img);
+    }
+
+    //根据ID获得发布的打卡任务
+    @Override
+    @Transactional
+    public void acceptTaskById(long userId, long taskId) {
+        userRepository.findById(userId)
+                .ifPresentOrElse(
+                        user -> {
+                            user.addNo(taskId);
+                            userRepository.save(user);
+                        },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + userId);
                         }
                 );
     }
