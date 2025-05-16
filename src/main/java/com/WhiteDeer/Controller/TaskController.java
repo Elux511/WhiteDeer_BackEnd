@@ -149,6 +149,7 @@ public class TaskController {
     @GetMapping("/api/task")
     public Response<TaskDTO> getTasks(@RequestParam long id) throws IllegalAccessException {
         TaskDTO taskDTO = taskService.getTaskById(id);
+        if(taskDTO == null) {return Response.newFailed(2,taskDTO);}
         Vector<String> completed = new Vector<>();
         Vector<String> incomplete = new Vector<>();
         if(taskDTO.getCompletedUserList() != null) {//判断是否非空

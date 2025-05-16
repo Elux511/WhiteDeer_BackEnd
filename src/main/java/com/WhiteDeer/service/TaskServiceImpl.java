@@ -37,7 +37,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDTO getTaskById(Long id) throws NoSuchElementException {
        Optional<Task> task = taskRepository.findById(id);
-       return TaskConverter.convertTask(task.orElseThrow());
+       if(!task.isEmpty()){
+           return TaskConverter.convertTask(task.get());
+       }
+       return null;
     }
 
     //通过id删除task
