@@ -2,10 +2,7 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.UserConverter;
-import com.WhiteDeer.dao.GroupRepository;
-import com.WhiteDeer.dao.TaskRepository;
-import com.WhiteDeer.dao.User;
-import com.WhiteDeer.dao.UserRepository;
+import com.WhiteDeer.dao.*;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.util.PyAPI;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,7 +25,9 @@ public class UserServiceImpl implements UserService {
     private TaskRepository taskRepository;
 
     @Autowired
-    private GroupRepository groupRepository;
+    private GroupInfoRepository groupRepository;
+    @Autowired
+    private GroupInfoRepository groupInfoRepository;
 
     //通过ID获取用户
     @Override
@@ -67,7 +66,7 @@ public class UserServiceImpl implements UserService {
                 .ifPresentOrElse(
                         user -> {
                             taskRepository.removeUserFromAllTasks(id);
-                            groupRepository.removeUserFromAllGroups(id);
+                            groupInfoRepository.removeUserFromAllGroups(id);
                             userRepository.delete(user);
                             },
                         () -> {
