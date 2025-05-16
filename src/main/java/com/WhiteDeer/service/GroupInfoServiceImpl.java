@@ -35,13 +35,26 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (user == null || user.getJoinGroupSet() == null) {
             return Collections.emptyList();
         }
+        List<Long> managedGroupIds = getManagedGroupIds(userId);
         Vector<Long> groupIds = user.getJoinGroupSet()
                 .stream()
                 .map(Long::valueOf)
+                .filter(groupId -> managedGroupIds.contains(groupId))
                 .collect(Collectors.toCollection(Vector::new));
         List<GroupInfo> groups = groupInfoRepository.findAllById(groupIds);
         return groups.stream()
                 .map(GroupInfoConverter::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    @Override
+    public List<Long> getManagedGroupIds(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || user.getCreateGroupSet() == null) {
+            return Collections.emptyList();
+        }
+        return user.getCreateGroupSet()
+                .stream()
+                .map(Long::valueOf)
                 .collect(Collectors.toList());
     }
 

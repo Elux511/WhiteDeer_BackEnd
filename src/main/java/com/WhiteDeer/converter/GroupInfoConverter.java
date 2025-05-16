@@ -3,6 +3,7 @@ package com.WhiteDeer.converter;
 import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dto.GroupInfoDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class GroupInfoConverter {
@@ -16,6 +17,7 @@ public class GroupInfoConverter {
         dto.setYesTaskSet(groupInfo.getYesTaskSet());
         dto.setNoTaskSet(groupInfo.getNoTaskSet());
         dto.setCreatorId(groupInfo.getCreatorId());
+        dto.setCreateTime(groupInfo.getCreateTime().toString());
 
         List<Long> members = groupInfo.getMemberList();
         dto.setMemberCount(members != null ? members.size() : 0);
@@ -32,6 +34,7 @@ public class GroupInfoConverter {
         entity.setYesTaskSet(groupInfoDTO.getYesTaskSet());
         entity.setNoTaskSet(groupInfoDTO.getNoTaskSet());
         entity.setCreatorId(groupInfoDTO.getCreatorId());
+        entity.setCreateTime(LocalDateTime.parse(groupInfoDTO.getCreateTime()));
         return entity;
     }
 }
