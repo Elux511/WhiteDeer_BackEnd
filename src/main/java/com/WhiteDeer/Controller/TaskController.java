@@ -84,6 +84,9 @@ public class TaskController {
         for(Long taskId : userDTO.getYesTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
+            if(taskDTO == null){
+                return Response.newFailed(2,taskListDTO);
+            }
             GroupInfo groupInfo = groupInfoService.getGroupInfo(taskDTO.getGroupId());
             taskDTO.setGroupName(groupInfo.getGroupName());
             taskDTO.setStatus("completed");
@@ -92,6 +95,9 @@ public class TaskController {
         for(Long taskId : userDTO.getNoTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
+            if(taskDTO == null){
+                return Response.newFailed(2,taskListDTO);
+            }
             GroupInfo groupInfo = groupInfoService.getGroupInfo(taskDTO.getGroupId());
             taskDTO.setGroupName(groupInfo.getGroupName());
             taskDTO.setStatus("incomplete");
