@@ -37,20 +37,24 @@ public class TaskController {
         if(groupDetailDTO == null){return Response.newState(2);}//检测是否存在团队
         if(groupDetailDTO.getMemberlist() == null){return Response.newState(1);}//检测团队列表是否为空
 
+        Task task = taskService.createTask(taskDTO);
+
         Vector<Long> incomplete = new Vector<>();
         //为所有团队成员发布打卡任务
         for(MemberDTO member : groupDetailDTO.getMemberlist()){
             long userId = member.getId();
-            userService.acceptTaskById(userId,taskDTO.getId());
-            incomplete.add(taskDTO.getId());
+            userService.acceptTaskById(userId,task.getId());
+            incomplete.add(task.getId());
         }
 
         //将所有成员加入到task的未完成列表
-        taskDTO.setIncompleteUserList(incomplete);
+        task.setCompletedUserList(new Vector<>());
+        task.setIncompleteUserList(incomplete);
         //设置应到实到
-        taskDTO.setShouldCount(groupDetailDTO.getMemberlist().size());
-        taskDTO.setActualCount(0);
-        taskService.createTask(taskDTO);
+        task.setShouldCount(groupDetailDTO.getMemberlist().size());
+        task.setActualCount(0);
+        taskService.createTask(task);
+
         return Response.newState(1);
     }
 

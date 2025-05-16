@@ -4,7 +4,6 @@ import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.Task;
 import com.WhiteDeer.dao.TaskRepository;
-import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.TaskDTO;
 import com.WhiteDeer.util.GeoDistanceCalculator;
 import com.WhiteDeer.util.PyAPI;
@@ -25,9 +24,13 @@ public class TaskServiceImpl implements TaskService {
 
     //创建task
     @Override
-    public void createTask(TaskDTO taskDTO) {
-        taskDTO.setCompletedUserList(new Vector<>());
-        taskRepository.save(TaskConverter.convertTask(taskDTO));
+    public Task createTask(TaskDTO taskDTO) {
+        return taskRepository.save(TaskConverter.convertTask(taskDTO));
+    }
+
+    @Override
+    public void createTask(Task task){
+        taskRepository.save(task);
     }
 
     //通过id获取task
