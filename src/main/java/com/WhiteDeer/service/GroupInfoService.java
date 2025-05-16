@@ -9,9 +9,12 @@ import java.util.List;
 public interface GroupInfoService {
     List<GroupInfoDTO> getJoinedGroups(Long userId);
 
+
     List<GroupInfoDTO> getManagedGroups(Long userId);
 
     List<GroupInfoDTO> searchGroups(String id, String name, String begin, String end);
+
+    List<Long> getManagedGroupIds(Long userId);
 
     Boolean joinGroup(Long userId, Long groupId);
 

@@ -105,19 +105,14 @@ public class GroupController {
     }
 
     // 加入团队
-    //（POST）http://localhost:8080/api/joingroup
-    //请求体数据：{
-    //id:12345678
-    //groupid:123456
-    //}
-    //返回:{state（1（成功）；2（失败）}
+    //如果已加入返回state3
     @PostMapping("/api/joingroup")
     public Response<Map<String, Object>> joinGroup(@RequestBody Map<String, Object> payload) {
 
         try {
             Map<String, Object> data = new HashMap<>();
             Long userId = Long.valueOf(payload.get("id").toString());
-            Long groupId = Long.valueOf(payload.get("groupid").toString());
+            Long groupId = Long.valueOf(payload.get("groupId").toString());
             boolean success = groupInfoService.joinGroup(userId, groupId);
             data.put("id", userId);
             data.put("groupId", groupId);
@@ -161,11 +156,11 @@ public class GroupController {
     }
 
     // 解散我创建的团队
-    //（DELETE）http://localhost:8080/api/deletegroup? userid=123456&groupid=123456
+    //（DELETE）http://localhost:8080/api/deletegroup? userId=123456&groupId=123456
     //请求体:无
     //返回：{state:(1(成功) 2（失败）)}
     @DeleteMapping("/api/deletegroup")
-    public Response<Map<String, Object>> deleteGroup(@RequestParam("userid") Long userId,@RequestParam("groupid") Long groupId) {
+    public Response<Map<String, Object>> deleteGroup(@RequestParam("userId") Long userId,@RequestParam("groupId") Long groupId) {
         try{
             Map<String, Object> data = new HashMap<>();
             boolean success = groupInfoService.deleteGroup(userId, groupId);
@@ -180,7 +175,7 @@ public class GroupController {
     }
 
     //查看创建的某个团队的信息
-    //（GET）http://localhost:8080/api/group?groupid=xxxxxx
+    //（GET）http://localhost:8080/api/group?groupId=xxxxxx
     //请求体数据：{
     //无
     //}
@@ -198,7 +193,7 @@ public class GroupController {
     //},
     //}
     @GetMapping("/api/group")
-    public Response<Map<String, Object>> getGroup(@RequestParam("groupid") Long groupId) {
+    public Response<Map<String, Object>> getGroup(@RequestParam("groupId") Long groupId) {
         try {
             GroupDetailDTO groupDetail = groupInfoService.getGroupDetails(groupId);
             Map<String, Object> data = new HashMap<>();
@@ -217,7 +212,7 @@ public class GroupController {
     //(POST)http://localhost:8080/api/quitgroup
     //	请求体数据：{
     //id：12345678
-    //groupid:123456
+    //groupId:123456
     //}
     //返回:{state（1（退出成功）；2(失败)}
     @PostMapping("/api/quitgroup")
@@ -226,7 +221,7 @@ public class GroupController {
         try {
             Map<String, Object> data = new HashMap<>();
             Long userId = Long.valueOf(payload.get("id").toString());
-            Long groupId = Long.valueOf(payload.get("groupid").toString());
+            Long groupId = Long.valueOf(payload.get("groupId").toString());
             boolean success = groupInfoService.quitGroup(userId, groupId);
             return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
