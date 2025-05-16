@@ -20,13 +20,17 @@ public class GroupController {
 
     //获取用户加入的团队列表
     //(GET) http://localhost:8080/api/getjoinedgroups?id=xxxxxxxx
-    //	请求体数据：{
-    //无
-    //}
+    //	请求体：无
     //返回:{
-    //state（1（成功）；2（失败）），
-    //data:{
-    //		joinedGroups:[{},{}]（每个group对象格式：groupId:1,groupName:'茧之泪殇', isFull:"否",memberCount:'123' createTime:'2024-10-01 09:15:00'）
+    //“state”（1（成功）；2（失败）），
+    //“data”:{
+    //		“joinedGroups”:[{},{}]
+    //（每个group对象格式：
+    //“groupId”:1,
+    //“groupName”:'茧之泪殇',
+    //“isFull”:"否",
+    //“memberCount”:'123'
+    //“createTime”:'2024-10-01 09:15:00'）
     //}
     //}
     @GetMapping("/api/getjoinedgroups")
@@ -48,13 +52,17 @@ public class GroupController {
 
     // 获取用户管理的团队列表
     //(GET) http://localhost:8080/api/getmanagedgroups?id=xxxxxxxx
-    //请求体数据：{
-    //无
-    //}
+    //请求体：无
     //返回{
-    //state（1（成功）；2（失败）），
-    //data:{
-    //		manegedGroups:[{},{}]（每个group对象格式：groupId:1,groupName:'茧之泪殇', isFull:"否",memberCount:'123' createTime:'2024-10-01 09:15:00'）
+    //“state”（1（成功）；2（失败）），
+    //“data”:{
+    //		“managedGroups”:[{},{}]
+    //（每个group对象格式：
+    //“groupId”:1,
+    //“groupName”:'茧之泪殇',
+    //“isFull“:"否",
+    //“memberCount“:'123'
+    //“createTime“:'2024-10-01 09:15:00'）
     //}
     //}
     @GetMapping("/api/getmanagedgroups")
@@ -74,15 +82,19 @@ public class GroupController {
 
     }
 
-    // 搜索团队
+    // .搜索团队
     //(GET) http://localhost:8080/api/searchgroup?id=xxxxxx&name=xxxxxx&begin=xxxxxxxx&end=xxxxxxxx
-    //请求体数据：{
-    //无
-    //}
+    //请求体：无
     //返回:{
-    //state（1（成功）；2（服务器错误）），
-    //data:{
-    //groups:[{}，{}](所有满足信息的团队列表，每个团队对象格式：groupId:"139834",groupName:'测试数据1', isFull:"否",memberCount:'123', createTime:'2025-5-11 09:15:00')
+    //“state”（1（返回成功）；2（错误）），
+    //“data”:{
+    //“groups”:[{}，{}]
+    //(所有满足信息的团队列表，每个团队对象格式：
+    //“groupId“:"139834",
+    //“groupName“:'测试数据1',
+    //“isFull“:"否",
+    //“memberCount“:'123',
+    //“createTime“:'2025-5-11 09:15:00')
     //}
     //（注：如果id不为空则只有一个团队，如果id是空串可能有多个团队符合情况，begin和end是团队创建时间区间格式为ISO 8601 标准时间字符串，如：2025-05-06T16:00:00.000Z)
     //}
@@ -105,18 +117,34 @@ public class GroupController {
     }
 
     // 加入团队
+    //（POST）http://localhost:8080/api/joingroup
+    //请求体：{
+    //“id”:12345678，
+    //“groupId“:123456
+    //}
+    //返回:{“state”（1（加入成功）；2（加入失败）；3（已加入该团队）}
     //如果已加入返回state3
+    //
+     //
+     //
+     //
+     //
     @PostMapping("/api/joingroup")
     public Response<Map<String, Object>> joinGroup(@RequestBody Map<String, Object> payload) {
-
         try {
             Map<String, Object> data = new HashMap<>();
             Long userId = Long.valueOf(payload.get("id").toString());
             Long groupId = Long.valueOf(payload.get("groupId").toString());
-            boolean success = groupInfoService.joinGroup(userId, groupId);
-            data.put("id", userId);
-            data.put("groupId", groupId);
-            return Response.newSuccess(1,data);
+            int success = groupInfoService.joinGroup(userId, groupId);
+            if (success  == 1) {
+                data.put("id", userId);
+                data.put("groupId", groupId);
+                return Response.newSuccess(1,data);
+            }else if(success == 2){
+                return Response.newFailed(3,data);
+            }else {
+                return Response.newFailed(2,data);
+            }
         } catch (IllegalArgumentException e) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", payload.get("id"));
@@ -174,23 +202,23 @@ public class GroupController {
         }
     }
 
-    //查看创建的某个团队的信息
+    //.查看创建的某个团队的信息
     //（GET）http://localhost:8080/api/group?groupId=xxxxxx
-    //请求体数据：{
-    //无
-    //}
+    //请求体：无
     //返回:{
-    //state（1（成功）2（失败））；
-    //data:{
-    //	memberlist:[{},{}],(每个member对象格式实例："id":"1","name":"茧之泪殇",
+    //“state”（1（成功）2（失败））；
+    //“data”:{
+    //	“memberlist":[{},{}],(每个member对象格式实例：
+    //"id":"1",
+    //"name":"茧之泪殇",
     //"phoneNumber":13013013130）
-    //	tasklist:[{},{}],（每个task对象格式实例：
+    //	“tasklist”:[{},{}],（每个task对象格式实例：
     //"id": 2,
     //          "name": "测试数据2",
-    //          "endTime": "2024-10-01 09:30:00"
+    //          "endTime": "2024-10-01T09:30:00.000Z",
     //          "shouldCount": 10,
-    //          "actualCount": 9,
-    //},
+    //          "actualCount": 9)
+    //}
     //}
     @GetMapping("/api/group")
     public Response<Map<String, Object>> getGroup(@RequestParam("groupId") Long groupId) {
@@ -208,13 +236,17 @@ public class GroupController {
         }
     }
 
-    // 退出团队
+
+
+
+
+    //退出团队
     //(POST)http://localhost:8080/api/quitgroup
-    //	请求体数据：{
-    //id：12345678
-    //groupId:123456
+    //	请求体：{
+    //“id”：12345678，
+    //“groupId”:123456
     //}
-    //返回:{state（1（退出成功）；2(失败)}
+    //返回:{“state”（1（退出成功）；2(失败)}
     @PostMapping("/api/quitgroup")
     public Response<Map<String, Object>> quitGroup(@RequestBody Map<String, Object> payload) {
 

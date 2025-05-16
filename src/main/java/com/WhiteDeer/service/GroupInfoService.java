@@ -16,7 +16,7 @@ public interface GroupInfoService {
 
     List<Long> getManagedGroupIds(Long userId);
 
-    Boolean joinGroup(Long userId, Long groupId);
+    int joinGroup(Long userId, Long groupId);
 
     Boolean createGroup(String groupName, Long maxMember, String introduction, Long creatorId);
 
