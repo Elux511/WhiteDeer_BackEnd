@@ -19,7 +19,13 @@ public interface UserService {
 
     void updatePhoneNumberById(UserDTO userDTO);
 
+    void updatePasswordById(UserDTO userDTO);
+
     void updateFaceById(UserDTO userDTO);
 
+    void acceptTaskById(long userId, long taskId);
+
     void finishTaskById(long userId, long taskId);
+
+    void deleteGroupById(long id);
 }

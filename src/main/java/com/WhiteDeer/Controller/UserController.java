@@ -2,14 +2,21 @@ package com.WhiteDeer.Controller;
 
 
 import com.WhiteDeer.Response;
-import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import static com.WhiteDeer.converter.BlobConverter.blobToBase64;
 
 @RestController
 public class UserController {
@@ -31,6 +38,7 @@ public class UserController {
                     Map<String, Object> data = new HashMap<>();
                     data.put("id", null);
                     data.put("haveface", null);
+                    data.put("message", "用户不存在");
                     return Response.newFailed(2,data);
                 });
     }
@@ -43,6 +51,7 @@ public class UserController {
                     if (!user.getPassword().equals(userDTO.getPassword())) {
                         Map<String, Object> data = new HashMap<>();
                         data.put("haveface", null);
+                        data.put("message", "密码错误");
                         return Response.newFailed(3,data);
                     }
                     Map<String, Object> data = new HashMap<>();
@@ -52,17 +61,54 @@ public class UserController {
                 .orElseGet(() -> {
                     Map<String, Object> data = new HashMap<>();
                     data.put("haveface", null);
+                    data.put("message", "用户不存在");
                     return Response.newFailed(2,data);
                 });
     }
 
     //获取个人信息
-//    @GetMapping("/api/myinfo/")
-//    public Response<UserDTO> getUserById(@RequestParam long id) {
-//        return userService.getUserById(id)
-//                .map(Response::<UserDTO>myinfoSuccess)
-//                .orElseGet(() -> Response.myinfoFailed("用户不存在"));
-//    }
+    @GetMapping("/api/myinfo")
+    public Response<Map<String, Object>> getUserById(@RequestParam long id) {
+        Optional<UserDTO> userDTOOptional = userService.getUserById(id);
+        if (userDTOOptional.isEmpty()) {
+            Map<String, Object> data=new HashMap<>();
+            data.put("message", "用户不存在");
+            return Response.newFailed(2, data);
+        }
+        UserDTO userDTO = userDTOOptional.get();
+        if (userDTO.getFace() != null) {
+            try {
+                Blob blob = userDTO.getFace();
+                String base64Image = blobToBase64(blob);
+                String face="data:image/jpeg;base64," + base64Image;
+            } catch (IOException e) {
+                String face= null;
+                Map<String, Object> data = new HashMap<>();
+                data.put("name", userDTO.getName());
+                data.put("id", userDTO.getId());
+                data.put("phoneNumber", userDTO.getPhoneNumber());
+                data.put("face", face);
+                data.put("message", e.getMessage());
+                return Response.newFailed(2, data);
+            }catch (Exception e) {
+                String face= null;
+                Map<String, Object> data = new HashMap<>();
+                data.put("name", userDTO.getName());
+                data.put("id", userDTO.getId());
+                data.put("phoneNumber", userDTO.getPhoneNumber());
+                data.put("face", face);
+                data.put("message", "未知错误获取个人信息失败");
+                data.put("message", e.getMessage());
+                return Response.newFailed(3, data);
+            }
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", userDTO.getName());
+        data.put("id", userDTO.getId());
+        data.put("phoneNumber", userDTO.getPhoneNumber());
+        data.put("face", userDTO.getFace());
+        return Response.newSuccess(1, data);
+    }
 
     //注册新用户
     @PostMapping("/api/register")
@@ -75,13 +121,15 @@ public class UserController {
         } catch (IllegalArgumentException e) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", null);
-            return Response.newFailed(2, data);
-        }catch(Exception e) {
-            Map<String, Object> data = new HashMap<>();
-            data.put("id", null);
             data.put("message", e.getMessage());
+            return Response.newFailed(2, data);
+        }catch (Exception e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
             data.put("message", "未知错误注册新用户失败");
-            return Response.newFailed(3,data);
+            data.put("message", e.getMessage());
+            return Response.newFailed(3, data);
         }
     }
 
@@ -98,48 +146,116 @@ public class UserController {
             Map<String, Object> data = new HashMap<>();
             data.put("id", id);
             data.put("success", false);
+            data.put("message", e.getMessage());
             return Response.newFailed(2, data);
+        }catch (Exception e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", id);
+            data.put("success", false);
+            data.put("message", "未知错误删除用户失败");
+            data.put("message", e.getMessage());
+            return Response.newFailed(3, data);
         }
     }
 
     //修改用户name
     @PatchMapping("/api/changename")
-    public Response<Void> updateNameById(@RequestBody UserDTO userDTO) {
+    public Response<Map<String, Object>> updateNameById(@RequestBody UserDTO userDTO) {
         try {
             userService.updateNameById(userDTO);
             Map<String, Object> data = new HashMap<>();
             data.put("id", userDTO.getId());
             data.put("success", true);
-            return Response.newState(1);
+            return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", userDTO.getId());
             data.put("success", false);
-            return Response.newState(2);
+            data.put("message", e.getMessage());
+            return Response.newSuccess(2,data);
+        }catch (Exception e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            data.put("message", "未知错误更新名字失败");
+            data.put("message", e.getMessage());
+            return Response.newFailed(3, data);
         }
     }
 
     //修改用户phoneNumber
     @PatchMapping("/api/changephone")
-    public Response<Void> updatePhoneNumberById(@RequestBody UserDTO userDTO) {
+    public Response<Map<String, Object>> updatePhoneNumberById(@RequestBody UserDTO userDTO) {
         try {
             userService.updatePhoneNumberById(userDTO);
             Map<String, Object> data = new HashMap<>();
             data.put("id", userDTO.getId());
             data.put("success", true);
-            return Response.newState(1);
+            return Response.newSuccess(1,data);
         } catch (IllegalArgumentException e) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", userDTO.getId());
             data.put("success", false);
-            return Response.newState(2);
+            data.put("message", e.getMessage());
+            return Response.newSuccess(2,data);
+        }catch (Exception e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            data.put("message", "未知错误更新手机号失败");
+            data.put("message", e.getMessage());
+            return Response.newFailed(3, data);
         }
     }
 
-//    //修改用户face
-//    @PatchMapping("/api/setface")
-//    public void updateFaceById(@RequestBody UserDTO userDTO) throws IllegalAccessException {
-//        userService.updateFaceById(userDTO);
-//    }
+    //修改用户password
+    @PatchMapping("/api/changepassword")
+    public Response<Map<String, Object>> updatePasswordById(@RequestBody UserDTO userDTO) {
+        try{
+            userService.updatePasswordById(userDTO);
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", true);
+            return Response.newSuccess(1,data);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            data.put("message", e.getMessage());
+            return Response.newSuccess(2,data);
+        }catch (Exception e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            data.put("message", "未知错误更新密码失败");
+            data.put("message", e.getMessage());
+            return Response.newFailed(3, data);
+        }
+    }
+
+    //修改用户face
+    @PatchMapping("/api/setface")
+    public Response<Map<String, Object>> updateFaceById(@RequestBody UserDTO userDTO) {
+        try {
+            userService.updateFaceById(userDTO);
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", true);
+            return Response.newSuccess(1, data);
+        } catch (EntityNotFoundException e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            data.put("message", e.getMessage());
+            return Response.newFailed(2, data);
+        } catch (Exception e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", userDTO.getId());
+            data.put("success", false);
+            data.put("message", "未知错误更新头像失败");
+            data.put("message", e.getMessage());
+            return Response.newFailed(3, data);
+        }
+    }
 
 }

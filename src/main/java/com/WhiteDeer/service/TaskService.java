@@ -7,7 +7,6 @@ import java.util.Optional;
 
 public interface TaskService {
 
-
     void createTask(TaskDTO taskDTO);
 
     TaskDTO getTaskById(Long id);
@@ -17,4 +16,5 @@ public interface TaskService {
     int checkinTask(TaskDTO taskDTO,long userId) throws IOException;
 
     void finishTaskById(long userId, long taskId) throws IOException;
+
 }

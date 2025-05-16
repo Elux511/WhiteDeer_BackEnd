@@ -27,7 +27,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void createTask(TaskDTO taskDTO) {
         taskDTO.setCompletedUserList(new Vector<>());
-        taskDTO.setIncompleteUserList(new Vector<>());
         taskRepository.save(TaskConverter.convertTask(taskDTO));
     }
 
@@ -85,7 +84,6 @@ public class TaskServiceImpl implements TaskService {
     //用户打卡完成后
     @Override
     public void finishTaskById(long userId, long taskId) {
-        System.out.println(4);
         Task task = taskRepository.getById(taskId);
         task.addCompletedUser(userId);
         task.deleteIncompleteUser(userId);
