@@ -2,8 +2,7 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.UserConverter;
-import com.WhiteDeer.dao.User;
-import com.WhiteDeer.dao.UserRepository;
+import com.WhiteDeer.dao.*;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.util.PyAPI;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +20,14 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private GroupInfoRepository groupRepository;
+    @Autowired
+    private GroupInfoRepository groupInfoRepository;
 
     //通过ID获取用户
     @Override
@@ -40,25 +47,31 @@ public class UserServiceImpl implements UserService {
 
     //创建用户
     @Override
+    @Transactional
     public Long createUser(UserDTO userDTO) throws IllegalArgumentException {
-        // 检查手机号是否已存在
         Optional<User> existingUser = userRepository.findByPhoneNumber(userDTO.getPhoneNumber());
         if (existingUser.isPresent()) {
             throw new IllegalArgumentException("手机号已被注册: " + userDTO.getPhoneNumber());
         }
-
-        // 转换DTO并保存用户
         User user = UserConverter.converterUser(userDTO);
         User savedUser = userRepository.save(user);
         return savedUser.getId();
     }
 
     //根据ID删除用户
+    @Override
+    @Transactional
     public void deleteUserById(long id) {
         userRepository.findById(id)
                 .ifPresentOrElse(
-                        user -> userRepository.delete(user),
-                        () -> { throw new IllegalArgumentException("用户ID不存在: " + id); }
+                        user -> {
+                            taskRepository.removeUserFromAllTasks(id);
+                            groupInfoRepository.removeUserFromAllGroups(id);
+                            userRepository.delete(user);
+                            },
+                        () -> {
+                            throw new IllegalArgumentException("用户ID不存在: " + id);
+                        }
                 );
     }
 
@@ -98,14 +111,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void updatePhoneNumberById(UserDTO userDTO) {
-        // 检查新手机号是否已被其他用户使用
         getUserByPhoneNumber(userDTO.getPhoneNumber())
                 .ifPresent(existingUser -> {
                     if (!existingUser.getId().equals(userDTO.getId())) {
                         throw new IllegalArgumentException("手机号已被其他用户占用: " + userDTO.getPhoneNumber());
                     }
                 });
-
         userRepository.findById(userDTO.getId())
                 .ifPresentOrElse(
                         user -> {
@@ -119,6 +130,8 @@ public class UserServiceImpl implements UserService {
     }
 
     //根据ID更新人脸
+    @Override
+    @Transactional
     public void updateFaceById(UserDTO userDTO) {
         userRepository.findById(userDTO.getId())
                 .ifPresentOrElse(
