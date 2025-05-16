@@ -155,8 +155,10 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userId)
                 .ifPresentOrElse(
                         user -> {
-                            user.addNo(taskId);
-                            userRepository.save(user);
+                            if(!user.getNoTaskSet().contains(taskId)) {
+                                user.addNo(taskId);
+                                userRepository.save(user);
+                            }
                         },
                         () -> {
                             throw new IllegalArgumentException("用户ID不存在: " + userId);

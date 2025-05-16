@@ -2,6 +2,7 @@ package com.WhiteDeer.Controller;
 
 import com.WhiteDeer.Response;
 import com.WhiteDeer.converter.TaskConverter;
+import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dao.Task;
 import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.*;
@@ -30,6 +31,8 @@ public class TaskController {
     //发布新的打卡任务
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
+
+
         GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
         if(groupDetailDTO == null){return Response.newState(2);}//检测是否存在团队
         if(groupDetailDTO.getMemberlist() == null){return Response.newState(1);}//检测团队列表是否为空
@@ -135,22 +138,20 @@ public class TaskController {
             for(Long userId : taskDTO.getCompletedUserList())//添加到已完成用户名单
             {
                 Optional<UserDTO> userOPT = userService.getUserById(userId);
-                userOPT.ifPresentOrElse(userDTO -> {
-                            completed.add(userDTO.getName());},
-                        () -> {
-                            throw new IllegalArgumentException("用户ID不存在: " + userId);
-                        });
+                if(userOPT.isEmpty()) {
+                    return  Response.newFailed(2,taskDTO);
+                }
+                completed.add(userOPT.get().getName());
             }
         }
         if(taskDTO.getIncompleteUserList() != null) {//判断是否非空
             for(Long userId : taskDTO.getIncompleteUserList())//添加到未完成用户名单
             {
                 Optional<UserDTO> userOPT = userService.getUserById(userId);
-                userOPT.ifPresentOrElse(userDTO -> {
-                            incomplete.add(userDTO.getName());},
-                        () -> {
-                            throw new IllegalArgumentException("用户ID不存在: " + userId);
-                        });
+                if(userOPT.isEmpty()) {
+                    return  Response.newFailed(2,taskDTO);
+                }
+                incomplete.add(userOPT.get().getName());
             }
         }
 
