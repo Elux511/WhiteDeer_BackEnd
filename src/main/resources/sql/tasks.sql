@@ -23,6 +23,4 @@ create table tasks
         foreign key (group_id) references groupinfo (group_id)
 );
 -- ALTER TABLE users AUTO_INCREMENT = 10000000;-- 设置自增初始值
-rences groupinfo (group_id)
-);
 
