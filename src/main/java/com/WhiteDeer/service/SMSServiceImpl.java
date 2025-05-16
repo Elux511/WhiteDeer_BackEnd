@@ -46,6 +46,26 @@ public class SMSServiceImpl implements SMSService {
         return false;
     }
 
+    @Override
+    public boolean verifyCodeWithoutInvalidate(String phoneNumber, String code) {
+        String key = getRedisKey(phoneNumber);
+        String storedCode = redisTemplate.opsForValue().get(key);
+        return storedCode != null && storedCode.equals(code);
+    }
+
+    @Override
+    public void invalidateCode(String phoneNumber) {
+        String key = getRedisKey(phoneNumber);
+        redisTemplate.delete(key);
+    }
+
+    //从Redis获取验证码
+    @Override
+    public String getCodeFromRedis(String phoneNumber) {
+        String key = getRedisKey(phoneNumber);
+        return redisTemplate.opsForValue().get(key);
+    }
+
     // 生成Redis键
     private String getRedisKey(String phoneNumber) {
         return VERIFY_CODE_KEY_PREFIX + phoneNumber;

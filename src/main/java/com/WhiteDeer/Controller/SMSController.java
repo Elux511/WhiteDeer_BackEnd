@@ -1,6 +1,7 @@
 package com.WhiteDeer.Controller;
 
 import com.WhiteDeer.Response;
+import com.WhiteDeer.dto.SMSDTO;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.SMSService;
 import com.WhiteDeer.util.HttpUtils;
@@ -9,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -70,6 +72,36 @@ public class SMSController {
             result.put("success", false);
             result.put("message", "系统异常：" + e.getMessage());
             return Response.newFailed(3, result);
+        }
+    }
+
+    @PostMapping("/api/checkvericode")
+    public Response<Map<String, Object>> checkCode(@RequestBody @Validated SMSDTO smsdto) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String phoneNumber = smsdto.getPhoneNumber();
+            String code = smsdto.getVericode();
+            boolean isValid = smsService.verifyCodeWithoutInvalidate(phoneNumber, code);
+            if (isValid) {
+                smsService.invalidateCode(phoneNumber);
+                result.put("state", 1);
+                result.put("message", "验证通过");
+                return Response.newSuccess(1, result);
+            } else {
+                String storedCode = smsService.getCodeFromRedis(phoneNumber);
+                if (storedCode == null) {
+                    result.put("message", "验证码不存在或已过期");
+                    return Response.newFailed(3, result);
+                } else {
+                    result.put("message", "验证码错误");
+                    return Response.newFailed(2, result);
+                }
+            }
+
+        } catch (Exception e) {
+            result.put("message", "未知错误验证码验证失败");
+            result.put("message", e.getMessage());
+            return Response.newFailed(4, result);
         }
     }
 }
