@@ -92,6 +92,8 @@ public class TaskController {
         for(Long taskId : userDTO.getNoTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
+            GroupInfo groupInfo = groupInfoService.getGroupInfo(taskDTO.getGroupId());
+            taskDTO.setGroupName(groupInfo.getGroupName());
             taskDTO.setStatus("incomplete");
             taskList.add(taskDTO);
         }
