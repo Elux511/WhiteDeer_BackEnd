@@ -110,22 +110,21 @@ public class TaskController {
     @DeleteMapping("/api/deletetask")
     public Response<String> deleteTask(@RequestParam long id) {
         try{
-            taskService.deleteTaskById(id);
             TaskDTO taskDTO = taskService.getTaskById(id);
+            taskService.deleteTaskById(id);
             //团队删除打卡任务
             String msg1 = groupInfoService.deleteTaskById(taskDTO.getGroupId(),id);
 
             //成员删除打卡任务
             String msg2 = "";
             GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
-            if (groupDetailDTO == null){msg2 = "未找到团队";}
-            if(groupDetailDTO.getMemberlist() == null){msg2 = "未找到团队成员";}
+            if (groupDetailDTO == null){return Response.newFailed(2,"未找到团队");}
+            if(groupDetailDTO.getMemberlist() == null){return Response.newFailed(2,"未找到团队成员");}
             for(MemberDTO member : groupDetailDTO.getMemberlist()){
                 long userId = member.getId();
                 userService.deleteTaskById(userId,id);
             }
-            msg2 = "用户删除打卡任务完成";
-            return Response.newSuccess(1,msg1 + "，" + msg2);
+            return Response.newSuccess(1,msg1 + "，用户删除打卡任务完成");
         }catch (IllegalArgumentException e){
             return Response.newFailed(2,"未找到任务");
         }
