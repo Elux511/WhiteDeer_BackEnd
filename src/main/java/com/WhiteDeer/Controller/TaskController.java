@@ -54,7 +54,7 @@ public class TaskController {
         for(MemberDTO member : groupDetailDTO.getMemberlist()){
             long userId = member.getId();
             userService.acceptTaskById(userId,task.getId());
-            incomplete.add(task.getId());
+            incomplete.add(userId);
         }
 
         //将所有成员加入到task的未完成列表
