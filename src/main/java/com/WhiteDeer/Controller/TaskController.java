@@ -84,6 +84,8 @@ public class TaskController {
         for(Long taskId : userDTO.getYesTaskSet())
         {
             TaskDTO taskDTO = taskService.getTaskById(taskId);
+            GroupInfo groupInfo = groupInfoService.getGroupInfo(taskDTO.getGroupId());
+            taskDTO.setGroupName(groupInfo.getGroupName());
             taskDTO.setStatus("completed");
             taskList.add(taskDTO);
         }
