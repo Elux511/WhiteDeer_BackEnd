@@ -20,7 +20,7 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @Autowired
+    @Autowired(required=true)
     private UserService userService;
 
     @Autowired
