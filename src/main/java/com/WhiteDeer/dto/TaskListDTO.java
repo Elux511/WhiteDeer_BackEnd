@@ -9,11 +9,11 @@ public class TaskListDTO {
         this.checkinList = taskList;
     }
 
-    public Vector<TaskDTO> getTasks() {
+    public Vector<TaskDTO> getCheckinList() {
         return checkinList;
     }
-    public void setTasks(Vector<TaskDTO> tasks) {
-        this.checkinList = tasks;
+    public void setCheckinList(Vector<TaskDTO> checkinList) {
+        this.checkinList = checkinList;
     }
 
 }
