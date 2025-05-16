@@ -14,6 +14,7 @@ import org.w3c.dom.DOMException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Vector;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -188,11 +189,11 @@ public class UserServiceImpl implements UserService {
     public void deleteTaskById(long userId, long taskId) {
         userRepository.findById(userId).ifPresentOrElse(
                 user -> {
-                    if(user.getYesTaskSet() == null || user.getNoTaskSet() == null) {
-                        throw new NullPointerException("用户打卡列表为空");
-                    }
+                    if(user.getYesTaskSet() == null) {user.setYesTaskSet(new Vector<>());}
+                    if(user.getNoTaskSet() == null) {user.setNoTaskSet(new Vector<>());}
                     if (user.getYesTaskSet().contains(taskId)) {user.deleteYes(taskId);}
                     if (user.getNoTaskSet().contains(taskId)) {user.deleteNo(taskId);}
+                    userRepository.save(user);
                 },
                 ()->{
                     throw new IllegalArgumentException("用户ID不存在: " + userId);
