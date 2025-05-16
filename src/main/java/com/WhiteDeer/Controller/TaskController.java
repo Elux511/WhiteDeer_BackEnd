@@ -96,6 +96,7 @@ public class TaskController {
             if(groupDetailDTO.getMemberlist() == null){msg2 = "未找到团队成员";}
             for(MemberDTO member : groupDetailDTO.getMemberlist()){
                 long userId = member.getId();
+                userService.deleteTaskById(userId,id);
             }
             msg2 = "用户删除打卡任务完成";
             return Response.newSuccess(1,msg1 + "，" + msg2);
