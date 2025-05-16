@@ -30,9 +30,8 @@ public class TaskController {
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
         GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
-        if(groupDetailDTO.getMemberlist().isEmpty()){
-            return Response.newState(2);
-        }
+        if(groupDetailDTO == null){return Response.newState(2);}//检测是否存在团队
+        if(groupDetailDTO.getMemberlist() == null){return Response.newState(1);}//检测团队列表是否为空
 
         Vector<Long> incomplete = new Vector<>();
         //为所有团队成员发布打卡任务
@@ -85,6 +84,7 @@ public class TaskController {
     public Response<Void> deleteTask(@RequestParam long id) {
         try{
             taskService.deleteTaskById(id);
+            groupInfoService.deleteTaskById(taskService.getTaskById(id).getId(),id);
             return Response.newState(1);
         }catch (IllegalArgumentException e){
             return Response.newState(2);

@@ -147,7 +147,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             Vector<Long> joinGroups = user.getJoinGroupSet();
             if (joinGroups != null && joinGroups.contains(groupId)) {
                 joinGroups.remove(groupId);
-                user.setJoinGroupSet(joinGroups);
                 userRepository.save(user);
             }
         }
@@ -221,6 +220,20 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             groupInfoRepository.save(group);
         }
         return true;
+    }
+
+    @Override
+    public void deleteTaskById(long groupId, long taskId) {
+        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
+        if(group == null) {
+            return;
+        }
+        if(hasContain(group.getYesTaskSet(), taskId)) {
+            group.deteleYesTaskSet(taskId);
+        }
+        if(hasContain(group.getNoTaskSet(), taskId)) {
+            group.deteleNoTaskSet(taskId);
+        }
     }
 
     private boolean hasContain(Vector<Long> nums, Long num) {

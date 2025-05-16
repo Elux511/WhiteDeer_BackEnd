@@ -22,4 +22,6 @@ public interface GroupInfoService {
     GroupDetailDTO getGroupDetails(Long groupId);
 
     Boolean quitGroup(Long userId, Long groupId);
+
+    void deleteTaskById(long groupId, long taskId);
 }
