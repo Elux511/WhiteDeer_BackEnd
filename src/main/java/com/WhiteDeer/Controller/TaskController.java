@@ -31,14 +31,23 @@ public class TaskController {
     //发布新的打卡任务
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
+        Task task = taskService.createTask(taskDTO);
 
+        GroupInfo groupInfo = groupInfoService.getGroupInfo(taskDTO.getGroupId());
+        if(groupInfo == null){
+            return Response.newState(2);
+        }
+        if(groupInfo.getNoTaskSet()==null){
+            groupInfo.setNoTaskSet(new Vector<>());
+        }
+        groupInfo.getNoTaskSet().add(task.getId());
         
 
         GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
         if(groupDetailDTO == null){return Response.newState(2);}//检测是否存在团队
         if(groupDetailDTO.getMemberlist() == null){return Response.newState(1);}//检测团队列表是否为空
 
-        Task task = taskService.createTask(taskDTO);
+
 
         Vector<Long> incomplete = new Vector<>();
         //为所有团队成员发布打卡任务
