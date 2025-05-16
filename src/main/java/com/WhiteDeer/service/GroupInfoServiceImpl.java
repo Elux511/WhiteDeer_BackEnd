@@ -1,12 +1,15 @@
 package com.WhiteDeer.service;
 
+
 import com.WhiteDeer.converter.GroupInfoConverter;
 import com.WhiteDeer.dao.*;
 import com.WhiteDeer.dto.GroupDetailDTO;
 import com.WhiteDeer.dto.GroupInfoDTO;
+import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dto.MemberDTO;
 import com.WhiteDeer.dto.TaskDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.JavaInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +42,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         Vector<Long> groupIds = user.getJoinGroupSet()
                 .stream()
                 .map(Long::valueOf)
-                .filter(groupId -> managedGroupIds.contains(groupId))
+                .filter(groupId -> !managedGroupIds.contains(groupId))
                 .collect(Collectors.toCollection(Vector::new));
         List<GroupInfo> groups = groupInfoRepository.findAllById(groupIds);
         return groups.stream()
@@ -78,17 +81,17 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     @Override
     public List<GroupInfoDTO> searchGroups(String idStr, String name, String beginStr, String endStr) {
         List<GroupInfo> result = new ArrayList<>();
-        if (idStr != null && !idStr.isEmpty()) {
+        if (idStr != null && !idStr.isEmpty()) {    //   null  “” !=null
             Long groupId = Long.valueOf(idStr);
             Optional<GroupInfo> optionalGroup = groupInfoRepository.findById(groupId);
             optionalGroup.ifPresent(result::add);
         } else if (name != null && !name.isEmpty()) {
-            result = groupInfoRepository.findByGroupNameContaining(name);
+            result = groupInfoRepository.findByGroupNameContaining(name);    // like '%分组%'
         } else if (beginStr != null && !beginStr.isEmpty()&&endStr == null && endStr.isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             LocalDateTime begin = LocalDateTime.parse(beginStr, formatter);
             result = groupInfoRepository.findByCreateTimeAfter(begin);
-        }else if (beginStr == null && beginStr.isEmpty()&&endStr != null && endStr.isEmpty()) {
+        }else if (beginStr == null && beginStr.isEmpty()&&endStr != null && !endStr.isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             LocalDateTime end = LocalDateTime.parse(beginStr, formatter);
             result = groupInfoRepository.findByCreateTimeBefore(end);
@@ -96,7 +99,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
             LocalDateTime begin = LocalDateTime.parse(beginStr, formatter);
             LocalDateTime end = LocalDateTime.parse(endStr, formatter);
-            result = groupInfoRepository.findByCreateTimeBetween(begin, end);
+            result = groupInfoRepository.findByCreateTimeBetween(begin, end);   // Spring Data  根据我们的韩顺
         } else {
             result = groupInfoRepository.findAll();
         }
@@ -107,25 +110,36 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     }
 
     @Override
-    public Boolean joinGroup(Long userId, Long groupId) {
+    public int joinGroup(Long userId, Long groupId) {
         User user = userRepository.findById(userId).orElse(null);
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
-        if (user == null || group == null) {
-            return false;
+        if (user ==null|| group == null) {
+            return 0; //不成功
         }
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
-        if (!joinGroupSet.contains(groupId)) {
-            joinGroupSet.add(groupId);
-            user.setJoinGroupSet(joinGroupSet);
-            userRepository.save(user);
+        if(joinGroupSet.contains(groupId)){
+            return 2;  //已经加入    早回
         }
+        joinGroupSet.add(groupId);
+        user.setJoinGroupSet(joinGroupSet);
+        userRepository.save(user);
         Vector<Long> memberList = group.getMemberList() == null ? new Vector<>() : group.getMemberList();
         if(!memberList.contains(userId)) {
             memberList.add(userId);
             group.setMemberList(memberList);
             groupInfoRepository.save(group);
         }
-        return true;
+        return 1;
+    }
+    @Override
+    public GroupInfo getGroupInfo(Long groupId){
+        if(groupId!=null) {
+            GroupInfo groupInfo = groupInfoRepository.findById(groupId).orElse(null);
+            groupInfo = groupInfoRepository.findById(groupId).orElse(null);
+            return groupInfo;
+        }else{
+            return null;
+        }
     }
 
     @Override
@@ -284,5 +298,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         }
         return false;
     }
+
 
 }

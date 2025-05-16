@@ -17,10 +17,10 @@ create table tasks
     isQRcode             tinyint(1)   null,
     should_count         int          null,
     actual_count         int          null,
-    constraint tasks_pk_2
+    /*constraint tasks_pk_2
         unique (task_id),
     constraint tasks_groupinfo_group_id_fk
-        foreign key (group_id) references groupinfo (group_id)
+        foreign key (group_id) references groupinfo (group_id)*/
 );
 ALTER TABLE users AUTO_INCREMENT = 100000;
 

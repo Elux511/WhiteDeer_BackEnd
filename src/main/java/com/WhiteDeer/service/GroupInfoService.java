@@ -2,7 +2,7 @@ package com.WhiteDeer.service;
 
 import com.WhiteDeer.dto.GroupDetailDTO;
 import com.WhiteDeer.dto.GroupInfoDTO;
-
+import com.WhiteDeer.dao.GroupInfo;
 import java.util.List;
 
 
@@ -16,7 +16,7 @@ public interface GroupInfoService {
 
     List<Long> getManagedGroupIds(Long userId);
 
-    Boolean joinGroup(Long userId, Long groupId);
+    int joinGroup(Long userId, Long groupId);
 
     Boolean createGroup(String groupName, Long maxMember, String introduction, Long creatorId);
 
@@ -25,6 +25,9 @@ public interface GroupInfoService {
     GroupDetailDTO getGroupDetails(Long groupId);
 
     Boolean quitGroup(Long userId, Long groupId);
+
+    GroupInfo getGroupInfo(Long groupId);
+
 
     String deleteTaskById(long groupId, long taskId);
 

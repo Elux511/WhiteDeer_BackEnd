@@ -28,5 +28,6 @@ public interface UserService {
 
     void finishTaskById(long userId, long taskId);
 
+    //void deleteGroupById(long id);
     void deleteTaskById(long userId, long taskId);
 }
