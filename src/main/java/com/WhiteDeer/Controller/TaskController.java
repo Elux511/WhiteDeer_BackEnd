@@ -11,7 +11,9 @@ import com.WhiteDeer.service.TaskService;
 import com.WhiteDeer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -134,23 +136,25 @@ public class TaskController {
     }
 
     //打卡
-    @PostMapping("/api/checkin")
-    public Response<Void> checkinTask(@RequestParam long id, @RequestBody TaskDTO taskDTO) throws IllegalAccessException, IOException {
+    @PostMapping(value="/api/checkin",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Response<Void> checkinTask(@RequestParam("id") long userId,@RequestParam("taskId") long taskId, @RequestParam("type") String type,
+                                      @RequestParam("face") MultipartFile face, @RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) throws IllegalAccessException, IOException {
+        TaskDTO taskDTO = taskService.getTaskById(taskId);
         if (LocalDateTime.now().isBefore(taskDTO.getBeginTime()) || LocalDateTime.now().isAfter(taskDTO.getEndTime())) {return Response.newState(5);}
 
-        Optional<UserDTO> userOPT = userService.getUserById(id);
+        Optional<UserDTO> userOPT = userService.getUserById(userId);
         if(userOPT.isEmpty()) {
             return Response.newState(4);
         }
         UserDTO userDTO = userOPT.get();
         int result = taskService.checkinTask(taskDTO,userDTO.getId());
         if(result == 1) {
-            userService.finishTaskById(id,taskDTO.getId());
-            taskService.finishTaskById(id,taskDTO.getId());
+            userService.finishTaskById(userId,taskId);
+            taskService.finishTaskById(userId,taskId);
         }
-        TaskDTO taskTemp = taskService.getTaskById(taskDTO.getId());
+        TaskDTO taskTemp = taskService.getTaskById(taskId);
         if(taskTemp.getIncompleteUserList().isEmpty()) {
-            groupInfoService.finishTaskById(taskTemp.getGroupId(), taskDTO.getId());
+            groupInfoService.finishTaskById(taskTemp.getGroupId(),taskId);
         }
         return Response.newState(result);
     }
