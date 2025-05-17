@@ -233,6 +233,11 @@ public class GroupController {
             data.put("id", groupId);
             data.put("message",  e.getMessage());
             return Response.newFailed(2,data);
+        }catch(Exception e){
+            Map<String,Object> data = new HashMap<>();
+            data.put("id", groupId);
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
         }
     }
 
@@ -260,6 +265,11 @@ public class GroupController {
             Map<String, Object> data = new HashMap<>();
             data.put("id", payload.get("id"));
            return Response.newFailed(2,data);
+        }catch(Exception e){
+            Map<String,Object> data = new HashMap<>();
+            data.put("id", payload.get("id"));
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
         }
     }
 

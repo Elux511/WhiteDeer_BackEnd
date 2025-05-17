@@ -8,6 +8,7 @@ import com.WhiteDeer.dto.GroupInfoDTO;
 import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dto.MemberDTO;
 import com.WhiteDeer.dto.TaskDTO;
+import com.WhiteDeer.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.JavaInfo;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class GroupInfoServiceImpl implements GroupInfoService{
 
     @Autowired
     private GroupInfoRepository groupInfoRepository;
+    @Autowired
+    private TaskService taskService;
 
     @Override
     public List<GroupInfoDTO> getJoinedGroups(Long userId) {
@@ -172,6 +175,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     @Override
     @Transactional
     public Boolean deleteGroup(Long userId, Long groupId) {
+
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
         if (group == null) {
             return false;
@@ -179,8 +183,13 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (!userId.equals(group.getCreatorId())) {
             return false;
         }
-        // 获取所有用户
         List<User> allUsers = userRepository.findAll();
+        //删除对应的task中的打卡任务
+        List<Task> allTasks = taskRepository.findByGroupId(groupId);
+        for (Task task : allTasks) {
+            taskService.deleteTaskById(task.getId());
+        }
+        //删除组成员信息中加入的该团队
         for (User user : allUsers) {
             Vector<Long> joinGroups = user.getJoinGroupSet();
             if (joinGroups != null && joinGroups.contains(groupId)) {
@@ -245,13 +254,20 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (user == null || group == null) {
             return false;
         }
+        //删除成员
+        //删除对应的task中的打卡任务
+        List<Task> allTasks = taskRepository.findByGroupId(groupId);
+        for (Task task : allTasks) {
+            taskService.deleteTaskById(task.getId());
+        }
+        //在user的joinedgroupset删除该团队
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
-        System.out.println(hasContain(joinGroupSet, groupId));
         if (hasContain(joinGroupSet, groupId)) {
             joinGroupSet.remove(groupId);
             user.setJoinGroupSet(joinGroupSet);
             userRepository.save(user);
         }
+        //删除memberList中该成员
         Vector<Long> memberList = group.getMemberList() == null ? new Vector<>() : group.getMemberList();
         if(hasContain(memberList, userId)) {
             memberList.remove(userId);
