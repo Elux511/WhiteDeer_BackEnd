@@ -175,6 +175,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     @Transactional
     public Boolean deleteGroup(Long userId, Long groupId) {
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
         if (group == null) {
             return false;
         }
@@ -189,13 +190,22 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         for (Task task : allTasks) {
             taskService.deleteTaskById(task.getId());
         }
+        //删除user表中对应的task任务
+        for(Task task : allTasks){
+            if(user.getNoTaskSet().contains(task.getId())){
+                user.getNoTaskSet().remove(task.getId());
+            }else if(user.getYesTaskSet().contains(task.getId())){
+                user.getYesTaskSet().remove(task.getId());
+            }else{
+            }
 
+        }
         //删除组成员信息中加入的该团队
-        for (User user : allUsers) {
-            Vector<Long> joinGroups = user.getJoinGroupSet();
+        for (User user1 : allUsers) {
+            Vector<Long> joinGroups = user1.getJoinGroupSet();
             if (joinGroups != null && joinGroups.contains(groupId)) {
                 joinGroups.remove(groupId);
-                user.setJoinGroupSet(joinGroups);
+                user1.setJoinGroupSet(joinGroups);
                 userRepository.save(user);
             }
         }
