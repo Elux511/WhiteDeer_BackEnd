@@ -27,14 +27,17 @@ public class GroupInfo {
 
     @Column(name = "member_list")
     @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = com.WhiteDeer.converter.LongVectorConverter.class)
     private Vector<Long> memberList;
 
     @Column(name = "yes_task_set")
     @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = com.WhiteDeer.converter.LongVectorConverter.class)
     private Vector<Long> yesTaskSet;
 
     @Column(name = "no_task_set")
     @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = com.WhiteDeer.converter.LongVectorConverter.class)
     private Vector<Long> noTaskSet;
 
     @Column(name = "creator_id")

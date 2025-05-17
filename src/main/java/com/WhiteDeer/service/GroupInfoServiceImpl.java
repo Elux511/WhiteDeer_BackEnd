@@ -180,6 +180,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (group == null) {
             return false;
         }
+        //确保为创建者
         if (!userId.equals(group.getCreatorId())) {
             return false;
         }
@@ -189,6 +190,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         for (Task task : allTasks) {
             taskService.deleteTaskById(task.getId());
         }
+
         //删除组成员信息中加入的该团队
         for (User user : allUsers) {
             Vector<Long> joinGroups = user.getJoinGroupSet();

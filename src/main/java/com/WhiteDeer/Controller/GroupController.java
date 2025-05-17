@@ -47,6 +47,11 @@ public class GroupController {
             data.put("id", userId);
             data.put("message", e.getMessage());
             return Response.newFailed(2,data);
+        }catch (Exception e) {
+            Map<String,Object> data = new HashMap<>();
+            data.put("id", userId);
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
         }
     }
 
@@ -76,6 +81,11 @@ public class GroupController {
         } catch (IllegalIdentifierException e) {
             Map<String, Object> data = new HashMap<>();
             data.put("id",userId);
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
+        }catch (Exception e) {
+            Map<String,Object> data = new HashMap<>();
+            data.put("id", userId);
             data.put("message", e.getMessage());
             return Response.newFailed(2,data);
         }
@@ -110,6 +120,11 @@ public class GroupController {
             return Response.newSuccess(1,data);
         } catch (IllegalIdentifierException e) {
             Map<String, Object> data = new HashMap<>();
+            data.put("id", id);
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
+        }catch (Exception e) {
+            Map<String,Object> data = new HashMap<>();
             data.put("id", id);
             data.put("message", e.getMessage());
             return Response.newFailed(2,data);
@@ -150,6 +165,11 @@ public class GroupController {
             data.put("id", payload.get("id"));
             data.put("message", e.getMessage());
             return Response.newFailed(2,data);
+        }catch (Exception e) {
+            Map<String,Object> data = new HashMap<>();
+            data.put("id", payload.get("id"));
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
         }
 
     }
@@ -180,6 +200,11 @@ public class GroupController {
             data.put("message", e.getMessage());
 
            return Response.newFailed(2,data);
+        } catch (Exception e) {
+            Map<String,Object> data = new HashMap<>();
+            data.put("id", payload.get("id"));
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
         }
     }
 
@@ -194,6 +219,12 @@ public class GroupController {
             boolean success = groupInfoService.deleteGroup(userId, groupId);
             return Response.newSuccess(1,data);
         }catch(IllegalArgumentException e){
+            Map<String,Object> data = new HashMap<>();
+            data.put("userId", userId);
+            data.put("groupId", groupId);
+            data.put("message", e.getMessage());
+            return Response.newFailed(2,data);
+        } catch (Exception e) {
             Map<String,Object> data = new HashMap<>();
             data.put("userId", userId);
             data.put("groupId", groupId);
@@ -220,6 +251,12 @@ public class GroupController {
     //          "actualCount": 9)
     //}
     //}
+
+
+
+    //tasklist里面的name返回为空
+
+
     @GetMapping("/api/group")
     public Response<Map<String, Object>> getGroup(@RequestParam("groupId") Long groupId) {
         try {
