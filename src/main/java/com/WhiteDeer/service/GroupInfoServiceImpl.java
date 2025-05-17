@@ -8,7 +8,6 @@ import com.WhiteDeer.dto.GroupInfoDTO;
 import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dto.MemberDTO;
 import com.WhiteDeer.dto.TaskDTO;
-import com.WhiteDeer.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.JavaInfo;
 import org.springframework.stereotype.Service;
@@ -175,7 +174,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     @Override
     @Transactional
     public Boolean deleteGroup(Long userId, Long groupId) {
-
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
         if (group == null) {
             return false;
@@ -184,6 +182,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (!userId.equals(group.getCreatorId())) {
             return false;
         }
+        // 获取所有用户
         List<User> allUsers = userRepository.findAll();
         //删除对应的task中的打卡任务
         List<Task> allTasks = taskRepository.findByGroupId(groupId);
@@ -264,6 +263,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         }
         //在user的joinedgroupset删除该团队
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
+        System.out.println(hasContain(joinGroupSet, groupId));
         if (hasContain(joinGroupSet, groupId)) {
             joinGroupSet.remove(groupId);
             user.setJoinGroupSet(joinGroupSet);
