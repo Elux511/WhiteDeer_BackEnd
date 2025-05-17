@@ -137,6 +137,9 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userDTO.getId())
                 .ifPresentOrElse(
                         user -> {
+                            //if(face.judge(userDTO.getFace())==0){
+                            // throw new FaceException("未检测到人脸");
+                            // }; 判断人脸是否为空
                             user.setFace(userDTO.getFace());
                             userRepository.save(user);
                         },

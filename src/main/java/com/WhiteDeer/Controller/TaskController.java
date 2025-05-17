@@ -142,8 +142,8 @@ public class TaskController {
     @PostMapping(value="/api/checkin",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<Void> checkinTask(@RequestParam("id") long userId,@RequestParam("taskId") long taskId, @RequestParam("type") String type,
                                       @RequestPart(value = "face",required = false) MultipartFile face,
-                                      @RequestParam(value = "latitude",defaultValue = "0.0") double latitude,
-                                      @RequestParam(value = "longitude",defaultValue = "0.0") double longitude) throws IllegalAccessException, IOException {
+                                      @RequestParam(value = "latitude") String latitudeStr,
+                                      @RequestParam(value = "longitude") String longitudeStr) throws IllegalAccessException, IOException {
         //通过id获取taskDTO，后面用
         TaskDTO taskDTO = taskService.getTaskById(taskId);
 
@@ -160,6 +160,12 @@ public class TaskController {
         }
         //将获取到的经纬度传给taskDTO
         if(type.equals("定位打卡")||type.equals("都")){
+            //对经纬度进行处理
+            double latitude = 0.0;
+            if (latitudeStr != null && !latitudeStr.isEmpty()) {latitude = Double.parseDouble(latitudeStr);}
+            double longitude = 0.0;
+            if (longitudeStr != null && !longitudeStr.isEmpty()) {longitude = Double.parseDouble(longitudeStr);}
+
             taskDTO.setLatitude(latitude);
             taskDTO.setLongitude(longitude);
         }
