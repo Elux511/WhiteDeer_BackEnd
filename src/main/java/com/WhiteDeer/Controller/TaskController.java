@@ -141,7 +141,7 @@ public class TaskController {
     //打卡
     @PostMapping(value="/api/checkin",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<Void> checkinTask(@RequestParam("id") long userId,@RequestParam("taskId") long taskId, @RequestParam("type") String type,
-                                      @RequestParam("face") MultipartFile face, @RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) throws IllegalAccessException, IOException {
+                                      @RequestPart(value = "face",required = false) MultipartFile face, @RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) throws IllegalAccessException, IOException {
         //通过id获取taskDTO，后面用
         TaskDTO taskDTO = taskService.getTaskById(taskId);
 
@@ -149,7 +149,7 @@ public class TaskController {
         if (LocalDateTime.now().isBefore(taskDTO.getBeginTime()) || LocalDateTime.now().isAfter(taskDTO.getEndTime())) {return Response.newState(5);}
 
         //将获取到的face传给taskDTO
-        if (!face.isEmpty()) {
+        if (face!=null) {
             try {
                 Blob blob = new SerialBlob(face.getBytes());
                 taskDTO.setFace(blob);
