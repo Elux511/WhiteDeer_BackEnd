@@ -260,9 +260,18 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         //删除成员
         //删除对应的task中的打卡任务
         List<Task> allTasks = taskRepository.findByGroupId(groupId);
-        for (Task task : allTasks) {
-            taskService.deleteTaskById(task.getId());
+        //调用user包含task的列表
+        for(Task task : allTasks){
+            if(user.getNoTaskSet().contains(task.getId())){
+                user.getNoTaskSet().remove(task.getId());
+            }else if(user.getYesTaskSet().contains(task.getId())){
+                user.getYesTaskSet().remove(task.getId());
+            }else{
+            }
+
         }
+
+
         //在user的joinedgroupset删除该团队
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
         System.out.println(hasContain(joinGroupSet, groupId));
