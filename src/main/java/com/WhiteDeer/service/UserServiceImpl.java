@@ -156,6 +156,7 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userId)
                 .ifPresentOrElse(
                         user -> {
+                            if(user.getNoTaskSet() == null){user.setNoTaskSet(new Vector());}
                             if(!user.getNoTaskSet().contains(taskId)) {
                                 user.addNo(taskId);
                                 userRepository.save(user);

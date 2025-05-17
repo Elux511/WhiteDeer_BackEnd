@@ -32,9 +32,8 @@ public class TaskController {
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
         Task task = taskService.createTask(taskDTO);
-        System.out.println(task.getLatitude());
-        System.out.println(task.getLongitude());
 
+        //为团队发布任务
         GroupInfo groupInfo = groupInfoService.getGroupInfo(taskDTO.getGroupId());
         if(groupInfo == null){
             return Response.newState(2);
@@ -48,8 +47,6 @@ public class TaskController {
         GroupDetailDTO groupDetailDTO = groupInfoService.getGroupDetails(taskDTO.getGroupId());
         if(groupDetailDTO == null){return Response.newState(2);}//检测是否存在团队
         if(groupDetailDTO.getMemberlist() == null){return Response.newState(1);}//检测团队列表是否为空
-
-
 
         Vector<Long> incomplete = new Vector<>();
         //为所有团队成员发布打卡任务
