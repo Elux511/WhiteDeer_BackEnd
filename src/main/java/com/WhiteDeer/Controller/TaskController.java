@@ -14,6 +14,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -133,6 +135,8 @@ public class TaskController {
     //打卡
     @PostMapping("/api/checkin")
     public Response<Void> checkinTask(@RequestParam long id, @RequestBody TaskDTO taskDTO) throws IllegalAccessException, IOException {
+        if (LocalDateTime.now().isBefore(taskDTO.getBeginTime()) || LocalDateTime.now().isAfter(taskDTO.getEndTime())) {return Response.newState(5);}
+
         Optional<UserDTO> userOPT = userService.getUserById(id);
         if(userOPT.isEmpty()) {
             return Response.newState(4);
