@@ -9,6 +9,7 @@ import com.WhiteDeer.util.GeoDistanceCalculator;
 import com.WhiteDeer.util.PyAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
@@ -17,6 +18,7 @@ import java.util.Vector;
 
 
 @Service
+@Transactional
 public class TaskServiceImpl implements TaskService {
 
     @Autowired

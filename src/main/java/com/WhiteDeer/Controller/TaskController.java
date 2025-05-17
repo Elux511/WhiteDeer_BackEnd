@@ -32,6 +32,8 @@ public class TaskController {
     @PostMapping("/api/createtask")
     public Response<Void> createTask(@RequestBody TaskDTO taskDTO) throws IllegalAccessException {
         Task task = taskService.createTask(taskDTO);
+        System.out.println(task.getLatitude());
+        System.out.println(task.getLongitude());
 
         GroupInfo groupInfo = groupInfoService.getGroupInfo(taskDTO.getGroupId());
         if(groupInfo == null){
@@ -124,7 +126,7 @@ public class TaskController {
                 long userId = member.getId();
                 userService.deleteTaskById(userId,id);
             }
-            return Response.newSuccess(1,msg1 + "，用户删除打卡任务完成");
+            return Response.newSuccess(1,"用户删除打卡任务完成");
         }catch (IllegalArgumentException e){
             return Response.newFailed(2,"未找到任务");
         }
