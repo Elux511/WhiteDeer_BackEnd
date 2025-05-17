@@ -57,6 +57,7 @@ public class TaskServiceImpl implements TaskService {
     //用户打卡过程
     @Override
     public int checkinTask(TaskDTO taskDTO, long userId) {
+        //这个task里存储的是任务的各项要求，taskDTO里则是存储用户的各种条件
         Task task = taskRepository.getById(taskDTO.getId());
         if(taskDTO.getType().equals("人脸识别")){
             String img = null;

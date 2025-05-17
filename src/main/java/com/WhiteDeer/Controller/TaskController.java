@@ -15,7 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -118,7 +121,7 @@ public class TaskController {
             taskService.deleteTaskById(id);
             //团队删除打卡任务
             String msg1 = groupInfoService.deleteTaskById(taskDTO.getGroupId(),id);
-            if(msg1.equals("团队删除成功")){return Response.newFailed(2,msg1);}
+            if(!msg1.equals("团队删除成功")){return Response.newFailed(2,msg1);}
 
             //成员删除打卡任务
             String msg2 = "";
@@ -139,8 +142,25 @@ public class TaskController {
     @PostMapping(value="/api/checkin",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<Void> checkinTask(@RequestParam("id") long userId,@RequestParam("taskId") long taskId, @RequestParam("type") String type,
                                       @RequestParam("face") MultipartFile face, @RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) throws IllegalAccessException, IOException {
+        //通过id获取taskDTO，后面用
         TaskDTO taskDTO = taskService.getTaskById(taskId);
+
+        //检验是否超时
         if (LocalDateTime.now().isBefore(taskDTO.getBeginTime()) || LocalDateTime.now().isAfter(taskDTO.getEndTime())) {return Response.newState(5);}
+
+        //将获取到的face传给taskDTO
+        if (!face.isEmpty()) {
+            try {
+                Blob blob = new SerialBlob(face.getBytes());
+                taskDTO.setFace(blob);
+            }
+            catch (SQLException e) {throw new RuntimeException(e);}
+        }
+        //将获取到的经纬度传给taskDTO
+        if(type.equals("定位打卡")||type.equals("都")){
+            taskDTO.setLatitude(latitude);
+            taskDTO.setLongitude(longitude);
+        }
 
         Optional<UserDTO> userOPT = userService.getUserById(userId);
         if(userOPT.isEmpty()) {
