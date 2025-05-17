@@ -80,6 +80,7 @@ public class TaskController {
             return Response.newFailed(2,taskListDTO);
         }
         UserDTO userDTO = userOPT.get();
+        if(userDTO.getYesTaskSet() == null && userDTO.getNoTaskSet() == null) {return Response.newSuccess(1,taskListDTO);}
         if(userDTO.getYesTaskSet() == null){userDTO.setYesTaskSet(new Vector<>());}
         if(userDTO.getNoTaskSet() == null){userDTO.setNoTaskSet(new Vector<>());}
         for(Long taskId : userDTO.getYesTaskSet())
