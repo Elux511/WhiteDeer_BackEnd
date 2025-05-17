@@ -116,6 +116,7 @@ public class TaskController {
             taskService.deleteTaskById(id);
             //团队删除打卡任务
             String msg1 = groupInfoService.deleteTaskById(taskDTO.getGroupId(),id);
+            if(msg1.equals("团队删除成功")){return Response.newFailed(2,msg1);}
 
             //成员删除打卡任务
             String msg2 = "";

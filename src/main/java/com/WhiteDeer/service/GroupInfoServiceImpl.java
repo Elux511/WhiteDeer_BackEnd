@@ -267,15 +267,16 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if(group == null) {
             return "未找到团队";
         }
-        if(!hasContain(group.getYesTaskSet(), groupId) && !hasContain(group.getNoTaskSet(), groupId)) {
+        if(!group.getYesTaskSet().contains(taskId) && !group.getNoTaskSet().contains(taskId)) {
             return "未找到任务";
         }
-        if(hasContain(group.getYesTaskSet(), taskId)) {
+        if(group.getYesTaskSet().contains(taskId)) {
             group.deteleYesTaskSet(taskId);
         }
-        if(hasContain(group.getNoTaskSet(), taskId)) {
+        if(group.getNoTaskSet().contains(taskId)) {
             group.deteleNoTaskSet(taskId);
         }
+        groupInfoRepository.save(group);
         return "团队删除成功";
     }
 
