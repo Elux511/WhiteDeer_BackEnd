@@ -141,7 +141,9 @@ public class TaskController {
     //打卡
     @PostMapping(value="/api/checkin",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Response<Void> checkinTask(@RequestParam("id") long userId,@RequestParam("taskId") long taskId, @RequestParam("type") String type,
-                                      @RequestPart(value = "face",required = false) MultipartFile face, @RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude) throws IllegalAccessException, IOException {
+                                      @RequestPart(value = "face",required = false) MultipartFile face,
+                                      @RequestParam(value = "latitude",defaultValue = "0.0") double latitude,
+                                      @RequestParam(value = "longitude",defaultValue = "0.0") double longitude) throws IllegalAccessException, IOException {
         //通过id获取taskDTO，后面用
         TaskDTO taskDTO = taskService.getTaskById(taskId);
 
@@ -167,11 +169,15 @@ public class TaskController {
             return Response.newState(4);
         }
         UserDTO userDTO = userOPT.get();
+        //打卡过程
         int result = taskService.checkinTask(taskDTO,userDTO.getId());
+        //打卡成功后
         if(result == 1) {
             userService.finishTaskById(userId,taskId);
             taskService.finishTaskById(userId,taskId);
         }
+
+        //如果所有人都打卡成功，就在团队里进行更新
         TaskDTO taskTemp = taskService.getTaskById(taskId);
         if(taskTemp.getIncompleteUserList().isEmpty()) {
             groupInfoService.finishTaskById(taskTemp.getGroupId(),taskId);

@@ -280,6 +280,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         return "团队删除成功";
     }
 
+    //任务被所有人完成
     @Override
     public void finishTaskById(long groupId, long taskId) {
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);

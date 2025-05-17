@@ -96,7 +96,6 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.getById(taskId);
         task.addCompletedUser(userId);
         task.deleteIncompleteUser(userId);
-        task.setShouldCount(task.getShouldCount()-1);
         task.setActualCount(task.getActualCount()+1);
         taskRepository.save(task);
     }
