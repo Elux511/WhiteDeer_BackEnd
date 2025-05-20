@@ -187,6 +187,7 @@ public class UserServiceImpl implements UserService {
 
     //删除user的对应打卡任务
     @Override
+    @Transactional
     public void deleteTaskById(long userId, long taskId) {
         userRepository.findById(userId).ifPresentOrElse(
                 user -> {
