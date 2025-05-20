@@ -8,7 +8,10 @@ CREATE TABLE groupinfo (
                            creator_id         BIGINT,
                            max_member         INT DEFAULT 0,
                            create_time        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+
                            /*CONSTRAINT groupinfo_pk_2 UNIQUE (group_id),--
                            CONSTRAINT groupinfo_users_user_id_fk FOREIGN KEY (creator_id) REFERENCES users(user_id)*/
-);
+);  CREATE INDEX idx_group_name ON groupinfo (group_name);
+CREATE INDEX idx_group_time ON groupinfo (create_time, end_time);
 ALTER TABLE groupinfo AUTO_INCREMENT = 100000;

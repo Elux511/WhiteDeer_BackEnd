@@ -52,6 +52,22 @@ public class GroupInfoServiceImpl implements GroupInfoService{
                 .collect(Collectors.toList());
     }
     @Override
+    public List<GroupInfoDTO> getJoinedGroups1(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || user.getJoinGroupSet() == null) {
+            return Collections.emptyList();
+        }
+        List<Long> managedGroupIds = getManagedGroupIds(userId);
+        Vector<Long> groupIds = user.getJoinGroupSet()
+                .stream()
+                .map(Long::valueOf)
+                .collect(Collectors.toCollection(Vector::new));
+        List<GroupInfo> groups = groupInfoRepository.findAllById(groupIds);
+        return groups.stream()
+                .map(GroupInfoConverter::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    @Override
     public List<Long> getManagedGroupIds(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getCreateGroupSet() == null) {
@@ -113,14 +129,17 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     @Override
     public int joinGroup(Long userId, Long groupId) {
         User user = userRepository.findById(userId).orElse(null);
+        //不成功
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
         if (user ==null|| group == null) {
-            return 0; //不成功
+            return 0;
         }
+        //已经加入
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
         if(joinGroupSet.contains(groupId)){
-            return 2;  //已经加入    早回
+            return 2;
         }
+        //未加入
         joinGroupSet.add(groupId);
         user.setJoinGroupSet(joinGroupSet);
         userRepository.save(user);
