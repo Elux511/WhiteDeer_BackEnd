@@ -9,6 +9,7 @@ import java.util.List;
 public interface GroupInfoService {
     List<GroupInfoDTO> getJoinedGroups(Long userId);
 
+    List<GroupInfoDTO> getJoinedGroups1(Long userId);
 
     List<GroupInfoDTO> getManagedGroups(Long userId);
 
