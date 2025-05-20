@@ -252,7 +252,13 @@ public class UserController {
             data.put("message", "未知错误更新照片失败: ");
             data.put("message", e.getMessage());
             return Response.newFailed(3, data);
-        }
+        }//catch (FaceException e){
+//        Map<String, Object> data = new HashMap<>();
+//        data.put("id", id);
+//        data.put("success", false);
+//        data.put("message", "未检测到人脸");
+//        return Response.newFailed(4, data);
+        // }
     }
 
 }
