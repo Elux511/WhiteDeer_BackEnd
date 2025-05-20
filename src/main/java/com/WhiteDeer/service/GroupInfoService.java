@@ -30,7 +30,7 @@ public interface GroupInfoService {
     GroupInfo getGroupInfo(Long groupId);
 
 
-    void deleteTaskById(long groupId, long taskId);
+    String deleteTaskById(long groupId, long taskId);
 
     void finishTaskById(long groupId, long taskId);
 }
