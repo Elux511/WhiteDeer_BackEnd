@@ -3,17 +3,17 @@ package com.WhiteDeer.dto;
 import java.util.Vector;
 
 public class TaskListDTO {
-    private Vector<TaskDTO> tasks;
+    private Vector<TaskDTO> checkinList;
 
     public TaskListDTO(Vector<TaskDTO> taskList) {
-        this.tasks = taskList;
+        this.checkinList = taskList;
     }
 
-    public Vector<TaskDTO> getTasks() {
-        return tasks;
+    public Vector<TaskDTO> getCheckinList() {
+        return checkinList;
     }
-    public void setTasks(Vector<TaskDTO> tasks) {
-        this.tasks = tasks;
+    public void setCheckinList(Vector<TaskDTO> checkinList) {
+        this.checkinList = checkinList;
     }
 
 }

@@ -14,12 +14,8 @@ recognizer = cv.face.LBPHFaceRecognizer_create()
 
 #人脸识别（用于后续打卡）
 #将传入的人脸图片与训练模型中的图片一一对照
-def checkFace(user_id, img_base64):
+def checkFace(user_id, img_path):
 
-    # 解码Base64字符串为字节数据
-    decoded_data = base64.b64decode(img_base64)
-    # 使用BytesIO将字节数据转换为文件对象
-    img_path = BytesIO(decoded_data)
 
     recognizer.read(f"trainer/{user_id}_trainer.yml")
     #img = cv.imread(img_path)

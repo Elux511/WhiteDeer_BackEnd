@@ -121,4 +121,23 @@ public class GroupInfo {
     public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
+
+    public void addYesTaskSet(Long taskId) {
+        if(yesTaskSet == null) {
+            yesTaskSet = new Vector<>();
+        }
+        yesTaskSet.add(taskId);
+    }
+    public void addNoTaskSet(Long taskId) {
+        if(noTaskSet == null) {
+            noTaskSet = new Vector<>();
+        }
+        noTaskSet.add(taskId);
+    }
+    public void deteleYesTaskSet(Long taskId) {
+        yesTaskSet.remove(taskId);
+    }
+    public void deteleNoTaskSet(Long taskId) {
+        noTaskSet.remove(taskId);
+    }
 }

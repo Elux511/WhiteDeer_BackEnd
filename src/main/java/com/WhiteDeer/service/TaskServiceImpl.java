@@ -4,12 +4,12 @@ import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.Task;
 import com.WhiteDeer.dao.TaskRepository;
-import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.TaskDTO;
 import com.WhiteDeer.util.GeoDistanceCalculator;
 import com.WhiteDeer.util.PyAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
@@ -18,6 +18,7 @@ import java.util.Vector;
 
 
 @Service
+@Transactional
 public class TaskServiceImpl implements TaskService {
 
     @Autowired
@@ -25,20 +26,31 @@ public class TaskServiceImpl implements TaskService {
 
     //创建task
     @Override
-    public void createTask(TaskDTO taskDTO) {
-        taskDTO.setCompletedUserList(new Vector<>());
-        taskRepository.save(TaskConverter.convertTask(taskDTO));
+    @Transactional
+    public Task createTask(TaskDTO taskDTO) {
+        return taskRepository.save(TaskConverter.convertTask(taskDTO));
+    }
+
+    @Override
+    @Transactional
+    public void createTask(Task task){
+        taskRepository.save(task);
     }
 
     //通过id获取task
     @Override
+    @Transactional
     public TaskDTO getTaskById(Long id) throws NoSuchElementException {
        Optional<Task> task = taskRepository.findById(id);
-       return TaskConverter.convertTask(task.orElseThrow());
+       if(task != null && !task.isEmpty()){
+           return TaskConverter.convertTask(task.get());
+       }
+       return null;
     }
 
     //通过id删除task
     @Override
+    @Transactional
     public void deleteTaskById(long id) {
         taskRepository.findById(id).ifPresentOrElse(
                 task -> taskRepository.delete(task),
@@ -49,6 +61,7 @@ public class TaskServiceImpl implements TaskService {
     //用户打卡过程
     @Override
     public int checkinTask(TaskDTO taskDTO, long userId) {
+        //这个task里存储的是任务的各项要求，taskDTO里则是存储用户的各种条件
         Task task = taskRepository.getById(taskDTO.getId());
         if(taskDTO.getType().equals("人脸识别")){
             String img = null;
@@ -83,11 +96,11 @@ public class TaskServiceImpl implements TaskService {
 
     //用户打卡完成后
     @Override
+    @Transactional
     public void finishTaskById(long userId, long taskId) {
         Task task = taskRepository.getById(taskId);
         task.addCompletedUser(userId);
         task.deleteIncompleteUser(userId);
-        task.setShouldCount(task.getShouldCount()-1);
         task.setActualCount(task.getActualCount()+1);
         taskRepository.save(task);
     }
