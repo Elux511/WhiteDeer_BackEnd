@@ -29,4 +29,8 @@ public interface GroupInfoService {
 
     GroupInfo getGroupInfo(Long groupId);
 
+
+    String deleteTaskById(long groupId, long taskId);
+
+    void finishTaskById(long groupId, long taskId);
 }

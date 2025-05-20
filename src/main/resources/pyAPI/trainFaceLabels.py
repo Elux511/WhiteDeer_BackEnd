@@ -14,15 +14,11 @@ recognizer = cv.face.LBPHFaceRecognizer_create()
 
 #获得用户人脸的特征（用于初次记录）
 #传入用户人脸图片，保存人脸特征
-def getImageLabels(user_id, img_base64):
+def getImageLabels(user_id, img_path):
     #为用户赋值id
     id = []
     face_sample = []
 
-    # 解码Base64字符串为字节数据
-    decoded_data = base64.b64decode(img_base64)
-    # 使用BytesIO将字节数据转换为文件对象
-    img_path = BytesIO(decoded_data)
 
     #获取传入的用户人脸特征
     #img = cv.imread(img_path)
@@ -38,6 +34,12 @@ def getImageLabels(user_id, img_base64):
             largest_face = img_numpy[y:y+h,x:x+w]
         else:
             continue
+
+    #如果没有人脸
+    if largest_face.size <=1:
+        print("false")
+        return
+
     #为id和face_sample赋值
     id.append(user_id)
     face_sample.append(largest_face)
@@ -51,7 +53,7 @@ def getImageLabels(user_id, img_base64):
     #让识别器记录id和对应人脸
     recognizer.train(face_sample,np.array(id))
     recognizer.write(f"trainer/{user_id}_trainer.yml")
-    print(1)
+    print("true")
 
 
 if __name__ == "__main__":

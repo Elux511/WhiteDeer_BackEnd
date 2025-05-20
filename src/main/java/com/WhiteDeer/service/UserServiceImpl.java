@@ -4,8 +4,10 @@ import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.UserConverter;
 import com.WhiteDeer.dao.*;
 import com.WhiteDeer.dto.UserDTO;
+import com.WhiteDeer.util.FaceException;
 import com.WhiteDeer.util.PyAPI;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.FactoryBeanNotInitializedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import org.w3c.dom.DOMException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Vector;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -136,6 +139,11 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userDTO.getId())
                 .ifPresentOrElse(
                         user -> {
+                            String img = null;
+                            try {img = BlobConverter.blobToBase64(userDTO.getFace());} catch (IOException e) {throw new DOMException((short) 12,"Blob无法转换为base64编码");}//尝试将Blob转为base64
+                            if(PyAPI.trainFaceLabels(String.valueOf(userDTO.getId()), img) == false){//检测是否存在人脸
+                                throw new FaceException("未检测到人脸");
+                            }
                             user.setFace(userDTO.getFace());
                             userRepository.save(user);
                         },
@@ -143,9 +151,6 @@ public class UserServiceImpl implements UserService {
                             throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());
                         }
                 );
-        String img = null;
-        try {img = BlobConverter.blobToBase64(userDTO.getFace());} catch (IOException e) {throw new DOMException((short) 12,"Blob无法转换为base64编码");}//尝试将Blob转为base64
-        PyAPI.trainFaceLabels(String.valueOf(userDTO.getId()), img);
     }
 
     //根据ID获得发布的打卡任务
@@ -155,8 +160,11 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userId)
                 .ifPresentOrElse(
                         user -> {
-                            user.addNo(taskId);
-                            userRepository.save(user);
+                            if(user.getNoTaskSet() == null){user.setNoTaskSet(new Vector());}
+                            if(!user.getNoTaskSet().contains(taskId)) {
+                                user.addNo(taskId);
+                                userRepository.save(user);
+                            }
                         },
                         () -> {
                             throw new IllegalArgumentException("用户ID不存在: " + userId);
@@ -179,5 +187,23 @@ public class UserServiceImpl implements UserService {
                             throw new IllegalArgumentException("用户ID不存在: " + userId);
                         }
                 );
+    }
+
+    //删除user的对应打卡任务
+    @Override
+    @Transactional
+    public void deleteTaskById(long userId, long taskId) {
+        userRepository.findById(userId).ifPresentOrElse(
+                user -> {
+                    if(user.getYesTaskSet() == null) {user.setYesTaskSet(new Vector<>());}
+                    if(user.getNoTaskSet() == null) {user.setNoTaskSet(new Vector<>());}
+                    if (user.getYesTaskSet().contains(taskId)) {user.deleteYes(taskId);}
+                    if (user.getNoTaskSet().contains(taskId)) {user.deleteNo(taskId);}
+                    userRepository.save(user);
+                },
+                ()->{
+                    throw new IllegalArgumentException("用户ID不存在: " + userId);
+                }
+        );
     }
 }

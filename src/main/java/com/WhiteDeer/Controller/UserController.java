@@ -4,6 +4,7 @@ package com.WhiteDeer.Controller;
 import com.WhiteDeer.Response;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.UserService;
+import com.WhiteDeer.util.FaceException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -245,6 +246,12 @@ public class UserController {
             data.put("success", false);
             data.put("message", e.getMessage());
             return Response.newFailed(2, data);
+        } catch (FaceException e){
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", id);
+            data.put("success", false);
+            data.put("message", "未检测到人脸");
+            return Response.newFailed(4, data);
         } catch (Exception e) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", id);
