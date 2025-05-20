@@ -69,7 +69,7 @@ public class TaskController {
         //设置应到实到
         task.setShouldCount(groupDetailDTO.getMemberlist().size());
         task.setActualCount(0);
-        taskService.createTask(task);
+        taskService.updateTask(task);
 
         return Response.newState(1);
     }

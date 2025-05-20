@@ -1,5 +1,6 @@
 package com.WhiteDeer.service;
 
+import com.WhiteDeer.cache.TaskCache;
 import com.WhiteDeer.converter.BlobConverter;
 import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.Task;
@@ -24,28 +25,43 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private TaskCache taskCache;
+
+
     //创建task
     @Override
     @Transactional
     public Task createTask(TaskDTO taskDTO) {
-        return taskRepository.save(TaskConverter.convertTask(taskDTO));
+        Task task = taskRepository.save(TaskConverter.convertTask(taskDTO));
+        taskCache.saveTask(task); // 更新缓存
+        return task;
     }
 
     @Override
     @Transactional
-    public void createTask(Task task){
+    public void updateTask(Task task){
         taskRepository.save(task);
+        taskCache.saveTask(task);
     }
 
     //通过id获取task
     @Override
     @Transactional
     public TaskDTO getTaskById(Long id) throws NoSuchElementException {
-       Optional<Task> task = taskRepository.findById(id);
-       if(task != null && !task.isEmpty()){
-           return TaskConverter.convertTask(task.get());
-       }
-       return null;
+        // 先查缓存
+        Optional<Task> cachedTask = taskCache.getTaskById(id);
+        if (cachedTask.isPresent()) {
+            return TaskConverter.convertTask(cachedTask.get());
+        }
+
+        // 缓存未命中，查数据库
+        Optional<Task> taskOpt = taskRepository.findById(id);
+        if (taskOpt.isPresent()) {
+            taskCache.saveTask(taskOpt.get()); // 写入缓存
+            return TaskConverter.convertTask(taskOpt.get());
+        }
+        return null;
     }
 
     //通过id删除task
@@ -53,7 +69,10 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public void deleteTaskById(long id) {
         taskRepository.findById(id).ifPresentOrElse(
-                task -> taskRepository.delete(task),
+                task -> {
+                    taskRepository.delete(task);
+                    taskCache.deleteTask(id); // 删除缓存
+                },
                 () -> { throw new IllegalArgumentException("打卡任务ID不存在: " + id); }
         );
     }
@@ -102,7 +121,7 @@ public class TaskServiceImpl implements TaskService {
         task.addCompletedUser(userId);
         task.deleteIncompleteUser(userId);
         task.setActualCount(task.getActualCount()+1);
-        taskRepository.save(task);
+        updateTask(task);
     }
 
 }
