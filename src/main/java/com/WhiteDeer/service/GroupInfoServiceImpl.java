@@ -162,6 +162,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         }
     }
 
+
     @Override
     public Boolean createGroup(String groupName, Long maxMember, String introduction, Long creatorId) {
 
@@ -325,6 +326,33 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             groupInfoRepository.save(group);
         }
         return true;
+    }
+
+
+    @Override
+    public void deleteTaskById(long groupId, long taskId) {
+        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
+        if (group == null) {return;}
+        if(group.getYesTaskSet()==null){group.setYesTaskSet(new Vector<>());}
+        if(group.getNoTaskSet()==null){group.setNoTaskSet(new Vector<>());}
+        if(group.getYesTaskSet().contains(taskId)){
+            group.getYesTaskSet().remove(taskId);
+        }
+        if(group.getNoTaskSet().contains(taskId)){
+            group.getNoTaskSet().remove(taskId);
+        }
+        groupInfoRepository.save(group);
+    }
+
+    @Override
+    public void finishTaskById(long groupId, long taskId) {
+        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
+        if (group == null) {return;}
+        if(group.getYesTaskSet()==null){group.setYesTaskSet(new Vector<>());}
+        if(group.getNoTaskSet()==null){return;}
+        group.getNoTaskSet().remove(taskId);
+        group.getYesTaskSet().add(taskId);
+        groupInfoRepository.save(group);
     }
 
     private boolean hasContain(Vector<Long> nums, Long num) {
