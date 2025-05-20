@@ -12,7 +12,4 @@ public interface TaskCache {
     void saveTask(Task task);
     void deleteTask(Long taskId);
 
-    // 批量操作
-    void batchSaveTasks(List<Task> tasks);
-    void refreshTaskCache();
 }

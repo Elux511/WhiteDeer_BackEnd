@@ -69,37 +69,4 @@ public class TaskCacheImpl implements TaskCache {
         }
     }
 
-    @Override
-    public void batchSaveTasks(List<Task> tasks) {
-        // 使用Redis Pipeline批量操作
-        redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-            tasks.forEach(task -> {
-                try {
-                    String taskKey = TASK_KEY_PREFIX + task.getTaskId();
-                    String taskJson = objectMapper.writeValueAsString(task);
-                    connection.setEx(
-                            taskKey.getBytes(),
-                            CACHE_EXPIRE_TIME,
-                            taskJson.getBytes()
-                    );
-
-                    String groupKey = GROUP_TASKS_KEY_PREFIX + task.getGroupId();
-                    connection.rPush(
-                            groupKey.getBytes(),
-                            taskJson.getBytes()
-                    );
-                    connection.expire(groupKey.getBytes(), CACHE_EXPIRE_TIME);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            return null;
-        });
-    }
-
-    @Override
-    public void refreshTaskCache() {
-        // 定时全量刷新缓存逻辑
-        // 实际项目中应通过消息队列或定时任务触发
-    }
 }
