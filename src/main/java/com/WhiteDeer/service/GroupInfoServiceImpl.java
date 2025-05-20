@@ -31,6 +31,8 @@ public class GroupInfoServiceImpl implements GroupInfoService{
 
     @Autowired
     private GroupInfoRepository groupInfoRepository;
+    @Autowired
+    private TaskService taskService;
 
     @Override
     public List<GroupInfoDTO> getJoinedGroups(Long userId) {
@@ -49,7 +51,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
                 .map(GroupInfoConverter::convertToDTO)
                 .collect(Collectors.toList());
     }
-
     @Override
     public List<Long> getManagedGroupIds(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
@@ -174,18 +175,37 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     @Transactional
     public Boolean deleteGroup(Long userId, Long groupId) {
         GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
         if (group == null) {
             return false;
         }
+        //确保为创建者
         if (!userId.equals(group.getCreatorId())) {
             return false;
         }
         // 获取所有用户
         List<User> allUsers = userRepository.findAll();
-        for (User user : allUsers) {
-            Vector<Long> joinGroups = user.getJoinGroupSet();
+        //删除对应的task中的打卡任务
+        List<Task> allTasks = taskRepository.findByGroupId(groupId);
+        for (Task task : allTasks) {
+            taskService.deleteTaskById(task.getId());
+        }
+        //删除user表中对应的task任务
+        for(Task task : allTasks){
+            if(user.getNoTaskSet().contains(task.getId())){
+                user.getNoTaskSet().remove(task.getId());
+            }else if(user.getYesTaskSet().contains(task.getId())){
+                user.getYesTaskSet().remove(task.getId());
+            }else{
+            }
+
+        }
+        //删除组成员信息中加入的该团队
+        for (User user1 : allUsers) {
+            Vector<Long> joinGroups = user1.getJoinGroupSet();
             if (joinGroups != null && joinGroups.contains(groupId)) {
                 joinGroups.remove(groupId);
+                user1.setJoinGroupSet(joinGroups);
                 userRepository.save(user);
             }
         }
@@ -225,6 +245,8 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             for (Task task : taskList) {
                 TaskDTO taskDTO = new TaskDTO();
                 taskDTO.setId(task.getId());
+                taskDTO.setName(task.getName());
+                taskDTO.setDescription(task.getDescription());
                 taskDTO.setGroupName(task.getGroupName());
                 taskDTO.setEndTime(task.getEndTime());
                 taskDTO.setShouldCount(task.getShouldCount());
@@ -245,6 +267,22 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (user == null || group == null) {
             return false;
         }
+        //删除成员
+        //删除对应的task中的打卡任务
+        List<Task> allTasks = taskRepository.findByGroupId(groupId);
+        //调用user包含task的列表
+        for(Task task : allTasks){
+            if(user.getNoTaskSet().contains(task.getId())){
+                user.getNoTaskSet().remove(task.getId());
+            }else if(user.getYesTaskSet().contains(task.getId())){
+                user.getYesTaskSet().remove(task.getId());
+            }else{
+            }
+
+        }
+
+
+        //在user的joinedgroupset删除该团队
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
         System.out.println(hasContain(joinGroupSet, groupId));
         if (hasContain(joinGroupSet, groupId)) {
@@ -252,6 +290,15 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             user.setJoinGroupSet(joinGroupSet);
             userRepository.save(user);
         }
+        //在user的成员creategroupset删除该团队
+        Vector<Long> createGroupSet=user.getCreateGroupSet() == null ? new Vector<>() : user.getCreateGroupSet();
+        System.out.println(hasContain(createGroupSet, groupId));
+        if (hasContain(createGroupSet, groupId)) {
+            createGroupSet.remove(groupId);
+            user.setCreateGroupSet(createGroupSet);
+            userRepository.save(user);
+        }
+        //删除memberList中该成员
         Vector<Long> memberList = group.getMemberList() == null ? new Vector<>() : group.getMemberList();
         if(hasContain(memberList, userId)) {
             memberList.remove(userId);
@@ -259,37 +306,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             groupInfoRepository.save(group);
         }
         return true;
-    }
-
-    @Override
-    public String deleteTaskById(long groupId, long taskId) {
-        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
-        if(group == null) {
-            return "未找到团队";
-        }
-        if(!group.getYesTaskSet().contains(taskId) && !group.getNoTaskSet().contains(taskId)) {
-            return "未找到任务";
-        }
-        if(group.getYesTaskSet().contains(taskId)) {
-            group.deteleYesTaskSet(taskId);
-        }
-        if(group.getNoTaskSet().contains(taskId)) {
-            group.deteleNoTaskSet(taskId);
-        }
-        groupInfoRepository.save(group);
-        return "团队删除成功";
-    }
-
-    //任务被所有人完成
-    @Override
-    public void finishTaskById(long groupId, long taskId) {
-        GroupInfo group = groupInfoRepository.findById(groupId).orElse(null);
-        if(group == null) {
-            return;
-        }
-        group.addYesTaskSet(taskId);
-        group.deteleNoTaskSet(taskId);
-        groupInfoRepository.save(group);
     }
 
     private boolean hasContain(Vector<Long> nums, Long num) {

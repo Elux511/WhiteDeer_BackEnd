@@ -9,7 +9,7 @@ create table users
     yes_task_set     json         null,
     no_task_set      json         null,
     create_group_set json         null,
-    join_group_set   json         null,
+    join_group_set   json         null
     /*constraint users_pk
         unique (user_id)*/
 );
