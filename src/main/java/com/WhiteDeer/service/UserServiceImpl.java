@@ -139,9 +139,10 @@ public class UserServiceImpl implements UserService {
         userRepository.findById(userDTO.getId())
                 .ifPresentOrElse(
                         user -> {
+                            //检测是否存在人脸
                             String img = null;
                             try {img = BlobConverter.blobToBase64(userDTO.getFace());} catch (IOException e) {throw new DOMException((short) 12,"Blob无法转换为base64编码");}//尝试将Blob转为base64
-                            if(PyAPI.trainFaceLabels(String.valueOf(userDTO.getId()), img) == false){//检测是否存在人脸
+                            if(PyAPI.trainFaceLabels(String.valueOf(userDTO.getId()), img) == false){
                                 throw new FaceException("未检测到人脸");
                             }
                             user.setFace(userDTO.getFace());
