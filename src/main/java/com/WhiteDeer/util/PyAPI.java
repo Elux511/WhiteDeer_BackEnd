@@ -10,7 +10,7 @@ public class PyAPI {
 
     //获得用户人脸的特征（用于初次记录）
     //传入用户人脸图片，保存人脸特征
-    static public void trainFaceLabels(String user_id, String img_base64) {
+    static public boolean trainFaceLabels(String user_id, String img_base64) {
         //创建临时图片文件
         File tempFile = null;
         try {
@@ -30,10 +30,14 @@ public class PyAPI {
 
             int exit_code = p.waitFor();
 
-            return;
+            InputStream in = p.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            String line = reader.readLine();
+
+            return "true".equals(line);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            return;
+            return false;
         }finally {
             // 删除临时文件
             if (tempFile.exists() && !tempFile.delete()) {

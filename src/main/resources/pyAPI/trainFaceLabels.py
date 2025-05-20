@@ -34,6 +34,12 @@ def getImageLabels(user_id, img_path):
             largest_face = img_numpy[y:y+h,x:x+w]
         else:
             continue
+
+    #如果没有人脸
+    if largest_face.size <=1:
+        print("false")
+        return
+
     #为id和face_sample赋值
     id.append(user_id)
     face_sample.append(largest_face)
@@ -47,7 +53,7 @@ def getImageLabels(user_id, img_path):
     #让识别器记录id和对应人脸
     recognizer.train(face_sample,np.array(id))
     recognizer.write(f"trainer/{user_id}_trainer.yml")
-    print(1)
+    print("true")
 
 
 if __name__ == "__main__":

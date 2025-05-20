@@ -26,17 +26,20 @@ public class TaskServiceImpl implements TaskService {
 
     //创建task
     @Override
+    @Transactional
     public Task createTask(TaskDTO taskDTO) {
         return taskRepository.save(TaskConverter.convertTask(taskDTO));
     }
 
     @Override
+    @Transactional
     public void createTask(Task task){
         taskRepository.save(task);
     }
 
     //通过id获取task
     @Override
+    @Transactional
     public TaskDTO getTaskById(Long id) throws NoSuchElementException {
        Optional<Task> task = taskRepository.findById(id);
        if(task != null && !task.isEmpty()){
@@ -47,6 +50,7 @@ public class TaskServiceImpl implements TaskService {
 
     //通过id删除task
     @Override
+    @Transactional
     public void deleteTaskById(long id) {
         taskRepository.findById(id).ifPresentOrElse(
                 task -> taskRepository.delete(task),
@@ -92,6 +96,7 @@ public class TaskServiceImpl implements TaskService {
 
     //用户打卡完成后
     @Override
+    @Transactional
     public void finishTaskById(long userId, long taskId) {
         Task task = taskRepository.getById(taskId);
         task.addCompletedUser(userId);
