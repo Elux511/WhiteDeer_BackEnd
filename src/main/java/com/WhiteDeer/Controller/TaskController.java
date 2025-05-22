@@ -1,16 +1,13 @@
 package com.WhiteDeer.Controller;
 
 import com.WhiteDeer.Response;
-import com.WhiteDeer.converter.TaskConverter;
 import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dao.Task;
-import com.WhiteDeer.dao.User;
 import com.WhiteDeer.dto.*;
 import com.WhiteDeer.service.GroupInfoService;
 import com.WhiteDeer.service.TaskService;
 import com.WhiteDeer.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,9 +16,9 @@ import javax.sql.rowset.serial.SerialBlob;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 public class TaskController {
@@ -175,20 +172,28 @@ public class TaskController {
             return Response.newState(4);
         }
         UserDTO userDTO = userOPT.get();
-        //打卡过程
-        int result = taskService.checkinTask(taskDTO,userDTO.getId());
-        //打卡成功后
-        if(result == 1) {
-            userService.finishTaskById(userId,taskId);
-            taskService.finishTaskById(userId,taskId);
-        }
+
+        //提前准备好储存结果值
+        AtomicInteger result = new AtomicInteger(4);
+        //打卡过程及结果判断
+        taskService.checkinTask(taskDTO,userDTO.getId()).thenAccept(response -> {
+            result.set(response);
+            if(response == 1) {
+                try {
+                    userService.finishTaskById(userId,taskId);
+                    taskService.finishTaskById(userId,taskId);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         //如果所有人都打卡成功，就在团队里进行更新
         TaskDTO taskTemp = taskService.getTaskById(taskId);
         if(taskTemp.getIncompleteUserList().isEmpty()) {
             groupInfoService.finishTaskById(taskTemp.getGroupId(),taskId);
         }
-        return Response.newState(result);
+        return Response.newState(result.get());
     }
 
     //查询task详细信息
