@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -141,11 +142,11 @@ public class UserServiceImpl implements UserService {
                         user -> {
                             String img = null;
                             try {img = BlobConverter.blobToBase64(userDTO.getFace());} catch (IOException e) {throw new DOMException((short) 12,"Blob无法转换为base64编码");}//尝试将Blob转为base64
-                            if(PyAPI.trainFaceLabels(String.valueOf(userDTO.getId()), img) == false){//检测是否存在人脸
-                                throw new FaceException("未检测到人脸");
-                            }
-                            user.setFace(userDTO.getFace());
-                            userRepository.save(user);
+                            CompletableFuture<Boolean> success = PyAPI.trainFaceLabelsAsync(String.valueOf(userDTO.getId()), img);
+                            success.thenAccept(result -> {
+                                user.setFace(userDTO.getFace());
+                                userRepository.save(user);
+                            });
                         },
                         () -> {
                             throw new EntityNotFoundException("用户ID不存在: " + userDTO.getId());

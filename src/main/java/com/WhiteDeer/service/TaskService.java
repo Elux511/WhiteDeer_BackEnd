@@ -5,6 +5,7 @@ import com.WhiteDeer.dto.TaskDTO;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 public interface TaskService {
 
@@ -16,7 +17,7 @@ public interface TaskService {
 
     void deleteTaskById(long id);
 
-    int checkinTask(TaskDTO taskDTO,long userId) throws IOException;
+    CompletableFuture<Integer> checkinTask(TaskDTO taskDTO, long userId) throws IOException;
 
     void finishTaskById(long userId, long taskId) throws IOException;
 
