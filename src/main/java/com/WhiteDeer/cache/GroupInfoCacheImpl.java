@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @Service
 public class GroupInfoCacheImpl implements GroupInfoCache{
     private static final String GROUP_KEY_PREFIX = "group:";
-    private static final String GROUP_TASKS_KEY_PREFIX = "group_tasks:";
     private static final long CACHE_EXPIRE_TIME = 3600;//1hour 缓存时间
 
     @Autowired
