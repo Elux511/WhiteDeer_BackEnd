@@ -144,8 +144,10 @@ public class UserServiceImpl implements UserService {
                             try {img = BlobConverter.blobToBase64(userDTO.getFace());} catch (IOException e) {throw new DOMException((short) 12,"Blob无法转换为base64编码");}//尝试将Blob转为base64
                             CompletableFuture<Boolean> success = PyAPI.trainFaceLabelsAsync(String.valueOf(userDTO.getId()), img);
                             success.thenAccept(result -> {
-                                user.setFace(userDTO.getFace());
-                                userRepository.save(user);
+                                if(result){
+                                    user.setFace(userDTO.getFace());
+                                    userRepository.save(user);
+                                }
                             });
                         },
                         () -> {
