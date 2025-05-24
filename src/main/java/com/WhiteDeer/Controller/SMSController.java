@@ -1,12 +1,10 @@
 package com.WhiteDeer.Controller;
 
-import com.WhiteDeer.Response;
+import com.WhiteDeer.util.Response;
 import com.WhiteDeer.dto.SMSDTO;
-import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.SMSService;
 import com.WhiteDeer.util.HttpUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,6 +1,4 @@
-package com.WhiteDeer;
-
-import java.util.Map;
+package com.WhiteDeer.util;
 
 public class Response <T>{
     private T data;

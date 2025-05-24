@@ -1,6 +1,6 @@
 package com.WhiteDeer.Controller;
 
-import com.WhiteDeer.Response;
+import com.WhiteDeer.util.Response;
 import com.WhiteDeer.dao.GroupInfo;
 import com.WhiteDeer.dao.Task;
 import com.WhiteDeer.dto.*;

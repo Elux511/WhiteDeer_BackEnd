@@ -1,5 +1,6 @@
 package com.WhiteDeer.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -9,8 +10,10 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class SMSServiceImpl implements SMSService {
-    private static final String VERIFY_CODE_KEY_PREFIX = "verify_code:"; //设置键前缀
-    private  static final int EXPIRE_MINUTES = 5; // 有效期，修改时控制器层也要修改
+    private static final String VERIFY_CODE_KEY_PREFIX = "verify_code:";
+
+    @Value("${sms.expire-minutes}")
+    private  static int EXPIRE_MINUTES;
     private final RedisTemplate<String, String> redisTemplate;
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -23,11 +26,10 @@ public class SMSServiceImpl implements SMSService {
     public String generateAndSaveCode(String phoneNumber) {
         String code = generateCode();
         String key = getRedisKey(phoneNumber);
-        //存储并设置5分钟有效时间
         redisTemplate.opsForValue().set(
                 key,
                 code,
-                5,
+                EXPIRE_MINUTES,
                 TimeUnit.MINUTES
         );
         return code;

@@ -1,7 +1,7 @@
 package com.WhiteDeer.Controller;
 
 
-import com.WhiteDeer.Response;
+import com.WhiteDeer.util.Response;
 import com.WhiteDeer.dto.UserDTO;
 import com.WhiteDeer.service.UserService;
 import com.WhiteDeer.util.FaceException;

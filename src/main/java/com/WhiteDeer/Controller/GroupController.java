@@ -1,6 +1,6 @@
 package com.WhiteDeer.Controller;
 
-import com.WhiteDeer.Response;
+import com.WhiteDeer.util.Response;
 import com.WhiteDeer.dto.GroupDetailDTO;
 import com.WhiteDeer.dto.GroupInfoDTO;
 import com.WhiteDeer.service.GroupInfoService;

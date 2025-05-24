@@ -1,8 +1,7 @@
 package com.WhiteDeer.Controller;
 
-import com.WhiteDeer.Response;
+import com.WhiteDeer.util.Response;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.time.ZonedDateTime;
