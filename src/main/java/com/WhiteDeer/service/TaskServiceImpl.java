@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Vector;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -79,36 +80,29 @@ public class TaskServiceImpl implements TaskService {
 
     //用户打卡过程
     @Override
-    public int checkinTask(TaskDTO taskDTO, long userId) {
+    public CompletableFuture<Integer> checkinTask(TaskDTO taskDTO, long userId) {
         //这个task里存储的是任务的各项要求，taskDTO里则是存储用户的各种条件
         Task task = taskRepository.getById(taskDTO.getId());
-        if(taskDTO.getType().equals("人脸识别")){
+        if(taskDTO.getType().equals("人脸识别")){//人脸识别部分
             String img = null;
-            try {img = BlobConverter.blobToBase64(taskDTO.getFace());} catch (IOException e) {return 2;}//尝试将Blob转为base64
-            if(PyAPI.faceRecognition(String.valueOf(userId),img)){//人脸识别成功
-                return 1;
-            }else {//人脸识别失败
-                return 2;
-            }
-        }else if(taskDTO.getType().equals("定位打卡")){
+            try {img = BlobConverter.blobToBase64(taskDTO.getFace());} catch (IOException e) {return CompletableFuture.completedFuture(2);}//尝试将Blob转为base64
+            return PyAPI.faceRecognitionAsync(String.valueOf(userId),img).thenApply(
+                    success -> success ? 1 : 2);
+
+        }else if(taskDTO.getType().equals("定位打卡")){//定位打卡部分
+            double distance = GeoDistanceCalculator.haversine(task.getLatitude(),task.getLongitude(),taskDTO.getLatitude(),taskDTO.getLongitude());
+            return CompletableFuture.completedFuture(
+                    distance <= task.getAccuracy() ? 1 : 3);
+
+        }else{//都部分
+            String img = null;
+            try {img = BlobConverter.blobToBase64(taskDTO.getFace());} catch (IOException e) {return CompletableFuture.completedFuture(2);}//尝试将Blob转为base64
             double distance = GeoDistanceCalculator.haversine(task.getLatitude(),task.getLongitude(),taskDTO.getLatitude(),taskDTO.getLongitude());
             if(distance <= task.getAccuracy()){//打卡位置在允许范围内
-                return 1;
+                return PyAPI.faceRecognitionAsync(String.valueOf(userId), img)
+                        .thenApply(success -> success ? 1 : 2);
             }else{//打卡位置不在允许范围内
-                return 3;
-            }
-        }else{
-            String img = null;
-            try {img = BlobConverter.blobToBase64(taskDTO.getFace());} catch (IOException e) {return 2;}//尝试将Blob转为base64
-            double distance = GeoDistanceCalculator.haversine(task.getLatitude(),task.getLongitude(),taskDTO.getLatitude(),taskDTO.getLongitude());
-            if(distance <= task.getAccuracy()){//打卡位置在允许范围内
-                if(PyAPI.faceRecognition(String.valueOf(userId),img)){//人脸识别成功
-                    return 1;
-                }else {//人脸识别失败
-                    return 2;
-                }
-            }else{//打卡位置不在允许范围内
-                return 3;
+                return CompletableFuture.completedFuture(3);
             }
         }
     }

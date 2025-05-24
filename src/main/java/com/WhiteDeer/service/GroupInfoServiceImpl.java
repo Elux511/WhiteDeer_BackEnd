@@ -1,6 +1,9 @@
 package com.WhiteDeer.service;
 
 
+import com.WhiteDeer.cache.GroupInfoCache;
+import com.WhiteDeer.cache.GroupInfoCacheImpl;
+import com.WhiteDeer.cache.TaskCache;
 import com.WhiteDeer.converter.GroupInfoConverter;
 import com.WhiteDeer.dao.*;
 import com.WhiteDeer.dto.GroupDetailDTO;
@@ -30,9 +33,17 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     private TaskRepository taskRepository;
 
     @Autowired
+    private GroupInfoCache groupInfoCache;
+
+    @Autowired
     private GroupInfoRepository groupInfoRepository;
+
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private TaskCache taskCache;
+    @Autowired
+    private GroupInfoCacheImpl groupInfoCacheImpl;
 
     @Override
     public List<GroupInfoDTO> getJoinedGroups(Long userId) {
@@ -98,10 +109,17 @@ public class GroupInfoServiceImpl implements GroupInfoService{
     @Override
     public List<GroupInfoDTO> searchGroups(String idStr, String name, String beginStr, String endStr) {
         List<GroupInfo> result = new ArrayList<>();
-        if (idStr != null && !idStr.isEmpty()) {    //   null  “” !=null
+        if (idStr != null && !idStr.isEmpty()) {//   null  “” !=null
             Long groupId = Long.valueOf(idStr);
-            Optional<GroupInfo> optionalGroup = groupInfoRepository.findById(groupId);
-            optionalGroup.ifPresent(result::add);
+            //先查询缓存
+            Optional<GroupInfo> groupInfo = groupInfoCache.getGroupInfo(idStr);
+            if (groupInfo.isPresent()) {
+                GroupInfo group = groupInfo.get();
+                result.add(group);
+            }else{
+                Optional<GroupInfo> optionalGroup = groupInfoRepository.findById(groupId);
+                optionalGroup.ifPresent(result::add);
+            }
         } else if (name != null && !name.isEmpty()) {
             result = groupInfoRepository.findByGroupNameContaining(name);    // like '%分组%'
         } else if (beginStr != null && !beginStr.isEmpty()&&endStr == null && endStr.isEmpty()) {
@@ -148,6 +166,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             memberList.add(userId);
             group.setMemberList(memberList);
             groupInfoRepository.save(group);
+            groupInfoCacheImpl.saveGroupInfo(group);
         }
         return 1;
     }
@@ -165,7 +184,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
 
     @Override
     public Boolean createGroup(String groupName, Long maxMember, String introduction, Long creatorId) {
-
+        //组成员信息操作
         GroupInfo group = new GroupInfo();
         group.setGroupName(groupName);
         group.setGroupIntroduction(introduction);
@@ -175,6 +194,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         group.setNoTaskSet(new Vector<>());
         group.setCreateTime(LocalDateTime.now());
         group.setMaxMember(maxMember);
+        groupInfoCache.saveGroupInfo(group);
         groupInfoRepository.save(group);
 
         User creator = userRepository.findById(creatorId).orElse(null);
@@ -209,6 +229,7 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         List<Task> allTasks = taskRepository.findByGroupId(groupId);
         for (Task task : allTasks) {
             taskService.deleteTaskById(task.getId());
+            taskCache.deleteTask(task.getId());
         }
         //删除user表中对应的task任务
         for(Task task : allTasks){
@@ -287,7 +308,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
         if (user == null || group == null) {
             return false;
         }
-        //删除成员
         //删除对应的task中的打卡任务
         List<Task> allTasks = taskRepository.findByGroupId(groupId);
         //调用user包含task的列表
@@ -300,8 +320,6 @@ public class GroupInfoServiceImpl implements GroupInfoService{
             }
 
         }
-
-
         //在user的joinedgroupset删除该团队
         Vector<Long> joinGroupSet = user.getJoinGroupSet() == null ? new Vector<>() : user.getJoinGroupSet();
         System.out.println(hasContain(joinGroupSet, groupId));
