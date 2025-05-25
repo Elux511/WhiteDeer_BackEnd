@@ -18,6 +18,7 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
@@ -173,27 +174,22 @@ public class TaskController {
         }
         UserDTO userDTO = userOPT.get();
 
-        //提前准备好储存结果值
-        AtomicInteger result = new AtomicInteger(0);
-        //打卡过程及结果判断
-        taskService.checkinTask(taskDTO,userDTO.getId()).thenAccept(response -> {
-            result.set(response);
-            if(response == 1) {
-                try {
-                    userService.finishTaskById(userId,taskId);
-                    taskService.finishTaskById(userId,taskId);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        CompletableFuture<Integer> future = taskService.checkinTask(taskDTO, userDTO.getId());
+        Integer response = future.join(); // 阻塞直到任务完成
+        if(response == 1) {
+            try {
+                userService.finishTaskById(userId,taskId);
+                taskService.finishTaskById(userId,taskId);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        });
-
+        }
         //如果所有人都打卡成功，就在团队里进行更新
         TaskDTO taskTemp = taskService.getTaskById(taskId);
         if(taskTemp.getIncompleteUserList().isEmpty()) {
             groupInfoService.finishTaskById(taskTemp.getGroupId(),taskId);
         }
-        return Response.newState(result.get());
+        return Response.newState(response);
     }
 
     //查询task详细信息
