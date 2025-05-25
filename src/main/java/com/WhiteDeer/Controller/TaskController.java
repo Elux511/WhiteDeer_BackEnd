@@ -174,6 +174,7 @@ public class TaskController {
         }
         UserDTO userDTO = userOPT.get();
 
+        //进行打卡
         CompletableFuture<Integer> future = taskService.checkinTask(taskDTO, userDTO.getId());
         Integer response = future.join(); // 阻塞直到任务完成
         if(response == 1) {
