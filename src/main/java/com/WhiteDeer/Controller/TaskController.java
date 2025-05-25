@@ -174,7 +174,7 @@ public class TaskController {
         UserDTO userDTO = userOPT.get();
 
         //提前准备好储存结果值
-        AtomicInteger result = new AtomicInteger(4);
+        AtomicInteger result = new AtomicInteger(0);
         //打卡过程及结果判断
         taskService.checkinTask(taskDTO,userDTO.getId()).thenAccept(response -> {
             result.set(response);
